@@ -394,6 +394,7 @@
       '<div class="set"><div class="sp"><b>📳 Vibración</b><div class="mut small">Avisos con vibración</div></div>' + sw('vib') + '</div>' +
       '<div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Aviso para no perder tu racha</div></div>' + sw('rem') + '</div>' +
       (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') + '</div>' +
+      '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido de la app: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b><br>' + esc(updStatusText()) + '</p><button class="btn sec sm" data-a="updcheck">🔄 Buscar actualizaciones</button></div>' +
       '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="row"><button class="btn sec sm sp" data-a="backup">Exportar</button><button class="btn sec sm sp" data-a="restore">Importar</button></div></div>' +
       '<div class="card"><b>🌱 Sobre crecer</b><p class="mut small" style="margin-top:6px;line-height:1.5">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
       '<button class="btn warn" data-a="reset">Borrar todos mis datos</button><p class="mut small" style="text-align:center;margin-top:14px">Crece Fit</p>';
@@ -763,6 +764,10 @@
         else S.custom.push({ id: 'U' + Date.now(), name: nm, slots: slots });
         save(); sheetClose(); toast('Rutina guardada ✅'); render(); break;
       case 'adj': adjust(+v); break;
+      case 'updcheck':
+        upd.shown = false; upd.force = true; toast('Buscando…');
+        try { if (AND() && AND().checkNow) AND().checkNow(); } catch (e) { }
+        jsCheck(true); break;
       case 'updno': dialogClose(); break;
       case 'updgo':
         upd.busy = true;
@@ -815,27 +820,53 @@
   };
 
   /* ---------- actualizaciones ---------- */
-  var upd = { v: 0, busy: false, wait: false };
+  var upd = { v: 0, busy: false, wait: false, shown: false, force: false };
   function showUpd() {
     var m = $('#modal');
     m.innerHTML = '<div class="dlg" id="upd"><h3>🚀 Actualización disponible</h3><p class="mut" style="line-height:1.45">Hay una versión nueva de la app. Al actualizar, la app se cerrará sola y la próxima vez que entres ya estará lista.</p>' +
       '<div class="row" style="margin-top:18px"><button class="btn ghost sm sp" data-a="updno">Más tarde</button><button class="btn sm sp" data-a="updgo">Actualizar</button></div></div>';
     m.className = 'on';
   }
+  var REMOTE = 'https://raw.githubusercontent.com/Anthonyxddddd/crece-fit-web/main/', jsStat = '', natStat = '';
+  function updStatusText() {
+    try { if (AND() && AND().updateStatus) natStat = AND().updateStatus(); } catch (e) { }
+    return (natStat || 'La app busca actualizaciones al abrirse.') + (jsStat ? ' · ' + jsStat : '');
+  }
   window.__updateAvailable = function (v) {
     if (upd.busy) return;
-    upd.v = v;
+    if (upd.shown && !upd.force) return;
+    upd.shown = true; upd.force = false; upd.v = v;
     if (P || $('#ob')) { upd.wait = true; return; }
     showUpd();
   };
+  window.__updateStatus = function (m, manual) {
+    natStat = m;
+    if (manual) { toast(m); if (/nueva/i.test(m)) { upd.force = true; } }
+    if (tab === 'set' && !upd.busy && !P) render();
+  };
+  // segunda vía de detección (desde la propia página); sirve de respaldo y de diagnóstico
+  function jsCheck(manual) {
+    try {
+      fetch(REMOTE + 'version.json?t=' + Date.now()).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+        .then(function (o) {
+          jsStat = 'Web: v' + o.version;
+          if (o.version > (window.APP_VERSION || 0) && AND() && AND().startUpdate) { if (manual) upd.shown = false; window.__updateAvailable(o.version); }
+          else if (manual) toast('Ya tienes lo último ✅');
+          if (tab === 'set' && !upd.busy && !P) render();
+        })
+        .catch(function (e) { jsStat = 'Error web: ' + e; if (manual) toast('No se pudo consultar: ' + e); if (tab === 'set' && !P) render(); });
+    } catch (e) { jsStat = 'Error: ' + e; }
+  }
   window.__updateProgress = function (p) {
     var i = $('#upi'), t = $('#upt'), h = $('#uph');
     if (i) i.style.width = p + '%';
     if (t) t.textContent = p + '%';
     if (p >= 100 && h) { h.textContent = '¡Listo! ✅ Cerrando la app…'; var n = $('#upn'); if (n) n.textContent = 'La próxima vez que entres ya estará actualizada'; }
   };
-  window.__updateError = function () {
-    upd.busy = false; dialogClose(); toast('No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.');
+  window.__updateError = function (m) {
+    upd.busy = false; dialogClose(); natStat = m || natStat;
+    dialog('No se pudo actualizar', esc(m || 'Revisa tu internet e inténtalo de nuevo.'), 'Entendido', function () { }, false);
+    if (tab === 'set') render();
   };
   // compatibilidad con versiones anteriores de la app (descargaban en silencio)
   window.__updateReady = function () {
@@ -846,6 +877,7 @@
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !P) { autoFreezeMsg(); render(); } });
   function autoFreezeMsg() { if (S.setup && autoFreeze()) toast('❄️ Usamos un congelamiento: ¡tu racha sigue viva!'); }
   load(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
+  setTimeout(function () { jsCheck(false); }, 2500);
   if (!S.setup) onboarding();
   setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
 })();
