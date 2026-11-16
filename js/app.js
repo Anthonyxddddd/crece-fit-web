@@ -300,15 +300,14 @@
     if (!CLOUD_URL) return h + '<p class="mut small" style="margin:6px 0 0;line-height:1.5">Aún no está configurada. Mientras tanto, usa la copia manual de abajo.</p></div>';
     if (!c.code) {
       return h + '<p class="mut small" style="margin:6px 0 12px;line-height:1.5">Guarda tu progreso en internet (cifrado) para recuperarlo si cambias de teléfono. Sin cuenta: solo necesitas un código.</p>' +
-        '<div class="row"><button class="btn sm sp" data-a="cloudon">Activar</button><button class="btn sec sm sp" data-a="cloudrestore">Ya tengo un código</button></div></div>';
+        '<div class="col"><button class="btn sm" data-a="cloudon">Activar</button><button class="btn sec sm" data-a="cloudrestore">Ya tengo un código</button></div></div>';
     }
     var d = c.last ? new Date(c.last) : null;
     return h + '<p class="mut small" style="margin:6px 0 8px">Tu código (guárdalo, lo necesitas en otro teléfono):</p>' +
       '<button class="codebox" data-a="cloudcopy">' + c.code + ' <span>📋</span></button>' +
       '<p class="mut small" style="margin:8px 0 12px">' + (d ? 'Última copia: ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) : 'Aún sin copia') + '</p>' +
       '<div class="set" style="padding:6px 0"><div class="sp"><b>Guardar automáticamente</b><div class="mut small">Después de entrenar y una vez al día</div></div><div class="sw' + (c.auto ? ' on' : '') + '" data-a="cloudauto"></div></div>' +
-      '<div class="row" style="margin-top:6px"><button class="btn sm sp" data-a="cloudsave">Guardar ahora</button><button class="btn sec sm sp" data-a="cloudrestore">Restaurar</button></div>' +
-      '<button class="btn ghost sm" style="margin-top:10px;width:100%" data-a="cloudoff">Desactivar</button></div>';
+      '<div class="col" style="margin-top:6px"><button class="btn sm" data-a="cloudsave">Guardar ahora</button><button class="btn sec sm" data-a="cloudrestore">Restaurar otro código</button><button class="btn ghost sm" data-a="cloudoff">Desactivar</button></div></div>';
   }
 
   /* ---------- tema y voz ---------- */
@@ -428,7 +427,8 @@
     }
     return '<div class="week">' + out + '</div>';
   }
-  function mini(id, e, name, sub) { return '<button class="mini" data-a="prev" data-v="' + id + '"><div class="e">' + e + '</div><b>' + name + '</b><span>' + sub + '</span></button>'; }
+  function miniRow(attrs, e, name, sub) { return '<button class="mini" ' + attrs + '><span class="e">' + e + '</span><span class="mt"><b>' + name + '</b><span>' + sub + '</span></span><i class="chev">›</i></button>'; }
+  function mini(id, e, name, sub) { return miniRow('data-a="prev" data-v="' + id + '"', e, name, sub); }
 
   function homeV() {
     var st = stats(), tp = todayPlan(), id = tp ? (tp.t === 'R' ? null : tp.t) : nextId(), name = S.name ? ', ' + esc(S.name) : '';
@@ -441,49 +441,59 @@
         '<div class="row" style="margin-top:12px">' + (apkReq ? '' : '<button class="btn ghost sm sp" data-a="apkno">Después</button>') + '<button class="btn sm sp" data-a="gosite">🌐 Ir a descargar</button></div></div>';
     }
     h += '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes') + '</div></div></div>';
-    h += '<div class="card streak' + (st.cur ? '' : ' off') + '" style="margin-top:16px"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
+
+    // 1) Rutina de hoy (lo principal, arriba)
+    var planTag = tp ? '<span class="chip">📅 Plan · día ' + (tp.i + 1) + '/28</span>' : '';
+    if (st.doneToday) {
+      h += '<div class="card wcard" style="margin-top:16px"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz algo suave para tu postura.</p>' +
+        '<div class="col"><button class="btn sec" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec" data-a="start" data-v="S">🌱 Estirar (6 min)</button></div>' +
+        '<div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:var(--txt)">' + WORKOUTS[nextId()].name + '</b></div></div>';
+    } else if (!id) {
+      h += '<div class="card wcard" style="margin-top:16px"><div class="row"><div class="big">🛌</div><div><div class="mut small" style="font-weight:800">PLAN · DÍA ' + (tp.i + 1) + '/28</div><div style="font-size:21px;font-weight:900">Descanso activo</div></div></div>' +
+        '<p class="mut small" style="margin:10px 0 12px">Hoy toca descansar los músculos. Haz un chequeo de postura de 2 minutos y mantienes tu racha.</p>' +
+        '<div class="col"><button class="btn" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec" data-a="start" data-v="S">🌱 Estirar</button></div></div>';
+    } else {
+      var w = rdef(id), steps = build(id), cnt = w.items ? w.items.length : w.slots.length;
+      h += '<div class="card wcard" style="margin-top:16px"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
+        '<div class="row" style="margin:12px 0 4px;flex-wrap:wrap"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + cnt + ' ejercicios</span>' + planTag + (S.settings.nojump ? '<span class="chip">🤫 Sin saltos</span>' : '') + '</div>' +
+        '<div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
+        '<div style="margin-top:14px"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div></div>';
+    }
+
+    // 2) Racha
+    h += '<div class="card streak' + (st.cur ? '' : ' off') + '"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
       '<div style="font-weight:800">' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</div></div><div class="sp"></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor racha</div><div style="font-size:22px;font-weight:900">' + st.best + '</div></div></div>' +
       '<div class="small" style="margin-top:10px;color:var(--st-t);font-weight:700">' + msg + '</div>' + weekStrip() +
       '<div class="small" style="margin-top:10px;color:var(--st-t)">❄️ ' + left + ' congelamiento' + (left === 1 ? '' : 's') + ' este mes · salva tu racha si faltas un día</div></div>';
-    // nivel y meta semanal
+
+    // 3) Nivel y meta semanal
     var lv = st.lvl, a = xpAt(lv), b = xpAt(lv + 1), wc = weekCount(), g = S.settings.goal;
     h += '<div class="card"><div class="row"><div class="lvl">⭐ ' + lv + '</div><div class="sp"><b>' + lvlName(lv) + '</b><div class="mut small">' + S.xp + ' / ' + b + ' XP</div></div></div>' +
       '<div class="xpbar"><i style="width:' + Math.round((S.xp - a) / (b - a) * 100) + '%"></i></div>' +
       '<div class="row" style="margin-top:16px"><b>🎯 Meta semanal</b><div class="sp"></div><b>' + Math.min(wc, g) + '/' + g + ' días</b></div>' +
       '<div class="xpbar"><i style="width:' + Math.min(100, Math.round(wc / g * 100)) + '%"></i></div>' +
       (wc >= g ? '<div class="small" style="margin-top:6px;color:var(--acc);font-weight:800">¡Meta cumplida esta semana! 🎉</div>' : '') + '</div>';
-    // hábitos
+
+    // 4) Hábitos (una fila por hábito)
     var hb = S.habits[today()] || { w: 0, p: 0, s: 0, sl: 0 }, hc = habCount(hb);
-    h += '<div class="card"><div class="row"><b>✅ Hábitos para crecer</b><div class="sp"></div><span class="mut small">' + hc + '/4 hoy</span></div><div class="habs">' +
-      [['w', '💧', 'Agua'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) { return '<button class="hab' + (hb[x[0]] ? ' on' : '') + (fx.hab === x[0] ? ' bn' : '') + '" data-a="hab" data-v="' + x[0] + '"><span>' + x[1] + '</span>' + x[2] + '</button>'; }).join('') +
-      '<div class="hab' + (hb.sl >= 8 ? ' on' : '') + '"><span>😴</span>Sueño</div></div>' +
-      '<div class="row" style="margin-top:12px"><span class="mut small sp">¿Cuántas horas dormiste anoche?</span><button class="stp" data-a="slp" data-v="-1">−</button><b style="min-width:52px;text-align:center">' + (hb.sl ? hb.sl + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div></div>';
-    // tarjeta de hoy
-    var planTag = tp ? '<span class="chip">📅 Plan · día ' + (tp.i + 1) + '/28</span>' : '';
-    if (st.doneToday) {
-      h += '<div class="card wcard"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz algo suave para tu postura.</p>' +
-        '<div class="row"><button class="btn sec sp" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec sp" data-a="start" data-v="S">🌱 Estirar (6 min)</button></div>' +
-        '<div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:var(--txt)">' + WORKOUTS[nextId()].name + '</b></div></div>';
-    } else if (!id) {
-      h += '<div class="card wcard"><div class="row"><div class="big">🛌</div><div><div class="mut small" style="font-weight:800">PLAN · DÍA ' + (tp.i + 1) + '/28</div><div style="font-size:21px;font-weight:900">Descanso activo</div></div></div>' +
-        '<p class="mut small" style="margin:10px 0 12px">Hoy toca descansar los músculos. Haz un chequeo de postura de 2 minutos y mantienes tu racha.</p>' +
-        '<div class="row"><button class="btn sp" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec sp" data-a="start" data-v="S">🌱 Estirar</button></div></div>';
-    } else {
-      var w = rdef(id), steps = build(id), cnt = w.items ? w.items.length : w.slots.length;
-      h += '<div class="card wcard"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
-        '<div class="row" style="margin:12px 0 4px;flex-wrap:wrap"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + cnt + ' ejercicios</span>' + planTag + (S.settings.nojump ? '<span class="chip">🤫 Sin saltos</span>' : '') + '</div>' +
-        '<div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
-        '<div style="margin-top:14px" class="row"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div></div>';
-    }
-    h += '<div class="h2">Más rutinas</div><div class="grid2">';
+    h += '<div class="card"><div class="row"><b>✅ Hábitos para crecer</b><div class="sp"></div><span class="mut small">' + hc + '/4 hoy</span></div>' +
+      [['w', '💧', 'Agua (8 vasos)'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) {
+        return '<button class="hrow' + (hb[x[0]] ? ' on' : '') + (fx.hab === x[0] ? ' bn' : '') + '" data-a="hab" data-v="' + x[0] + '"><span class="e">' + x[1] + '</span><b>' + x[2] + '</b><i class="ck">✓</i></button>';
+      }).join('') +
+      '<div class="hrow' + (hb.sl >= 8 ? ' on' : '') + '" style="cursor:default"><span class="e">😴</span><b>Sueño</b><span class="sp"></span><button class="stp" data-a="slp" data-v="-1">−</button><b style="min-width:46px;text-align:center">' + (hb.sl ? hb.sl + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div></div>';
+
+    // 5) Rutinas (lista vertical)
+    h += '<div class="h2">Más rutinas</div><div class="vlist">';
     ORDER.forEach(function (k) { if (k === id && !st.doneToday) return; h += mini(k, WORKOUTS[k].emoji, WORKOUTS[k].name, 'Rutina ' + k); });
-    h += mini('Q5', '⏱', 'Rápida · 5 min', 'Poco tiempo') + mini('Q10', '⏲', 'Rápida · 10 min', 'Cardio + fuerza') +
+    h += mini('Q5', '⏱', 'Rápida · 5 min', 'Para días con poco tiempo') + mini('Q10', '⏲', 'Rápida · 10 min', 'Cardio + fuerza') +
       mini('P', '🧍', 'Chequeo de postura', '2 min · cuenta para la racha') + mini('S', '🌱', 'Crecer · estiramientos', '6 min · cuenta para la racha') + '</div>';
-    h += '<div class="h2">Mis rutinas</div><div class="grid2">' +
+    h += '<div class="h2">Mis rutinas y plan</div><div class="vlist">' +
       S.custom.map(function (c) { return mini(c.id, '🛠', esc(c.name), c.slots.length + ' ejercicios'); }).join('') +
-      '<button class="mini" data-a="crnew"><div class="e">➕</div><b>Crear rutina</b><span>Elige tus ejercicios</span></button>' +
-      '<button class="mini" data-a="planopen"><div class="e">📅</div><b>Plan de 4 semanas</b><span>' + (tp ? 'Día ' + (tp.i + 1) + ' de 28' : 'Calendario listo') + '</span></button></div>';
+      miniRow('data-a="crnew"', '➕', 'Crear rutina', 'Elige tus ejercicios') +
+      miniRow('data-a="planopen"', '📅', 'Plan de 4 semanas', tp ? 'Día ' + (tp.i + 1) + ' de 28' : 'Calendario listo') + '</div>';
+
+    // 6) Consejo
     h += '<div class="card tip" style="margin-top:14px"><div class="mut small" style="font-weight:800;color:var(--acc)">💡 CONSEJO DEL DÍA</div><p style="margin-top:6px;line-height:1.45">' + tip + '</p></div>';
     return h;
   }
@@ -596,12 +606,12 @@
     return '<div class="title">Ajustes</div>' +
       '<div class="card" style="margin-top:14px"><label style="margin-top:0">Tu nombre</label><input type="text" id="nm" data-set="name" value="' + esc(S.name) + '" placeholder="Opcional" maxlength="20">' +
       '<label>Descanso entre series: <b id="rv" style="color:var(--acc)">' + s.rest + ' s</b></label><input type="range" min="15" max="90" step="5" value="' + s.rest + '" data-set="rest"></div>' +
-      '<div class="card"><b>🏋️ Entrenamiento</b><label style="margin-top:10px">Meta semanal (días por semana)</label>' + seg('goal', [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']], s.goal) +
+      '<div class="card"><b>🏋️ Entrenamiento</b><label style="margin-top:10px">Meta semanal (días por semana)</label>' + seg('goal', [[2, '2 días'], [3, '3 días'], [4, '4 días'], [5, '5 días'], [6, '6 días']], s.goal) +
       '<label>Calentamiento</label>' + seg('warm', [['cardio', '🏃 Cardio'], ['suave', '🧘 Suave'], ['none', 'Ninguno']], s.warm) +
       '<label>Estiramiento final</label>' + seg('cool', [['all', 'Todo'], ['legs', 'Piernas'], ['back', 'Espalda'], ['upper', 'Brazos'], ['none', 'Ninguno']], s.cool) +
       '<div class="set" style="margin-top:8px;border-bottom:0"><div class="sp"><b>🤫 Modo sin saltos</b><div class="mut small">Cambia saltos por ejercicios silenciosos</div></div>' + sw('nojump') + '</div></div>' +
       '<div class="card"><b>🎨 Apariencia</b><label style="margin-top:10px">Color de la app</label><div class="swrow">' +
-      [['blue', '#4aa8ff'], ['green', '#2fcf8a'], ['purple', '#a78bfa'], ['orange', '#ffa23d'], ['pink', '#ff6fa8']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" style="background:' + c[1] + '" data-a="theme" data-v="' + c[0] + '"></button>'; }).join('') +
+      [['blue', '#4aa8ff', 'Azul'], ['green', '#2fcf8a', 'Verde'], ['purple', '#a78bfa', 'Morado'], ['orange', '#ffa23d', 'Naranja'], ['pink', '#ff6fa8', 'Rosa']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i>' + c[2] + '</button>'; }).join('') +
       '</div><label>Modo</label><div class="seg">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
       '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
       '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +
@@ -611,8 +621,8 @@
       '<div class="set" style="border-bottom:0"><div class="sp"><b>🔥 Aviso de racha en peligro</b><div class="mut small">A las 9 pm, solo si aún no entrenaste</div></div>' + sw('risk') + '</div>' +
       (nativeOk('setReminderPlus') ? '' : '<p class="mut small" style="margin:0">Los botones y este aviso necesitan la última versión del APK.</p>') + '</div>' +
       widgetCard() + cloudCard() + statsCard() +
-      '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b>' + (window.__src === 'ota' ? ' (descargado)' : window.__src === 'apk' ? ' (del APK)' : '') + ' · APK: <b style="color:var(--txt)">v' + esc(apkName()) + '</b><br>' + esc(updStatusText()) + '</p><div class="row"><button class="btn sec sm sp" data-a="updcheck">🔄 Buscar</button><button class="btn sec sm sp" data-a="gosite">🌐 Página de descargas</button></div></div>' +
-      '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="row"><button class="btn sec sm sp" data-a="backup">Exportar</button><button class="btn sec sm sp" data-a="restore">Importar</button></div></div>' +
+      '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b>' + (window.__src === 'ota' ? ' (descargado)' : window.__src === 'apk' ? ' (del APK)' : '') + ' · APK: <b style="color:var(--txt)">v' + esc(apkName()) + '</b><br>' + esc(updStatusText()) + '</p><div class="col"><button class="btn sec sm" data-a="updcheck">🔄 Buscar actualizaciones</button><button class="btn sec sm" data-a="gosite">🌐 Página de descargas</button></div></div>' +
+      '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="col"><button class="btn sec sm" data-a="backup">Exportar</button><button class="btn sec sm" data-a="restore">Importar</button></div></div>' +
       '<div class="card"><b>🌱 Sobre crecer</b><p class="mut small" style="margin-top:6px;line-height:1.5">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
       '<button class="btn warn" data-a="reset">Borrar todos mis datos</button><p class="mut small" style="text-align:center;margin-top:14px">Crece Fit</p>';
   }
