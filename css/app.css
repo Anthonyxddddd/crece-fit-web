@@ -201,3 +201,7 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .rbar i{display:block;width:100%;border-radius:8px 8px 3px 3px;background:linear-gradient(180deg,var(--acc),var(--acc2));min-height:4px}
 .rbar div.cur i{box-shadow:0 0 0 2px var(--fire)}
 .note2{width:100%;margin-top:12px;min-height:64px;resize:none}
+
+.pbar{height:14px;border-radius:9px;background:var(--card2);overflow:hidden;margin:16px 0 10px}
+.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .15s;border-radius:9px}
+.upct{font-size:46px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums}

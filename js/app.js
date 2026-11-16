@@ -466,7 +466,8 @@
   }
   function closeOverlay() {
     var nt = $('#note'); if (nt && nt.value.trim()) { var dd = S.days[today()]; if (dd) { dd.note = nt.value.trim(); save(); } }
-    $('#overlay').className = ''; $('#overlay').innerHTML = ''; P = null; tab = 'home'; render(); }
+    $('#overlay').className = ''; $('#overlay').innerHTML = ''; P = null; tab = 'home'; render();
+    if (upd.wait) { upd.wait = false; showUpd(); } }
 
   function quit() {
     dialog('¿Salir del entrenamiento?', 'Se perderá el avance de esta sesión.', 'Salir', function () { clearTimer(); destroyFigs(); keepAwake(false); closeOverlay(); }, true);
@@ -527,13 +528,19 @@
         catch (e) { toast('Texto no válido'); } break;
       case 'reset':
         dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
+      case 'updno': dialogClose(); break;
+      case 'updgo':
+        upd.busy = true;
+        $('#upd').innerHTML = '<h3 id="uph">Actualizando…</h3><div class="pbar"><i id="upi"></i></div><div class="upct" id="upt">0%</div><p class="mut small" id="upn" style="text-align:center;margin-top:6px">No cierres la app</p>';
+        try { if (AND() && AND().startUpdate) AND().startUpdate(); else { upd.busy = false; dialogClose(); location.reload(); } } catch (e) { window.__updateError(); }
+        break;
       case 'mno': dialogClose(); break;
       case 'myes': var f = dialog.fn; dialogClose(); if (f) f(); break;
       case 'oblvl': obLvl = +v; Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'obstart':
         S = fresh(); S.setup = true; S.name = ($('#obn').value || '').trim(); initChains(obLvl === 1);
         var hh = parseFloat($('#obh').value); if (hh >= 80 && hh <= 250) S.meas.push({ d: today(), h: hh, w: 0 });
-        save(); document.body.removeChild($('#ob')); render(); break;
+        save(); document.body.removeChild($('#ob')); render(); if (upd.wait) { upd.wait = false; showUpd(); } break;
       // reproductor
       case 'quit': quit(); break;
       case 'pp': pauseToggle(); break;
@@ -562,6 +569,7 @@
 
   // botón atrás de Android
   window.__back = function () {
+    if (upd.busy) return true;
     if ($('#modal').className === 'on') { dialogClose(); return true; }
     if ($('#sheet').className === 'on') { sheetClose(); return true; }
     if ($('#overlay').className === 'on') { if (P && P.steps[P.i]) quit(); else closeOverlay(); return true; }
@@ -570,9 +578,32 @@
     return false;
   };
 
-  // la app nativa avisa cuando descargó una actualización
+  /* ---------- actualizaciones ---------- */
+  var upd = { v: 0, busy: false, wait: false };
+  function showUpd() {
+    var m = $('#modal');
+    m.innerHTML = '<div class="dlg" id="upd"><h3>🚀 Actualización disponible</h3><p class="mut" style="line-height:1.45">Hay una versión nueva de la app. Al actualizar, la app se cerrará sola y la próxima vez que entres ya estará lista.</p>' +
+      '<div class="row" style="margin-top:18px"><button class="btn ghost sm sp" data-a="updno">Más tarde</button><button class="btn sm sp" data-a="updgo">Actualizar</button></div></div>';
+    m.className = 'on';
+  }
+  window.__updateAvailable = function (v) {
+    if (upd.busy) return;
+    upd.v = v;
+    if (P || $('#ob')) { upd.wait = true; return; }
+    showUpd();
+  };
+  window.__updateProgress = function (p) {
+    var i = $('#upi'), t = $('#upt'), h = $('#uph');
+    if (i) i.style.width = p + '%';
+    if (t) t.textContent = p + '%';
+    if (p >= 100 && h) { h.textContent = '¡Listo! ✅ Cerrando la app…'; var n = $('#upn'); if (n) n.textContent = 'La próxima vez que entres ya estará actualizada'; }
+  };
+  window.__updateError = function () {
+    upd.busy = false; dialogClose(); toast('No se pudo actualizar. Revisa tu internet e inténtalo de nuevo.');
+  };
+  // compatibilidad con versiones anteriores de la app (descargaban en silencio)
   window.__updateReady = function () {
-    if (!P && !$('#ob')) dialog('Actualización lista ✨', 'Hay una versión nueva de la app. ¿Recargar ahora?', 'Recargar', function () { location.reload(); });
+    if (!P && !$('#ob')) dialog('Actualización lista ✨', 'Hay una versión nueva de la app.', 'Actualizar', function () { location.reload(); });
     else toast('Actualización lista: se aplicará al reabrir la app');
   };
 
