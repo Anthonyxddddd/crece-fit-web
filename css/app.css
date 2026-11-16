@@ -205,3 +205,25 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .pbar{height:14px;border-radius:9px;background:var(--card2);overflow:hidden;margin:16px 0 10px}
 .pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .15s;border-radius:9px}
 .upct{font-size:46px;font-weight:900;text-align:center;font-variant-numeric:tabular-nums}
+/* nivel, hábitos, plan, creador */
+.lvl{width:52px;height:52px;border-radius:50%;background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on-acc);font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;flex:none}
+.xpbar{height:10px;border-radius:9px;background:var(--card2);overflow:hidden;margin-top:10px}
+.xpbar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:9px;transition:width .4s}
+.habs{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.hab{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 2px;border-radius:14px;background:var(--card2);border:2px solid transparent;font-size:11px;font-weight:700;color:var(--mut);text-align:center}
+.hab span{font-size:22px}
+.hab.on{border-color:var(--acc);background:rgba(var(--acc-rgb),.14);color:var(--txt)}
+.stp{width:36px;height:36px;border-radius:50%;background:var(--card2);color:var(--txt);font-weight:900;font-size:18px;flex:none}
+.crrow{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)}
+.adj{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.adj button{padding:8px 12px;border-radius:12px;background:var(--card2);color:var(--txt);font-weight:700;font-size:13px}
+.planrow{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.pc{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:12px;background:var(--card2);position:relative}
+.pc small{font-size:10px;font-weight:800;color:var(--mut)}
+.pc span{font-size:18px}
+.pc i{font-style:normal;font-size:10px;font-weight:900;height:12px;color:var(--acc)}
+.pc.done{background:rgba(var(--acc-rgb),.18)}
+.pc.today{box-shadow:0 0 0 2px var(--acc)}
+.pc.miss{opacity:.45}
+.wd.fz .dot{background:rgba(var(--acc-rgb),.25)}
+.cal .d.freeze{background:rgba(var(--acc-rgb),.28)}

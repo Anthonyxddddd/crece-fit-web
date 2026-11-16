@@ -5,7 +5,7 @@
   var S = null, tab = 'home', calOff = 0, exCat = 'Todos', P = null, figs = [], AC = null;
   var DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   var MONTHS = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  var ORDER = ['A', 'B', 'C'];
+  var ORDER = ['A', 'B', 'C', 'D'];
   var $ = function (s) { return document.querySelector(s); };
   var AND = function () { return window.Android || null; };
 
@@ -22,8 +22,10 @@
 
   /* ---------- estado ---------- */
   function fresh() {
-    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0 }, recs: {},
-      days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null };
+    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0,
+      goal: 3, warm: 'cardio', cool: 'all', nojump: false }, recs: {},
+      days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null,
+      xp: 0, freeze: { m: '', used: 0 }, habits: {}, custom: [], plan: null, planDone: false, exh: {}, goalsHit: {} };
   }
   function initChains(exp) {
     Object.keys(CHAINS).forEach(function (k) {
@@ -35,19 +37,54 @@
     try { var r = localStorage.getItem(KEY); if (r) S = JSON.parse(r); } catch (e) { }
     if (!S) { S = fresh(); initChains(false); }
     Object.keys(CHAINS).forEach(function (k) { if (!S.chains[k]) S.chains[k] = { i: 0, v: CHAINS[k][0].s }; });
-    if (!S.recs) S.recs = {};
+    var f0 = fresh(); ['recs', 'habits', 'exh', 'goalsHit'].forEach(function (k) { if (!S[k]) S[k] = {}; });
+    if (!S.custom) S.custom = []; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
 
+  function levelOf(xp) { return Math.floor(Math.sqrt(xp / 60)) + 1; }
+  function xpAt(l) { return 60 * (l - 1) * (l - 1); }
+  function lvlName(l) { return LEVEL_NAMES[Math.min(l - 1, LEVEL_NAMES.length - 1)]; }
+
   function stats() {
-    var keys = Object.keys(S.days).sort(), best = 0, run = 0, prev = null;
-    keys.forEach(function (k) { var n = dnum(k); run = (prev !== null && n - prev === 1) ? run + 1 : 1; if (run > best) best = run; prev = n; });
-    var t = dnum(today()), done = !!S.days[today()], n = done ? t : t - 1, cur = 0;
+    var keys = Object.keys(S.days).sort(), best = 0, run = 0, prev = null, maxReps = 0, early = false;
+    keys.forEach(function (k) {
+      var n = dnum(k); run = (prev !== null && n - prev === 1) ? run + 1 : 1; if (run > best) best = run; prev = n;
+      if ((S.days[k].reps || 0) > maxReps) maxReps = S.days[k].reps; if (S.days[k].early) early = true;
+    });
+    var td = S.days[today()], t = dnum(today()), done = !!(td && td.w > 0), n = done ? t : t - 1, cur = 0;
     while (S.days[nstr(n)]) { cur++; n--; }
     var mins = 0; keys.forEach(function (k) { mins += (S.days[k].sec || 0) / 60; });
-    return { cur: cur, best: best, doneToday: done, total: S.total, mins: Math.round(mins), chains: S.chains };
+    var hd = 0; Object.keys(S.habits).forEach(function (k) { if (S.habits[k].xp) hd++; });
+    return { cur: cur, best: best, doneToday: done, total: S.total, mins: Math.round(mins), chains: S.chains, lvl: levelOf(S.xp),
+      maxReps: maxReps, early: early, goalsHit: Object.keys(S.goalsHit).length, planDone: !!S.planDone, habitDays: hd };
   }
+  /* semana actual (lunes a domingo): entrenamientos hechos */
+  function weekKey() { var d = new Date(), wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return dstr(d); }
+  function weekCount() {
+    var d = new Date(), wd = (d.getDay() + 6) % 7, n = 0, i; d.setDate(d.getDate() - wd);
+    for (i = 0; i < 7; i++) { var r = S.days[dstr(d)]; if (r && r.w > 0) n++; d.setDate(d.getDate() + 1); }
+    return n;
+  }
+  /* congelamiento automático: si ayer faltaste y anteayer entrenaste, un congelamiento mantiene la racha (2 por mes) */
+  function autoFreeze() {
+    var t = dnum(today()), y = nstr(t - 1), yy = nstr(t - 2), mk = today().slice(0, 7);
+    if (S.freeze.m !== mk) S.freeze = { m: mk, used: 0 };
+    if (!S.days[y] && S.days[yy] && !S.days[yy].freeze && S.freeze.used < 2) {
+      S.days[y] = { w: 0, sec: 0, sets: 0, freeze: true }; S.freeze.used++; save(); return true;
+    }
+    return false;
+  }
+  function cheer(cur) {
+    var M = { 1: '¡Primer paso dado! Lo difícil es empezar 💙', 3: '¡3 días seguidos! Se está formando el hábito 🌱', 7: '¡Una semana completa! Eres imparable 🚀', 14: '¡Dos semanas! Tu cuerpo ya lo nota 💪', 21: '¡21 días! Esto ya es un hábito 🏅', 30: '¡UN MES! Eres una leyenda 👑' };
+    if (M[cur]) return M[cur];
+    var G = ['¡Buen trabajo! Cada día cuenta 💪', 'Constancia sobre intensidad. ¡Así se hace! 🔥', 'Tu yo de dentro de un mes te lo agradece 🙌', '¡Otro día más sumando! 🌟', 'Descansa, come bien y duerme: ahí crecen los músculos 😴'];
+    return G[(S.total + cur) % G.length];
+  }
+  function addXP(n) { var a = levelOf(S.xp); S.xp += n; var b = levelOf(S.xp); return b > a ? b : 0; }
+  function hab() { var d = today(); return S.habits[d] || (S.habits[d] = { w: 0, p: 0, s: 0, sl: 0 }); }
+  function habCount(h) { return (h.w ? 1 : 0) + (h.p ? 1 : 0) + (h.s ? 1 : 0) + (h.sl >= 8 ? 1 : 0); }
 
   /* ---------- sonido / vibración / android ---------- */
   function unlockAudio() { try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) { } }
@@ -99,29 +136,50 @@
   }
 
   /* ---------- rutinas ---------- */
+  var CHAIN_KEYS = Object.keys(CHAINS);
   function curVar(chain) { var c = S.chains[chain], v = CHAINS[chain][c.i]; return { ex: v.ex, val: c.v, type: EX[v.ex].type }; }
   function targetTxt(ex, val, type) {
     type = type || EX[ex].type;
     return type === 'time' ? val + ' s' : val + ' rep' + (val > 1 ? 's' : '');
   }
-  function build(id) {
-    var steps = [], rest = S.settings.rest;
-    if (id === 'S') {
-      STRETCH_ROUTINE.items.forEach(function (it) { steps.push({ k: 'ex', ex: it.ex, val: it.val, type: it.type || EX[it.ex].type, kind: 'cool' }); });
-      return steps;
+  function quietSub(ex, val) {
+    if (!S.settings.nojump || !NOISY[ex]) return { ex: ex, val: val };
+    var m = NOISY[ex]; return { ex: m[0], val: Math.round(val * m[1]) };
+  }
+  function warmSet() { var w = S.settings.warm; if (S.settings.nojump && w === 'cardio') w = 'suave'; return WARM_SETS[w] || []; }
+  function coolSet() { return COOL_SETS[S.settings.cool] || COOL_SETS.all; }
+  function rdef(id) {
+    if (WORKOUTS[id]) return WORKOUTS[id];
+    if (QUICK[id]) return QUICK[id];
+    if (id === 'S') return STRETCH_ROUTINE;
+    if (id === 'P') return POSTURE_ROUTINE;
+    for (var i = 0; i < S.custom.length; i++) {
+      if (S.custom[i].id === id) return { name: S.custom[i].name, emoji: '🛠', desc: 'Rutina creada por ti.', slots: S.custom[i].slots, custom: true };
     }
-    var w = WORKOUTS[id];
-    WARMUP.forEach(function (it) { steps.push({ k: 'ex', ex: it.ex, val: it.val, type: EX[it.ex].type, kind: 'warm' }); });
-    steps.push({ k: 'rest', secs: 15, title: 'Prepárate' });
-    w.slots.forEach(function (sl, si) {
-      var cv = curVar(sl[0]);
-      for (var s = 1; s <= sl[1]; s++) {
-        steps.push({ k: 'ex', ex: cv.ex, val: cv.val, type: cv.type, chain: sl[0], set: s, sets: sl[1], kind: 'main' });
-        if (!(si === w.slots.length - 1 && s === sl[1])) steps.push({ k: 'rest', secs: rest });
+    return WORKOUTS.A;
+  }
+  function isLight(id) { return id === 'S' || id === 'P'; }
+  function stepOf(it, kind, label) {
+    var q = quietSub(it.ex, it.val);
+    return { k: 'ex', ex: q.ex, val: q.val, type: (q.ex === it.ex && it.type) ? it.type : EX[q.ex].type, kind: kind, label: label };
+  }
+  function build(id) {
+    var steps = [], d = rdef(id), rest = d.rest || S.settings.rest;
+    if (d.items) { d.items.forEach(function (it) { steps.push(stepOf(it, 'cool', d.label || 'Estiramiento')); }); return steps; }
+    var warm = d.warm === false ? [] : warmSet(), cool = d.cool || coolSet();
+    warm.forEach(function (it) { steps.push(stepOf(it, 'warm')); });
+    if (warm.length) steps.push({ k: 'rest', secs: 15, title: 'Prepárate' });
+    d.slots.forEach(function (sl, si) {
+      var cv = curVar(sl[0]), q = quietSub(cv.ex, cv.val), type = EX[q.ex].type;
+      for (var n = 1; n <= sl[1]; n++) {
+        steps.push({ k: 'ex', ex: q.ex, val: q.val, type: type, chain: sl[0], set: n, sets: sl[1], kind: 'main' });
+        if (!(si === d.slots.length - 1 && n === sl[1])) steps.push({ k: 'rest', secs: rest });
       }
     });
-    steps.push({ k: 'rest', secs: 20, title: 'Ahora, a estirar 🌱' });
-    COOLDOWN.forEach(function (it) { steps.push({ k: 'ex', ex: it.ex, val: it.val, type: EX[it.ex].type, kind: 'cool' }); });
+    if (cool.length) {
+      steps.push({ k: 'rest', secs: 20, title: 'Ahora, a estirar 🌱' });
+      cool.forEach(function (it) { steps.push(stepOf(it, 'cool', 'Enfriamiento · Crecer')); });
+    }
     return steps;
   }
   function estMin(steps) {
@@ -129,12 +187,16 @@
     steps.forEach(function (st) { if (st.k === 'rest') s += st.secs; else s += st.type === 'time' ? st.val + 4 : st.val * 3.5 + 6; });
     return Math.max(1, Math.round(s / 60));
   }
-  function nextId() { return ORDER[S.rot % 3]; }
-  function wInfo(id) { return id === 'S' ? STRETCH_ROUTINE : WORKOUTS[id]; }
+  function nextId() { return ORDER[S.rot % ORDER.length]; }
+  function wInfo(id) { return rdef(id); }
   function mainList(id) {
-    if (id === 'S') return STRETCH_ROUTINE.items.map(function (it) { return { n: EX[it.ex].n, t: targetTxt(it.ex, it.val, it.type) }; });
-    return WORKOUTS[id].slots.map(function (sl) { var cv = curVar(sl[0]); return { n: EX[cv.ex].n, t: sl[1] + ' × ' + targetTxt(cv.ex, cv.val, cv.type) }; });
+    var d = rdef(id);
+    if (d.items) return d.items.map(function (it) { var q = quietSub(it.ex, it.val); return { n: EX[q.ex].n, t: targetTxt(q.ex, q.val, (q.ex === it.ex && it.type) || null) }; });
+    return d.slots.map(function (sl) { var cv = curVar(sl[0]), q = quietSub(cv.ex, cv.val); return { n: EX[q.ex].n, t: sl[1] + ' × ' + targetTxt(q.ex, q.val, EX[q.ex].type) }; });
   }
+  /* plan de 4 semanas */
+  function planIdx() { return S.plan ? dnum(today()) - dnum(S.plan.start) : -1; }
+  function todayPlan() { var i = planIdx(); if (i < 0 || i >= 28) return null; return { i: i, t: PLAN_WEEK[i % 7] }; }
 
   function applyProg(prev, done, mult) {
     var c = clone(prev);
@@ -160,34 +222,63 @@
     var d = new Date(), wd = (d.getDay() + 6) % 7, out = '', i;
     d.setDate(d.getDate() - wd);
     for (i = 0; i < 7; i++) {
-      var k = dstr(d), done = !!S.days[k], isT = k === today();
-      out += '<div class="wd' + (done ? ' done' : '') + (isT ? ' today' : '') + '">' + DAYS[i] + '<div class="dot">' + (done ? '✓' : '') + '</div></div>';
+      var k = dstr(d), r = S.days[k], done = !!(r && r.w > 0), fr = !!(r && r.freeze), isT = k === today();
+      out += '<div class="wd' + (done ? ' done' : '') + (fr ? ' fz' : '') + (isT ? ' today' : '') + '">' + DAYS[i] + '<div class="dot">' + (done ? '✓' : fr ? '❄️' : '') + '</div></div>';
       d.setDate(d.getDate() + 1);
     }
     return '<div class="week">' + out + '</div>';
   }
+  function mini(id, e, name, sub) { return '<button class="mini" data-a="prev" data-v="' + id + '"><div class="e">' + e + '</div><b>' + name + '</b><span>' + sub + '</span></button>'; }
 
   function homeV() {
-    var st = stats(), id = nextId(), w = WORKOUTS[id], steps = build(id), name = S.name ? ', ' + esc(S.name) : '';
+    var st = stats(), tp = todayPlan(), id = tp ? (tp.t === 'R' ? null : tp.t) : nextId(), name = S.name ? ', ' + esc(S.name) : '';
     var msg = st.doneToday ? '¡Hoy ya cumpliste! 🎉' : (st.cur > 0 ? 'Entrena hoy para mantener tu racha' : 'Empieza tu racha hoy');
     var tip = TIPS[dnum(today()) % TIPS.length];
-    var h = '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes · ✅ actualización de prueba') + '</div></div></div>';
+    var left = S.freeze.m === today().slice(0, 7) ? 2 - S.freeze.used : 2;
+    var h = '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes') + '</div></div></div>';
     h += '<div class="card streak' + (st.cur ? '' : ' off') + '" style="margin-top:16px"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
       '<div style="font-weight:800">' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</div></div><div class="sp"></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor racha</div><div style="font-size:22px;font-weight:900">' + st.best + '</div></div></div>' +
-      '<div class="small" style="margin-top:10px;color:var(--st-t);font-weight:700">' + msg + '</div>' + weekStrip() + '</div>';
-    if (!st.doneToday) {
+      '<div class="small" style="margin-top:10px;color:var(--st-t);font-weight:700">' + msg + '</div>' + weekStrip() +
+      '<div class="small" style="margin-top:10px;color:var(--st-t)">❄️ ' + left + ' congelamiento' + (left === 1 ? '' : 's') + ' este mes · salva tu racha si faltas un día</div></div>';
+    // nivel y meta semanal
+    var lv = st.lvl, a = xpAt(lv), b = xpAt(lv + 1), wc = weekCount(), g = S.settings.goal;
+    h += '<div class="card"><div class="row"><div class="lvl">⭐ ' + lv + '</div><div class="sp"><b>' + lvlName(lv) + '</b><div class="mut small">' + S.xp + ' / ' + b + ' XP</div></div></div>' +
+      '<div class="xpbar"><i style="width:' + Math.round((S.xp - a) / (b - a) * 100) + '%"></i></div>' +
+      '<div class="row" style="margin-top:16px"><b>🎯 Meta semanal</b><div class="sp"></div><b>' + Math.min(wc, g) + '/' + g + ' días</b></div>' +
+      '<div class="xpbar"><i style="width:' + Math.min(100, Math.round(wc / g * 100)) + '%"></i></div>' +
+      (wc >= g ? '<div class="small" style="margin-top:6px;color:var(--acc);font-weight:800">¡Meta cumplida esta semana! 🎉</div>' : '') + '</div>';
+    // hábitos
+    var hb = S.habits[today()] || { w: 0, p: 0, s: 0, sl: 0 }, hc = habCount(hb);
+    h += '<div class="card"><div class="row"><b>✅ Hábitos para crecer</b><div class="sp"></div><span class="mut small">' + hc + '/4 hoy</span></div><div class="habs">' +
+      [['w', '💧', 'Agua'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) { return '<button class="hab' + (hb[x[0]] ? ' on' : '') + '" data-a="hab" data-v="' + x[0] + '"><span>' + x[1] + '</span>' + x[2] + '</button>'; }).join('') +
+      '<div class="hab' + (hb.sl >= 8 ? ' on' : '') + '"><span>😴</span>Sueño</div></div>' +
+      '<div class="row" style="margin-top:12px"><span class="mut small sp">¿Cuántas horas dormiste anoche?</span><button class="stp" data-a="slp" data-v="-1">−</button><b style="min-width:52px;text-align:center">' + (hb.sl ? hb.sl + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div></div>';
+    // tarjeta de hoy
+    var planTag = tp ? '<span class="chip">📅 Plan · día ' + (tp.i + 1) + '/28</span>' : '';
+    if (st.doneToday) {
+      h += '<div class="card wcard"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz algo suave para tu postura.</p>' +
+        '<div class="row"><button class="btn sec sp" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec sp" data-a="start" data-v="S">🌱 Estirar (6 min)</button></div>' +
+        '<div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:var(--txt)">' + WORKOUTS[nextId()].name + '</b></div></div>';
+    } else if (!id) {
+      h += '<div class="card wcard"><div class="row"><div class="big">🛌</div><div><div class="mut small" style="font-weight:800">PLAN · DÍA ' + (tp.i + 1) + '/28</div><div style="font-size:21px;font-weight:900">Descanso activo</div></div></div>' +
+        '<p class="mut small" style="margin:10px 0 12px">Hoy toca descansar los músculos. Haz un chequeo de postura de 2 minutos y mantienes tu racha.</p>' +
+        '<div class="row"><button class="btn sp" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec sp" data-a="start" data-v="S">🌱 Estirar</button></div></div>';
+    } else {
+      var w = rdef(id), steps = build(id), cnt = w.items ? w.items.length : w.slots.length;
       h += '<div class="card wcard"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
-        '<div class="row" style="margin:12px 0 4px"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + w.slots.length + ' ejercicios</span><span class="chip">🌱 Estiramientos</span></div>' +
+        '<div class="row" style="margin:12px 0 4px;flex-wrap:wrap"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + cnt + ' ejercicios</span>' + planTag + (S.settings.nojump ? '<span class="chip">🤫 Sin saltos</span>' : '') + '</div>' +
         '<div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
         '<div style="margin-top:14px" class="row"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div></div>';
-    } else {
-      h += '<div class="card wcard"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz estiramientos suaves para tu postura.</p>' +
-        '<button class="btn sec" data-a="start" data-v="S">🌱 Estiramientos (6 min)</button><div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:var(--txt)">' + WORKOUTS[nextId()].name + '</b></div></div>';
     }
-    h += '<div class="h2">Otras rutinas</div><div class="grid2">';
-    ORDER.forEach(function (k) { if (k === id && !st.doneToday) return; h += '<button class="mini" data-a="prev" data-v="' + k + '"><div class="e">' + WORKOUTS[k].emoji + '</div><b>' + WORKOUTS[k].name + '</b><span>Rutina ' + k + '</span></button>'; });
-    h += '<button class="mini" data-a="prev" data-v="S"><div class="e">🌱</div><b>Crecer · estiramientos</b><span>Cuenta para tu racha</span></button></div>';
+    h += '<div class="h2">Más rutinas</div><div class="grid2">';
+    ORDER.forEach(function (k) { if (k === id && !st.doneToday) return; h += mini(k, WORKOUTS[k].emoji, WORKOUTS[k].name, 'Rutina ' + k); });
+    h += mini('Q5', '⏱', 'Rápida · 5 min', 'Poco tiempo') + mini('Q10', '⏲', 'Rápida · 10 min', 'Cardio + fuerza') +
+      mini('P', '🧍', 'Chequeo de postura', '2 min · cuenta para la racha') + mini('S', '🌱', 'Crecer · estiramientos', '6 min · cuenta para la racha') + '</div>';
+    h += '<div class="h2">Mis rutinas</div><div class="grid2">' +
+      S.custom.map(function (c) { return mini(c.id, '🛠', esc(c.name), c.slots.length + ' ejercicios'); }).join('') +
+      '<button class="mini" data-a="crnew"><div class="e">➕</div><b>Crear rutina</b><span>Elige tus ejercicios</span></button>' +
+      '<button class="mini" data-a="planopen"><div class="e">📅</div><b>Plan de 4 semanas</b><span>' + (tp ? 'Día ' + (tp.i + 1) + ' de 28' : 'Calendario listo') + '</span></button></div>';
     h += '<div class="card tip" style="margin-top:14px"><div class="mut small" style="font-weight:800;color:var(--acc)">💡 CONSEJO DEL DÍA</div><p style="margin-top:6px;line-height:1.45">' + tip + '</p></div>';
     return h;
   }
@@ -208,24 +299,43 @@
     var y = base.getFullYear(), m = base.getMonth(), first = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), i, c = '';
     DAYS.forEach(function (d) { c += '<div class="h">' + d + '</div>'; });
     for (i = 0; i < first; i++) c += '<div></div>';
-    for (i = 1; i <= n; i++) { var k = y + '-' + pad(m + 1) + '-' + pad(i); c += '<div class="d' + (S.days[k] ? ' done' : '') + (k === today() ? ' today' : '') + '">' + i + '</div>'; }
+    for (i = 1; i <= n; i++) { var k = y + '-' + pad(m + 1) + '-' + pad(i); var rr = S.days[k]; c += '<div class="d' + (rr && rr.w > 0 ? ' done' : rr && rr.freeze ? ' freeze' : '') + (k === today() ? ' today' : '') + '">' + i + '</div>'; }
     return '<div class="row" style="margin-bottom:10px"><button class="btn sec sm" data-a="calp">‹</button><div class="sp" style="text-align:center;font-weight:800">' + MONTHS[m] + ' ' + y + '</div><button class="btn sec sm" data-a="caln">›</button></div><div class="cal">' + c + '</div>';
   }
 
-  function chartHTML() {
-    var pts = S.meas.filter(function (x) { return x.h; }).slice(-12);
-    if (pts.length < 2) return '<p class="mut small" style="margin-top:10px">Guarda al menos dos medidas para ver tu gráfica de estatura.</p>';
-    var W = 300, H = 120, mn = Math.min.apply(0, pts.map(function (p) { return p.h; })) - 1, mx = Math.max.apply(0, pts.map(function (p) { return p.h; })) + 1;
-    var xy = pts.map(function (p, i) { return [14 + i * (W - 28) / (pts.length - 1), H - 22 - (p.h - mn) / (mx - mn) * (H - 44)]; });
+  function lineChart(pts) {
+    var W = 300, H = 120, vs = pts.map(function (p) { return p.v; }), mn = Math.min.apply(0, vs), mx = Math.max.apply(0, vs), pd = Math.max(1, (mx - mn) * 0.1);
+    mn -= pd; mx += pd;
+    var xy = pts.map(function (p, i) { return [14 + i * (W - 28) / (pts.length - 1), H - 22 - (p.v - mn) / (mx - mn) * (H - 44)]; });
     return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '"><polyline fill="none" style="stroke:var(--acc)" stroke-width="3" stroke-linejoin="round" points="' + xy.map(function (a) { return a[0].toFixed(1) + ',' + a[1].toFixed(1); }).join(' ') + '"/>' +
-      xy.map(function (a, i) { return '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="4" style="fill:var(--acc)"/><text x="' + a[0].toFixed(1) + '" y="' + (a[1] - 8).toFixed(1) + '" style="fill:var(--mut)" font-size="9" text-anchor="middle">' + pts[i].h + '</text>'; }).join('') + '</svg>';
+      xy.map(function (a, i) { return '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="4" style="fill:var(--acc)"/><text x="' + a[0].toFixed(1) + '" y="' + (a[1] - 8).toFixed(1) + '" style="fill:var(--mut)" font-size="9" text-anchor="middle">' + pts[i].v + '</text>'; }).join('') + '</svg>';
+  }
+  function chartHTML() {
+    var pts = S.meas.filter(function (x) { return x.h; }).slice(-12).map(function (x) { return { v: x.h }; });
+    if (pts.length < 2) return '<p class="mut small" style="margin-top:10px">Guarda al menos dos medidas para ver tu gráfica de estatura.</p>';
+    return lineChart(pts);
+  }
+  var progEx = null;
+  function evoHTML() {
+    var ks = Object.keys(S.exh).filter(function (k) { return EX[k] && S.exh[k].length; });
+    if (!ks.length) return '<p class="mut small">Cuando completes entrenamientos verás aquí cómo suben tus repeticiones.</p>';
+    if (!progEx || ks.indexOf(progEx) < 0) progEx = ks[0];
+    var arr = S.exh[progEx].slice(-12);
+    return '<div class="chips" style="margin-top:0">' + ks.map(function (k) { return '<button class="chip' + (k === progEx ? ' on' : '') + '" data-a="evx" data-v="' + k + '">' + EX[k].n + '</button>'; }).join('') + '</div>' +
+      (arr.length > 1 ? lineChart(arr.map(function (x) { return { v: x.v }; })) + '<div class="mut small" style="text-align:center">' + (EX[progEx].type === 'time' ? 'segundos' : 'repeticiones') + ' por sesión</div>' : '<p class="mut small">Haz este ejercicio otra vez para ver la gráfica. Último: ' + targetTxt(progEx, arr[0].v) + '</p>');
+  }
+  function sleepHTML() {
+    var out = [], i, any = false, now = dnum(today());
+    for (i = 13; i >= 0; i--) { var k = nstr(now - i), v = (S.habits[k] && S.habits[k].sl) || 0; if (v) any = true; out.push({ v: v, l: k.slice(8) }); }
+    if (!any) return '<p class="mut small">Apunta cuántas horas duermes en Inicio → Hábitos. Dormir 8–10 horas ayuda a crecer.</p>';
+    return '<div class="rbar">' + out.map(function (o) { return '<div' + (o.v >= 8 ? ' class="cur"' : '') + '>' + (o.v || '') + '<i style="height:' + Math.round(o.v / 12 * 78) + 'px;' + (o.v && o.v < 8 ? 'opacity:.5' : '') + '"></i>' + o.l + '</div>'; }).join('') + '</div><div class="mut small" style="text-align:center;margin-top:4px">Horas de sueño (borde = 8 h o más)</div>';
   }
 
   function weeklyHTML() {
     var now = new Date(), wd = (now.getDay() + 6) % 7, mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - wd), out = [], i, mx = 1;
     for (i = 7; i >= 0; i--) {
       var a = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() - i * 7), n = 0, k;
-      for (k = 0; k < 7; k++) { var d = new Date(a.getFullYear(), a.getMonth(), a.getDate() + k); var r = S.days[dstr(d)]; if (r) n += r.w; }
+      for (k = 0; k < 7; k++) { var d = new Date(a.getFullYear(), a.getMonth(), a.getDate() + k); var r = S.days[dstr(d)]; if (r && r.w > 0) n += r.w; }
       out.push({ n: n, l: pad(a.getDate()) + '/' + pad(a.getMonth() + 1), cur: i === 0 }); if (n > mx) mx = n;
     }
     return '<div class="rbar">' + out.map(function (o) { return '<div' + (o.cur ? ' class="cur"' : '') + '>' + (o.n || '') + '<i style="height:' + Math.round(o.n / mx * 78) + 'px"></i>' + o.l + '</div>'; }).join('') + '</div>';
@@ -245,6 +355,8 @@
     var h = '<div class="title">Tu progreso</div><div class="stats" style="margin-top:14px">' +
       '<div class="stat"><b>🔥 ' + st.cur + '</b><span>Racha actual</span></div><div class="stat"><b>🏆 ' + st.best + '</b><span>Mejor racha</span></div>' +
       '<div class="stat"><b>' + st.total + '</b><span>Entrenamientos</span></div><div class="stat"><b>' + st.mins + '</b><span>Minutos activos</span></div></div>';
+    h += '<div class="h2">Mi evolución</div><div class="card">' + evoHTML() + '</div>';
+    h += '<div class="h2">Mi sueño</div><div class="card">' + sleepHTML() + '</div>';
     h += '<div class="h2">Entrenamientos por semana</div><div class="card">' + weeklyHTML() + '</div>';
     h += '<div class="h2">Calendario</div><div class="card">' + calHTML() + '</div>';
     h += '<div class="h2">Mi estatura y peso</div><div class="card"><div class="row"><div class="sp"><label style="margin-top:0">Estatura (cm)</label><input type="number" id="mh" inputmode="decimal" placeholder="170"></div><div class="sp"><label style="margin-top:0">Peso (kg)</label><input type="number" id="mw" inputmode="decimal" placeholder="60"></div></div>' +
@@ -261,12 +373,19 @@
     return h;
   }
 
+  function seg(key, opts, cur) {
+    return '<div class="seg">' + opts.map(function (o) { return '<button class="' + (String(cur) === String(o[0]) ? 'on' : '') + '" data-a="opt" data-v="' + key + ':' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>';
+  }
   function sw(name) { return '<div class="sw' + (S.settings[name] ? ' on' : '') + '" data-a="tog" data-v="' + name + '"></div>'; }
   function setV() {
     var s = S.settings;
     return '<div class="title">Ajustes</div>' +
       '<div class="card" style="margin-top:14px"><label style="margin-top:0">Tu nombre</label><input type="text" id="nm" data-set="name" value="' + esc(S.name) + '" placeholder="Opcional" maxlength="20">' +
       '<label>Descanso entre series: <b id="rv" style="color:var(--acc)">' + s.rest + ' s</b></label><input type="range" min="15" max="90" step="5" value="' + s.rest + '" data-set="rest"></div>' +
+      '<div class="card"><b>🏋️ Entrenamiento</b><label style="margin-top:10px">Meta semanal (días por semana)</label>' + seg('goal', [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']], s.goal) +
+      '<label>Calentamiento</label>' + seg('warm', [['cardio', '🏃 Cardio'], ['suave', '🧘 Suave'], ['none', 'Ninguno']], s.warm) +
+      '<label>Estiramiento final</label>' + seg('cool', [['all', 'Todo'], ['legs', 'Piernas'], ['back', 'Espalda'], ['upper', 'Brazos'], ['none', 'Ninguno']], s.cool) +
+      '<div class="set" style="margin-top:8px;border-bottom:0"><div class="sp"><b>🤫 Modo sin saltos</b><div class="mut small">Cambia saltos por ejercicios silenciosos</div></div>' + sw('nojump') + '</div></div>' +
       '<div class="card"><b>🎨 Apariencia</b><label style="margin-top:10px">Color de la app</label><div class="swrow">' +
       [['blue', '#4aa8ff'], ['green', '#2fcf8a'], ['purple', '#a78bfa'], ['orange', '#ffa23d'], ['pink', '#ff6fa8']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" style="background:' + c[1] + '" data-a="theme" data-v="' + c[0] + '"></button>'; }).join('') +
       '</div><label>Modo</label><div class="seg">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
@@ -316,10 +435,56 @@
 
   function openPrev(id) {
     var steps = build(id), w = wInfo(id);
-    sheet('<div class="row"><div style="font-size:40px">' + w.emoji + '</div><div><div class="title" style="font-size:22px">' + w.name + '</div><div class="mut small">~' + estMin(steps) + ' min</div></div></div>' +
+    sheet('<div class="row"><div style="font-size:40px">' + w.emoji + '</div><div><div class="title" style="font-size:22px">' + esc(w.name) + '</div><div class="mut small">~' + estMin(steps) + ' min</div></div></div>' +
       '<p class="mut small" style="margin:10px 0">' + w.desc + '</p><div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
-      (id !== 'S' ? '<p class="mut small" style="margin-top:10px">Incluye calentamiento y 5 estiramientos “Crecer” al final.</p>' : '') +
-      '<button class="btn" style="margin-top:16px" data-a="start" data-v="' + id + '">▶ Empezar</button>');
+      (!w.items ? '<p class="mut small" style="margin-top:10px">Calentamiento y estiramiento según tus ajustes.</p>' : '') +
+      '<button class="btn" style="margin-top:16px" data-a="start" data-v="' + id + '">▶ Empezar</button>' +
+      (w.custom ? '<div class="row" style="margin-top:10px"><button class="btn sec sm sp" data-a="cred" data-v="' + id + '">✏️ Editar</button><button class="btn ghost sm sp" data-a="crdel" data-v="' + id + '">🗑 Eliminar</button></div>' : ''));
+  }
+
+  /* ---------- plan de 4 semanas ---------- */
+  function openPlan() {
+    var i = planIdx(), h = '<div class="title" style="font-size:22px">📅 Plan de 4 semanas</div>';
+    if (!S.plan || i < 0 || i >= 28) {
+      h += '<p class="mut" style="margin:10px 0;line-height:1.5">' + (S.plan && i >= 28 ? '🎉 ¡Terminaste tu plan! Puedes empezar otro cuando quieras.' : 'Un calendario listo: cada semana tiene 4 días de entrenamiento, 1 de estiramientos y 2 de descanso activo. La dificultad sube sola.') + '</p>' +
+        '<div class="row" style="flex-wrap:wrap">' + ['A', 'B', 'C', 'D', 'S', 'R'].map(function (k) { return '<span class="chip">' + PLAN_ICON[k] + ' ' + ({ A: 'Piernas', B: 'Pecho/espalda', C: 'Cuerpo completo', D: 'Core', S: 'Estirar', R: 'Descanso activo' })[k] + '</span>'; }).join('') + '</div>' +
+        '<button class="btn" style="margin-top:16px" data-a="planstart">▶ Empezar hoy</button>';
+    } else {
+      var base = dnum(S.plan.start), w, k;
+      for (w = 0; w < 4; w++) {
+        h += '<div class="mut small" style="font-weight:800;margin:14px 0 6px">SEMANA ' + (w + 1) + '</div><div class="planrow">';
+        for (k = 0; k < 7; k++) {
+          var idx = w * 7 + k, ds = nstr(base + idx), r = S.days[ds], dn = r && r.w > 0, t = PLAN_WEEK[k], dd = ds.split('-'), wd = (new Date(+dd[0], +dd[1] - 1, +dd[2]).getDay() + 6) % 7;
+          h += '<div class="pc' + (dn ? ' done' : '') + (idx === i ? ' today' : '') + (idx < i && !dn && t !== 'R' ? ' miss' : '') + '"><small>' + DAYS[wd] + '</small><span>' + PLAN_ICON[t] + '</span><i>' + (dn ? '✓' : '') + '</i></div>';
+        }
+        h += '</div>';
+      }
+      h += '<p class="mut small" style="margin-top:12px">Hoy: día ' + (i + 1) + ' de 28. 🦵 piernas · 💪 pecho/espalda · ⚡ cuerpo completo · 🎯 core · 🌱 estirar · 🛌 descanso activo (haz el chequeo de postura para mantener la racha).</p>' +
+        '<button class="btn ghost" style="margin-top:12px" data-a="planstop">Dejar el plan</button>';
+    }
+    sheet(h + '<button class="btn sec" style="margin-top:10px" data-a="closeSheet">Cerrar</button>');
+  }
+
+  /* ---------- crear rutina propia ---------- */
+  var cr = null;
+  function openBuilder(id) {
+    var c = null, i;
+    for (i = 0; i < S.custom.length; i++) if (S.custom[i].id === id) c = S.custom[i];
+    cr = { id: c ? c.id : null, name: c ? c.name : '', sets: {} };
+    CHAIN_KEYS.forEach(function (k) { cr.sets[k] = 0; });
+    if (c) c.slots.forEach(function (sl) { cr.sets[sl[0]] = sl[1]; });
+    renderBuilder(0);
+  }
+  function renderBuilder(scr) {
+    var rows = CHAIN_KEYS.map(function (k) {
+      var cv = curVar(k), e = EX[cv.ex], n = cr.sets[k];
+      return '<div class="crrow"><div class="sp"><b style="font-size:14px">' + e.n + '</b><div class="mut small">' + e.cat + ' · ' + targetTxt(cv.ex, cv.val, cv.type) + '</div></div>' +
+        '<button class="stp" data-a="crd" data-v="' + k + '">−</button><b style="min-width:22px;text-align:center">' + n + '</b><button class="stp" data-a="cru" data-v="' + k + '">+</button></div>';
+    }).join('');
+    sheet('<div class="title" style="font-size:22px">' + (cr.id ? 'Editar' : 'Crear') + ' rutina</div><label>Nombre</label><input type="text" id="crname" data-set="crname" maxlength="24" value="' + esc(cr.name) + '" placeholder="Ej. Mi rutina de piernas">' +
+      '<div class="mut small" style="margin:12px 0 2px">Elige cuántas series de cada ejercicio (0 = no incluir). La dificultad sube sola.</div>' + rows +
+      '<button class="btn" style="margin-top:16px" data-a="crsave">Guardar rutina</button>');
+    var sh = $('#sheet .sheet'); if (sh) sh.scrollTop = scr || 0;
   }
 
   /* ---------- reproductor ---------- */
@@ -354,10 +519,11 @@
 
   function startWorkout(id) {
     unlockAudio(); sheetClose();
-    P = { id: id, steps: build(id), i: 0, t0: Date.now(), sets: 0, exs: 0, chains: {}, done: [], timer: null };
+    P = { id: id, steps: build(id), i: 0, t0: Date.now(), sets: 0, exs: 0, chains: {}, done: [], adj: {}, timer: null };
     keepAwake(true); showStep();
   }
 
+  var ADJ = '<div class="adj"><button data-a="adj" data-v="-1">😅 Muy difícil</button><button data-a="adj" data-v="1">💪 Muy fácil</button></div>';
   function showStep() {
     clearTimer(); destroyFigs();
     var st = P.steps[P.i];
@@ -365,13 +531,14 @@
     P.paused = false; P.count = 0; P.beepTick = false; P.sayTick = false;
     if (st.k === 'rest') return showRest(st);
     var e = EX[st.ex], isTime = st.type === 'time';
-    var kind = st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (P.id === 'S' ? 'Estiramiento' : 'Enfriamiento · Crecer') : 'Serie ' + st.set + ' de ' + st.sets;
+    var kind = st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (st.label || 'Estiramiento') : 'Serie ' + st.set + ' de ' + st.sets;
     var html = header() + '<div class="pbody"><div class="kind">' + kind + '</div><div class="pname">' + e.n + '</div>' +
       '<div class="figbox"><svg id="pfig"></svg></div>';
     if (isTime) {
       html += '<div class="ringwrap">' + ring(1) + '<div class="tx"><b id="rn">3</b><span id="rl">¡Prepárate!</span></div></div>';
     } else {
-      html += '<div class="target">Haz <b>' + st.val + '</b> repeticiones</div><button class="counter" id="cnt" data-a="cnt"><b id="cn">0</b><span>toca para contar</span></button>';
+      html += '<div class="target">Haz <b id="tv">' + st.val + '</b> repeticiones</div><button class="counter" id="cnt" data-a="cnt"><b id="cn">0</b><span>toca para contar</span></button>';
+      if (st.kind === 'main' && st.chain) html += ADJ;
     }
     html += '<div class="cue">' + e.steps.map(function (s, i) { return (i + 1) + '. ' + s; }).join('<br>') + '</div></div>';
     html += '<div class="pfoot"><button class="rb" data-a="pprev">‹</button>' +
@@ -402,7 +569,7 @@
     if (nx) {
       var e = EX[nx.ex];
       html += '<div class="mut small" style="margin-top:14px;font-weight:800">A CONTINUACIÓN</div><div class="up"><div class="figbox"><svg id="pfig"></svg></div><div><b style="font-size:18px">' + e.n + '</b><div class="mut small" style="margin-top:4px">' +
-        (nx.kind === 'main' ? 'Serie ' + nx.set + '/' + nx.sets + ' · ' : '') + targetTxt(nx.ex, nx.val, nx.type) + '</div></div></div>';
+        (nx.kind === 'main' ? 'Serie ' + nx.set + '/' + nx.sets + ' · ' : '') + '<span id="upv">' + targetTxt(nx.ex, nx.val, nx.type) + '</span></div>' + (nx.kind === 'main' && nx.chain ? ADJ : '') + '</div></div>';
     }
     html += '</div><div class="pfoot"><button class="btn sec sm" style="width:auto" data-a="plus">+15 s</button><button class="btn" data-a="pnext">Saltar descanso ›</button></div>';
     ov(html);
@@ -410,6 +577,22 @@
     P.beepTick = true; P.sayTick = true;
     say((st.title ? st.title.replace(/[^\wáéíóúñ ]/gi, '') : 'Descanso') + (nx ? '. Siguiente: ' + EX[nx.ex].n : ''));
     startTimer(st.secs, function (rem, s) { var n = $('#rn'); if (n) n.textContent = s; setRing(rem / (P.total * 1000), '#c084fc'); }, function () { beep(1000, 300, 0.35); vib(150); next(); });
+  }
+
+  /* ajuste rápido de dificultad en pleno entrenamiento */
+  function adjust(dir) {
+    var idx = P.i, st = P.steps[idx], j;
+    if (st.k === 'rest') { idx = -1; for (j = P.i + 1; j < P.steps.length; j++) if (P.steps[j].k === 'ex') { idx = j; break; } if (idx < 0) return; st = P.steps[idx]; }
+    if (st.kind !== 'main' || !st.chain) { toast('Solo en las series de la rutina'); return; }
+    var v = CHAINS[st.chain][S.chains[st.chain].i], delta = v.st * 2, lo = st.type === 'time' ? 5 : 3, hi = v.max + v.st * 2;
+    var nv = Math.max(lo, Math.min(hi, st.val + dir * delta));
+    if (nv === st.val) { toast(dir > 0 ? 'Ya estás en el máximo' : 'Ya está en el mínimo'); return; }
+    for (j = idx; j < P.steps.length; j++) { var q = P.steps[j]; if (q.k === 'ex' && q.kind === 'main' && q.chain === st.chain) q.val = nv; }
+    if (!S.settings.nojump) P.adj[st.chain] = nv;
+    toast((dir > 0 ? '💪 ' : '😅 ') + 'Ahora: ' + targetTxt(st.ex, nv, st.type));
+    var tv = $('#tv'); if (tv) tv.textContent = nv;
+    var uv = $('#upv'); if (uv) uv.textContent = targetTxt(st.ex, nv, st.type);
+    say('Ahora ' + nv);
   }
 
   function completeStep() {
@@ -427,37 +610,61 @@
 
   function finish() {
     clearTimer(); destroyFigs(); keepAwake(false);
-    var secs = Math.round((Date.now() - P.t0) / 1000), d = today(), isS = P.id === 'S';
+    var secs = Math.round((Date.now() - P.t0) / 1000), d = today(), id = P.id, light = isLight(id), isQuick = !!QUICK[id];
     var day = S.days[d] || (S.days[d] = { w: 0, sec: 0, sets: 0 });
-    day.w++; day.sec += secs; day.sets += P.sets;
-    P.done.forEach(function (x) { if (!S.recs[x.ex] || x.val > S.recs[x.ex]) S.recs[x.ex] = x.val; });
-    S.total++; S.log.push({ d: d, id: P.id, sec: secs }); if (S.log.length > 300) S.log.shift();
+    day.w++; day.sec += secs; day.sets += P.sets; delete day.freeze;
+    var reps = 0, best = {};
+    P.done.forEach(function (x) {
+      if (!S.recs[x.ex] || x.val > S.recs[x.ex]) S.recs[x.ex] = x.val;
+      if (EX[x.ex].type === 'reps') reps += x.val;
+      if (!best[x.ex] || x.val > best[x.ex]) best[x.ex] = x.val;
+    });
+    Object.keys(best).forEach(function (k) {
+      var a = S.exh[k] || (S.exh[k] = []), last = a[a.length - 1];
+      if (last && last.d === d) last.v = Math.max(last.v, best[k]); else a.push({ d: d, v: best[k] });
+      if (a.length > 40) a.shift();
+    });
+    day.reps = (day.reps || 0) + reps;
+    if (new Date().getHours() < 8) day.early = 1;
+    // ajustes rápidos hechos durante la sesión
+    Object.keys(P.adj).forEach(function (k) { S.chains[k].v = Math.min(CHAINS[k][S.chains[k].i].max, P.adj[k]); });
+    S.total++; S.log.push({ d: d, id: id, sec: secs }); if (S.log.length > 300) S.log.shift();
     var done = Object.keys(P.chains);
-    if (!isS) {
-      S.rot = (ORDER.indexOf(P.id) + 1) % 3;
+    if (!light) {
+      if (ORDER.indexOf(id) >= 0) S.rot = (ORDER.indexOf(id) + 1) % ORDER.length;
       S.last = { prev: clone(S.chains), done: done, mult: 1 };
       S.chains = applyProg(S.last.prev, done, 1);
     } else S.last = null;
+    // XP, meta semanal y plan
+    var gain = light ? 15 : 20 + P.sets * 6 + (isQuick ? 0 : 20), wk = weekKey(), tp = todayPlan();
+    P.goalHit = false; P.planDay = false;
+    if (weekCount() >= S.settings.goal && !S.goalsHit[wk]) { S.goalsHit[wk] = 1; gain += 50; P.goalHit = true; }
+    if (tp && tp.t !== 'R') { gain += 10; P.planDay = true; }
+    if (tp && tp.i >= 27) S.planDone = true;
+    var up = addXP(gain); P.xp = { gain: gain, up: up };
     save(); syncReminder();
     beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
-    summary(secs, isS);
+    summary(secs, light);
   }
 
   function changesHTML() {
     if (!S.last || !S.last.done.length) return '';
     var out = S.last.done.map(function (k) {
-      var a = S.last.prev[k], b = S.chains[k], ea = CHAINS[k][a.i], eb = CHAINS[k][b.i];
+      var a = S.last.prev[k], b = S.chains[k], eb = CHAINS[k][b.i];
       if (a.i !== b.i) return '🎉 <b>¡Subes de nivel!</b> ' + EX[eb.ex].n + ' · ' + targetTxt(eb.ex, b.v);
       return EX[eb.ex].n + ': ' + targetTxt(eb.ex, a.v) + ' → <b>' + targetTxt(eb.ex, b.v) + '</b>';
     });
     return '<div class="card" style="margin-top:14px"><div class="mut small" style="font-weight:800;margin-bottom:6px">PRÓXIMA VEZ</div>' + out.map(function (x) { return '<div style="padding:4px 0;font-size:14px">' + x + '</div>'; }).join('') + '</div>';
   }
-  function summary(secs, isS) {
-    var st = stats();
+  function summary(secs, light) {
+    var st = stats(), x = P.xp;
     var html = '<div class="pbody" style="padding-top:calc(var(--safe-t) + 20px)"><div class="trophy">🏆</div><div class="title" style="text-align:center;margin-top:6px">¡Entrenamiento completado!</div>' +
+      '<p style="text-align:center;margin:8px 0 0;color:var(--mut);line-height:1.4">' + cheer(st.cur) + '</p>' +
       '<div class="card streak" style="margin-top:16px;text-align:center"><div class="flame" style="font-size:44px">🔥</div><div class="num">' + st.cur + '</div><div style="font-weight:800">' + (st.cur === 1 ? 'día de racha' : 'días de racha') + '</div></div>' +
+      '<div class="row" style="justify-content:center;flex-wrap:wrap;margin-bottom:6px"><span class="chip on">+' + x.gain + ' XP</span>' + (P.goalHit ? '<span class="chip">🎯 ¡Meta semanal cumplida! +50</span>' : '') + (P.planDay ? '<span class="chip">📅 Día del plan ✓</span>' : '') + '</div>' +
+      (x.up ? '<div class="note" style="text-align:center;font-weight:800">⭐ ¡Subiste al nivel ' + x.up + ': ' + lvlName(x.up) + '!</div>' : '') +
       '<div class="sumgrid"><div><b>' + mmss(secs) + '</b><span>Tiempo</span></div><div><b>' + P.sets + '</b><span>Series</span></div><div><b>' + P.exs + '</b><span>Ejercicios</span></div></div>';
-    if (!isS && S.last && S.last.done.length) {
+    if (!light && S.last && S.last.done.length) {
       html += '<div class="mut small" style="font-weight:800;margin-bottom:8px">¿CÓMO TE SENTISTE?</div><div class="fb"><button data-a="fb" data-v="2">😄 Fácil</button><button class="on" data-a="fb" data-v="1">👍 Justo</button><button data-a="fb" data-v="0">😓 Difícil</button></div><div id="chg">' + changesHTML() + '</div>';
     }
     html += '<textarea class="note2" id="note" maxlength="200" placeholder="📝 Nota del día (opcional): ¿cómo te sentiste?"></textarea>';
@@ -486,6 +693,11 @@
       '<div class="note">🌱 Sobre la altura: depende mucho de la genética, pero dormir, comer bien, buena postura y ejercicio te ayudan a llegar a tu máximo.</div>' +
       '<button class="btn" style="margin-top:20px" data-a="obstart">¡Empezar!</button>';
     document.body.appendChild(o);
+  }
+
+  /* hábitos completos = +15 XP (una vez por día) */
+  function habDone(h) {
+    if (habCount(h) === 4 && !h.xp) { h.xp = 1; var up = addXP(15); toast('✅ ¡Hábitos completos! +15 XP' + (up ? ' · ⭐ nivel ' + up : '')); }
   }
 
   /* ---------- acciones ---------- */
@@ -528,6 +740,29 @@
         catch (e) { toast('Texto no válido'); } break;
       case 'reset':
         dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
+      case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); render(); break;
+      case 'hab':
+        var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); render(); break;
+      case 'slp':
+        var hs = hab(); hs.sl = Math.max(3, Math.min(12, (hs.sl || 7.5) + 0.5 * (+v))); habDone(hs); save(); render(); break;
+      case 'evx': progEx = v; render(); break;
+      case 'planopen': openPlan(); break;
+      case 'planstart': S.plan = { start: today() }; S.planDone = false; save(); sheetClose(); toast('📅 ¡Plan iniciado! Hoy es el día 1'); render(); break;
+      case 'planstop': dialog('¿Dejar el plan?', 'Tu progreso y tu racha no se pierden. Volverás a las rutinas en rotación.', 'Dejar plan', function () { S.plan = null; save(); sheetClose(); render(); }, true); break;
+      case 'crnew': openBuilder(null); break;
+      case 'cred': openBuilder(v); break;
+      case 'crdel': dialog('¿Eliminar rutina?', 'Esta rutina se borrará. No se puede deshacer.', 'Eliminar', function () { S.custom = S.custom.filter(function (c) { return c.id !== v; }); save(); sheetClose(); render(); }, true); break;
+      case 'cru': case 'crd':
+        var sh = $('#sheet .sheet'), sc = sh ? sh.scrollTop : 0;
+        cr.sets[v] = Math.max(0, Math.min(5, cr.sets[v] + (a === 'cru' ? 1 : -1))); renderBuilder(sc); break;
+      case 'crsave':
+        var slots = []; CHAIN_KEYS.forEach(function (k) { if (cr.sets[k] > 0) slots.push([k, cr.sets[k]]); });
+        if (!slots.length) { toast('Elige al menos un ejercicio'); break; }
+        var nm = (cr.name || '').trim() || 'Mi rutina';
+        if (cr.id) { S.custom.forEach(function (c) { if (c.id === cr.id) { c.name = nm; c.slots = slots; } }); }
+        else S.custom.push({ id: 'U' + Date.now(), name: nm, slots: slots });
+        save(); sheetClose(); toast('Rutina guardada ✅'); render(); break;
+      case 'adj': adjust(+v); break;
       case 'updno': dialogClose(); break;
       case 'updgo':
         upd.busy = true;
@@ -564,6 +799,7 @@
     var t = ev.target, k = t.getAttribute && t.getAttribute('data-set'); if (!k) return;
     if (k === 'name') { S.name = t.value.trim(); save(); }
     else if (k === 'rest') { S.settings.rest = +t.value; var r = $('#rv'); if (r) r.textContent = t.value + ' s'; save(); }
+    else if (k === 'crname') { if (cr) cr.name = t.value; }
     else if (k === 'rtime') { var p = t.value.split(':'); if (p.length === 2) { S.settings.rh = +p[0]; S.settings.rm = +p[1]; save(); syncReminder(); } }
   });
 
@@ -607,8 +843,9 @@
     else toast('Actualización lista: se aplicará al reabrir la app');
   };
 
-  document.addEventListener('visibilitychange', function () { if (!document.hidden && !P) render(); });
-  load(); applyTheme(); render(true); syncReminder();
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && !P) { autoFreezeMsg(); render(); } });
+  function autoFreezeMsg() { if (S.setup && autoFreeze()) toast('❄️ Usamos un congelamiento: ¡tu racha sigue viva!'); }
+  load(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
   if (!S.setup) onboarding();
   setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
 })();

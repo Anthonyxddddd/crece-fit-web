@@ -231,9 +231,44 @@ var WORKOUTS = {
     slots: [['squat', 3], ['lunge', 2], ['glute', 3], ['kick', 2], ['calf', 2], ['wsit', 2]] },
   B: { name: 'Pecho, espalda y core', emoji: '💪', desc: 'Empuje, brazos, espalda y abdomen.',
     slots: [['push', 3], ['arms', 2], ['back', 2], ['core', 3], ['bird', 2], ['plank', 2]] },
+  D: { name: 'Core y estabilidad', emoji: '🎯', desc: 'Abdomen, espalda y equilibrio para una postura fuerte.',
+    slots: [['core', 3], ['bird', 3], ['plank', 3], ['back', 2], ['glute', 2]] },
   C: { name: 'Cuerpo completo', emoji: '⚡', desc: 'Todo el cuerpo con cardio, saltos y burpees.',
     slots: [['cardio', 2], ['squat', 2], ['push', 2], ['burp', 2], ['vjump', 2], ['plank', 2]] }
 };
+var QUICK = {
+  Q5: { name: 'Rápida · 5 min', emoji: '⏱', desc: 'Para días con poco tiempo: 4 ejercicios, una serie de cada uno.',
+    slots: [['squat', 1], ['push', 1], ['core', 1], ['plank', 1]], rest: 15, warm: false,
+    cool: [{ ex: 'child', val: 20 }, { ex: 'reach', val: 15 }] },
+  Q10: { name: 'Rápida · 10 min', emoji: '⏲', desc: 'Cardio, piernas, empuje y core en solo 10 minutos.',
+    slots: [['cardio', 1], ['squat', 2], ['push', 2], ['core', 2], ['plank', 1]], rest: 20, warm: false,
+    cool: [{ ex: 'child', val: 25 }, { ex: 'cobra', val: 25 }, { ex: 'reach', val: 20 }] }
+};
+var POSTURE_ROUTINE = { name: 'Chequeo de postura', emoji: '🧍', label: 'Postura',
+  desc: '2 minutos para enderezar la espalda y estirarte. También cuenta para tu racha.',
+  items: [{ ex: 'reach', val: 20 }, { ex: 'wallangel', val: 8, type: 'reps' }, { ex: 'catcow', val: 30 }, { ex: 'child', val: 25 }] };
+
+/* Plan de 4 semanas: el día 1 es el día en que empiezas (A, S=estiramientos, R=descanso activo) */
+var PLAN_WEEK = ['A', 'S', 'B', 'R', 'C', 'D', 'R'];
+var PLAN_ICON = { A: '🦵', B: '💪', C: '⚡', D: '🎯', S: '🌱', R: '🛌' };
+
+var WARM_SETS = {
+  cardio: [{ ex: 'jacks', val: 30 }],
+  suave: [{ ex: 'catcow', val: 30 }, { ex: 'reach', val: 20 }],
+  none: []
+};
+var COOL_SETS = {
+  all: [{ ex: 'child', val: 30 }, { ex: 'cobra', val: 30 }, { ex: 'reach', val: 20 }, { ex: 'sidebend', val: 30 }, { ex: 'seatedfold', val: 30 }],
+  legs: [{ ex: 'seatedfold', val: 40 }, { ex: 'child', val: 30 }, { ex: 'catcow', val: 30 }],
+  back: [{ ex: 'catcow', val: 30 }, { ex: 'cobra', val: 30 }, { ex: 'child', val: 30 }],
+  upper: [{ ex: 'reach', val: 25 }, { ex: 'sidebend', val: 30 }, { ex: 'wallangel', val: 8, type: 'reps' }, { ex: 'child', val: 25 }],
+  none: []
+};
+/* Modo sin saltos: ejercicio silencioso equivalente y factor de repeticiones */
+var NOISY = { jumpsquat: ['squat', 1], jump: ['calf', 2], burpee: ['squat', 2], highknees: ['wallsit', 1], jacks: ['catcow', 1] };
+
+var LEVEL_NAMES = ['Novato', 'Aprendiz', 'Atleta', 'Guerrero', 'Experto', 'Máquina', 'Campeón', 'Titán', 'Leyenda', 'Mito'];
+
 var WARMUP = [{ ex: 'jacks', val: 30 }];
 var COOLDOWN = [{ ex: 'child', val: 30 }, { ex: 'cobra', val: 30 }, { ex: 'reach', val: 20 }, { ex: 'sidebend', val: 30 }, { ex: 'seatedfold', val: 30 }];
 var STRETCH_ROUTINE = { name: 'Crecer · estiramientos', emoji: '🌱', desc: 'Rutina suave de 6 minutos para postura y columna. También mantiene tu racha en días de descanso.',
@@ -261,5 +296,13 @@ var BADGES = [
   { id: 's7', e: '🚀', n: 'Racha de 7 días', f: function (s) { return s.best >= 7; } },
   { id: 's14', e: '⚡', n: 'Racha de 14 días', f: function (s) { return s.best >= 14; } },
   { id: 's30', e: '👑', n: 'Racha de 30 días', f: function (s) { return s.best >= 30; } },
+  { id: 'lvl3', e: '⭐', n: 'Nivel 3', f: function (s) { return s.lvl >= 3; } },
+  { id: 'lvl6', e: '🌠', n: 'Nivel 6', f: function (s) { return s.lvl >= 6; } },
+  { id: 'goal1', e: '🎯', n: 'Meta semanal cumplida', f: function (s) { return s.goalsHit >= 1; } },
+  { id: 'goal4', e: '🎖', n: '4 metas semanales', f: function (s) { return s.goalsHit >= 4; } },
+  { id: 'reps100', e: '💯', n: '100 reps en un día', f: function (s) { return s.maxReps >= 100; } },
+  { id: 'early', e: '🌅', n: 'Madrugador (antes de las 8)', f: function (s) { return s.early; } },
+  { id: 'habits7', e: '💧', n: '7 días de hábitos completos', f: function (s) { return s.habitDays >= 7; } },
+  { id: 'plan', e: '📅', n: 'Plan de 4 semanas', f: function (s) { return s.planDone; } },
   { id: 'push', e: '🦾', n: 'Llegaste a flexión normal', f: function (s) { return s.chains.push && s.chains.push.i >= 2; } }
 ];
