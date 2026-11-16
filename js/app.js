@@ -23,7 +23,7 @@
   /* ---------- estado ---------- */
   function fresh() {
     return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0,
-      goal: 3, warm: 'cardio', cool: 'all', nojump: false }, recs: {},
+      goal: 3, warm: 'cardio', cool: 'all', nojump: false, risk: false }, recs: {},
       days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null,
       xp: 0, freeze: { m: '', used: 0 }, habits: {}, custom: [], plan: null, planDone: false, exh: {}, goalsHit: {} };
   }
@@ -38,6 +38,7 @@
     if (!S) { S = fresh(); initChains(false); }
     Object.keys(CHAINS).forEach(function (k) { if (!S.chains[k]) S.chains[k] = { i: 0, v: CHAINS[k][0].s }; });
     var f0 = fresh(); ['recs', 'habits', 'exh', 'goalsHit'].forEach(function (k) { if (!S[k]) S[k] = {}; });
+    if (!S.cloud) S.cloud = { code: '', auto: true, last: 0 };
     if (!S.custom) S.custom = []; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
   }
@@ -109,7 +110,29 @@
       var last = Object.keys(S.days).sort().pop() || '';
       AND().setReminder(!!S.settings.rem, S.settings.rh, S.settings.rm, msg, last);
     } catch (e) { }
+    syncWidget();
   }
+  var NOTIF_MSGS = ['¡Es hora de entrenar! 💪', 'Tu racha de {n} días te espera 🔥', 'Hoy bastan 15 minutos. ¡Tú puedes! 🙌', '¡Hoy toca crecer! 🌱',
+    'Un día más suma. ¡Vamos! ⚡', 'Tu cuerpo te lo agradecerá 😎', 'No rompas tu racha de {n} días 🔥', 'Haz tu chequeo de postura de 2 minutos 🧍'];
+  function lastKeys() {
+    var ks = Object.keys(S.days).sort(), i, lw = '';
+    for (i = ks.length - 1; i >= 0; i--) if (S.days[ks[i]].w > 0) { lw = ks[i]; break; }
+    return { any: ks.length ? ks[ks.length - 1] : '', w: lw };
+  }
+  function todayRoutineId() { var tp = todayPlan(); return tp ? (tp.t === 'R' ? 'P' : tp.t) : nextId(); }
+  function syncWidget() {
+    try {
+      var a = AND(); if (!a) return;
+      var st = stats(), k = lastKeys();
+      if (a.updateWidget) a.updateWidget(st.cur, k.any, k.w, rdef(todayRoutineId()).name);
+      if (a.setReminderPlus) a.setReminderPlus(!!S.settings.risk, JSON.stringify(NOTIF_MSGS));
+    } catch (e) { }
+  }
+  // botón "Empezar" de la notificación
+  window.__startToday = function () {
+    if (P || $('#ob')) return;
+    sheetClose(); dialogClose(); startWorkout(todayRoutineId());
+  };
 
   /* ---------- efectos ---------- */
   var fx = { hab: null, tab: false };
@@ -138,6 +161,103 @@
       box.appendChild(p);
     }
     o.appendChild(box); setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 4200);
+  }
+
+  /* ---------- copia en la nube (Firebase Realtime Database) ----------
+     Los datos se guardan cifrados con tu código; sin el código no se pueden leer. */
+  function cloudCfg() { if (!S.cloud) S.cloud = { code: '', auto: true, last: 0 }; return S.cloud; }
+  function cyrb(str, seed) {
+    var h1 = 0xdeadbeef ^ seed, h2 = 0x41c6ce57 ^ seed, i, ch;
+    for (i = 0; i < str.length; i++) { ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507) ^ Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507) ^ Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return ('00000000' + (h2 >>> 0).toString(16)).slice(-8) + ('00000000' + (h1 >>> 0).toString(16)).slice(-8);
+  }
+  function cloudId(code) { var c = 'id:' + code; return cyrb(c, 1) + cyrb(c, 2) + cyrb(c, 3); }
+  function genCode() {
+    var al = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789', a = new Uint8Array(16), o = '', i;
+    (window.crypto || window.msCrypto).getRandomValues(a);
+    for (i = 0; i < 16; i++) { o += al[a[i] % al.length]; if (i % 4 === 3 && i < 15) o += '-'; }
+    return o;
+  }
+  function b64(buf) { var a = new Uint8Array(buf), s2 = '', i; for (i = 0; i < a.length; i++) s2 += String.fromCharCode(a[i]); return btoa(s2); }
+  function unb64(str) { var s2 = atob(str), a = new Uint8Array(s2.length), i; for (i = 0; i < s2.length; i++) a[i] = s2.charCodeAt(i); return a; }
+  function hasCrypto() { return !!(window.crypto && crypto.subtle && window.TextEncoder); }
+  function cloudKey(code) {
+    var te = new TextEncoder();
+    return crypto.subtle.importKey('raw', te.encode(code), 'PBKDF2', false, ['deriveKey']).then(function (k) {
+      return crypto.subtle.deriveKey({ name: 'PBKDF2', salt: te.encode('crece-fit-v1'), iterations: 100000, hash: 'SHA-256' }, k, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
+    });
+  }
+  function pack(json, code) {
+    if (!hasCrypto()) return Promise.resolve({ v: 0, d: btoa(unescape(encodeURIComponent(json))), t: Date.now() });
+    var iv = crypto.getRandomValues(new Uint8Array(12));
+    return cloudKey(code).then(function (k) { return crypto.subtle.encrypt({ name: 'AES-GCM', iv: iv }, k, new TextEncoder().encode(json)); })
+      .then(function (ct) { return { v: 1, iv: b64(iv), d: b64(ct), t: Date.now() }; });
+  }
+  function unpack(o, code) {
+    if (o.v === 0) return Promise.resolve(decodeURIComponent(escape(atob(o.d))));
+    if (!hasCrypto()) return Promise.reject(new Error('Este teléfono no puede descifrar la copia'));
+    return cloudKey(code).then(function (k) { return crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(o.iv) }, k, unb64(o.d)); })
+      .then(function (pt) { return new TextDecoder().decode(pt); }, function () { throw new Error('Código incorrecto'); });
+  }
+  function cloudSave(silent) {
+    var c = cloudCfg();
+    if (!CLOUD_URL || !c.code) return Promise.resolve(false);
+    var snap = JSON.parse(JSON.stringify(S)); delete snap.cloud;
+    return pack(JSON.stringify(snap), c.code).then(function (obj) {
+      return fetch(CLOUD_URL + '/b/' + cloudId(c.code) + '.json', { method: 'PUT', body: JSON.stringify(obj) });
+    }).then(function (r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      c.last = Date.now(); save(); if (!silent) toast('☁️ Copia guardada'); return true;
+    }).catch(function (e) { if (!silent) toast('No se pudo guardar: ' + (e && e.message || e)); return false; });
+  }
+  function cloudOn() {
+    if (!CLOUD_URL) return;
+    var c = cloudCfg(); c.code = genCode(); c.auto = true; save();
+    cloudSave(false).then(function (ok) { if (!ok) { c.code = ''; save(); } render(); });
+  }
+  function cloudOff() {
+    var c = cloudCfg(), id = cloudId(c.code);
+    try { fetch(CLOUD_URL + '/b/' + id + '.json', { method: 'DELETE' }); } catch (e) { }
+    c.code = ''; c.last = 0; save(); toast('Copia en la nube desactivada'); render();
+  }
+  function cloudFind(raw) {
+    var code = raw.toUpperCase().replace(/[^A-Z0-9]/g, '');
+    if (code.length !== 16) { toast('El código tiene 16 letras y números'); return; }
+    code = code.replace(/(.{4})(?=.)/g, '$1-');
+    toast('Buscando…');
+    fetch(CLOUD_URL + '/b/' + cloudId(code) + '.json').then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function (o) { if (!o) throw new Error('No hay ninguna copia con ese código'); return unpack(o, code); })
+      .then(function (txt) {
+        var data = JSON.parse(txt);
+        if (!data || !data.settings || !data.days) throw new Error('La copia no es válida');
+        var n = data.total || 0;
+        sheetClose();
+        dialog('Copia encontrada ☁️', 'Tiene ' + n + ' entrenamiento' + (n === 1 ? '' : 's') + ' y nivel ' + levelOf(data.xp || 0) + '. Al restaurar se <b>reemplazan los datos de este teléfono</b>. ¿Continuar?', 'Restaurar', function () {
+          data.cloud = { code: code, auto: true, last: Date.now() };
+          S = data; save(); load(); save(); applyTheme(); toast('Datos restaurados ✅'); render(true); syncReminder();
+        });
+      }).catch(function (e) { toast(e && e.message || 'No se pudo restaurar'); });
+  }
+  function cloudAuto() {
+    var c = cloudCfg();
+    if (CLOUD_URL && c.code && c.auto && Date.now() - c.last > 20 * 3600 * 1000) cloudSave(true);
+  }
+  function cloudCard() {
+    var c = cloudCfg(), h = '<div class="card"><b>☁️ Copia en la nube</b>';
+    if (!CLOUD_URL) return h + '<p class="mut small" style="margin:6px 0 0;line-height:1.5">Aún no está configurada. Mientras tanto, usa la copia manual de abajo.</p></div>';
+    if (!c.code) {
+      return h + '<p class="mut small" style="margin:6px 0 12px;line-height:1.5">Guarda tu progreso en internet (cifrado) para recuperarlo si cambias de teléfono. Sin cuenta: solo necesitas un código.</p>' +
+        '<div class="row"><button class="btn sm sp" data-a="cloudon">Activar</button><button class="btn sec sm sp" data-a="cloudrestore">Ya tengo un código</button></div></div>';
+    }
+    var d = c.last ? new Date(c.last) : null;
+    return h + '<p class="mut small" style="margin:6px 0 8px">Tu código (guárdalo, lo necesitas en otro teléfono):</p>' +
+      '<button class="codebox" data-a="cloudcopy">' + c.code + ' <span>📋</span></button>' +
+      '<p class="mut small" style="margin:8px 0 12px">' + (d ? 'Última copia: ' + pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) : 'Aún sin copia') + '</p>' +
+      '<div class="set" style="padding:6px 0"><div class="sp"><b>Guardar automáticamente</b><div class="mut small">Después de entrenar y una vez al día</div></div><div class="sw' + (c.auto ? ' on' : '') + '" data-a="cloudauto"></div></div>' +
+      '<div class="row" style="margin-top:6px"><button class="btn sm sp" data-a="cloudsave">Guardar ahora</button><button class="btn sec sm sp" data-a="cloudrestore">Restaurar</button></div>' +
+      '<button class="btn ghost sm" style="margin-top:10px;width:100%" data-a="cloudoff">Desactivar</button></div>';
   }
 
   /* ---------- tema y voz ---------- */
@@ -410,6 +530,11 @@
   function seg(key, opts, cur) {
     return '<div class="seg">' + opts.map(function (o) { return '<button class="' + (String(cur) === String(o[0]) ? 'on' : '') + '" data-a="opt" data-v="' + key + ':' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>';
   }
+  function nativeOk(fn) { try { return !!(AND() && AND()[fn]); } catch (e) { return false; } }
+  function widgetCard() {
+    return '<div class="card"><b>🧩 Widget de racha</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Mira tu racha 🔥 en la pantalla de inicio del teléfono y entra con un toque.</p>' +
+      (nativeOk('pinWidget') ? '<button class="btn sec sm" data-a="pinw">➕ Añadir a la pantalla de inicio</button>' : '<p class="mut small" style="margin:0">Necesita la última versión del APK.</p>') + '</div>';
+  }
   function sw(name) { return '<div class="sw' + (S.settings[name] ? ' on' : '') + '" data-a="tog" data-v="' + name + '"></div>'; }
   function setV() {
     var s = S.settings;
@@ -426,8 +551,11 @@
       '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
       '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +
       '<div class="set"><div class="sp"><b>📳 Vibración</b><div class="mut small">Avisos con vibración</div></div>' + sw('vib') + '</div>' +
-      '<div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Aviso para no perder tu racha</div></div>' + sw('rem') + '</div>' +
-      (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') + '</div>' +
+      '<div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Con botones “Empezar” y “En 1 hora”</div></div>' + sw('rem') + '</div>' +
+      (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') +
+      '<div class="set" style="border-bottom:0"><div class="sp"><b>🔥 Aviso de racha en peligro</b><div class="mut small">A las 9 pm, solo si aún no entrenaste</div></div>' + sw('risk') + '</div>' +
+      (nativeOk('setReminderPlus') ? '' : '<p class="mut small" style="margin:0">Los botones y este aviso necesitan la última versión del APK.</p>') + '</div>' +
+      widgetCard() + cloudCard() +
       '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b> · APK: <b style="color:var(--txt)">v' + esc(apkName()) + '</b><br>' + esc(updStatusText()) + '</p><div class="row"><button class="btn sec sm sp" data-a="updcheck">🔄 Buscar</button><button class="btn sec sm sp" data-a="gosite">🌐 Página de descargas</button></div></div>' +
       '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="row"><button class="btn sec sm sp" data-a="backup">Exportar</button><button class="btn sec sm sp" data-a="restore">Importar</button></div></div>' +
       '<div class="card"><b>🌱 Sobre crecer</b><p class="mut small" style="margin-top:6px;line-height:1.5">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
@@ -678,7 +806,7 @@
     if (tp && tp.t !== 'R') { gain += 10; P.planDay = true; }
     if (tp && tp.i >= 27) S.planDone = true;
     var up = addXP(gain); P.xp = { gain: gain, up: up };
-    save(); syncReminder();
+    save(); syncReminder(); cloudAuto();
     beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
     summary(secs, light);
   }
@@ -762,7 +890,7 @@
       case 'tog':
         setBool(v);
         if (v === 'voice' && S.settings.voice) say('Voz activada');
-        if (v === 'rem') { if (S.settings.rem && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
+        if (v === 'rem' || v === 'risk') { if ((S.settings.rem || S.settings.risk) && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
         render(); break;
       case 'backup': var js = JSON.stringify(S);
         sheet('<div class="title" style="font-size:22px">Copia de seguridad</div><p class="mut small" style="margin:8px 0">Copia este texto y guárdalo (notas, mensaje a ti mismo…). Para restaurar, pégalo en “Importar”.</p><textarea id="bk" rows="7" readonly>' + esc(js) + '</textarea><div class="row" style="margin-top:12px"><button class="btn sm sp" data-a="copybk">Copiar</button><button class="btn sec sm sp" data-a="sharebk">Compartir</button></div>'); break;
@@ -800,6 +928,18 @@
         else S.custom.push({ id: 'U' + Date.now(), name: nm, slots: slots });
         save(); sheetClose(); toast('Rutina guardada ✅'); render(); break;
       case 'adj': adjust(+v); break;
+      case 'pinw':
+        try { if (AND().pinWidget()) toast('Elige dónde poner el widget 👆'); else toast('Mantén pulsado un espacio vacío de tu pantalla → Widgets → Crece Fit'); } catch (e) { }
+        break;
+      case 'cloudon': cloudOn(); break;
+      case 'cloudsave': cloudSave(false).then(function () { render(); }); break;
+      case 'cloudauto': cloudCfg().auto = !cloudCfg().auto; save(); render(); break;
+      case 'cloudcopy': try { if (AND() && AND().copy) AND().copy(cloudCfg().code); toast('Código copiado 📋'); } catch (e) { } break;
+      case 'cloudrestore':
+        sheet('<div class="title" style="font-size:22px">☁️ Restaurar desde la nube</div><p class="mut small" style="margin:8px 0">Escribe el código de tu copia (lo ves en Ajustes del otro teléfono).</p><input type="text" id="ccode" maxlength="19" placeholder="XXXX-XXXX-XXXX-XXXX" style="text-transform:uppercase;letter-spacing:1px"><button class="btn" style="margin-top:12px" data-a="cloudfind">Buscar copia</button>'); break;
+      case 'cloudfind': cloudFind(($('#ccode').value || '')); break;
+      case 'cloudoff':
+        dialog('¿Desactivar la copia?', 'Se borrará la copia guardada en la nube y este teléfono dejará de subirla. Tus datos locales no se tocan.', 'Desactivar', function () { cloudOff(); }, true); break;
       case 'gosite': dialogClose(); openSite(); break;
       case 'apkno': if (apkInfo) { S.apkDismiss = apkInfo.code; save(); } render(); break;
       case 'updcheck':
@@ -974,6 +1114,7 @@
   function autoFreezeMsg() { if (S.setup && autoFreeze()) toast('❄️ Usamos un congelamiento: ¡tu racha sigue viva!'); }
   load(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
   setTimeout(function () { jsCheck(false); }, 2500);
+  setTimeout(cloudAuto, 6000);
   if (!S.setup) onboarding();
   setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
 })();
