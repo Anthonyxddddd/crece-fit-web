@@ -117,7 +117,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
 #toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:99}
 #toast.on{opacity:1;transform:translateX(-50%)}
 .news ul{margin:0;padding-left:20px;color:var(--mut)}.news li{margin:8px 0}
-.news{max-width:640px;margin:34px auto 0}
+.news{margin:0}.news2{display:grid;grid-template-columns:1fr 1fr;gap:18px;max-width:900px;margin:34px auto 0}@media (max-width:760px){.news2{grid-template-columns:1fr}}
 
 /* tablet y teléfono */
 @media (max-width:900px){
@@ -348,7 +348,10 @@ details[open] p{animation:rise .35s ease-out both}
   <section id="novedades" style="background:var(--bg2)">
     <div class="wrap">
       <h2>Novedades</h2>
-      <div class="card news"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><b style="font-size:18px">Versión <span id="ver2">—</span></b><span class="chip" id="date2"></span></div><ul id="notes"><li>Cargando…</li></ul></div>
+      <div class="news2">
+        <div class="card news"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap"><b style="font-size:18px">📲 App (APK) <span id="ver2">—</span></b><span class="chip" id="date2"></span></div><p class="mut" style="margin:0 0 4px;font-size:14px">Se instala desde esta página.</p><ul id="notes"><li>Cargando…</li></ul></div>
+        <div class="card news"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;flex-wrap:wrap"><b style="font-size:18px">⚡ Contenido <span id="wver">—</span></b><span class="chip" id="wdate"></span></div><p class="mut" style="margin:0 0 4px;font-size:14px">Se actualiza solo desde la app, sin instalar nada.</p><ul id="wnotes"><li>Cargando…</li></ul></div>
+      </div>
     </div>
   </section>
 
@@ -462,11 +465,15 @@ details[open] p{animation:rise .35s ease-out both}
   // versión del APK
   function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
   fetch('apk.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (a) {
-    $('ver').textContent = 'Versión ' + a.version; $('ver2').textContent = a.version;
+    $('ver').textContent = 'Versión ' + a.version; $('ver2').textContent = 'v' + a.version;
     if (a.size) $('size').textContent = a.size >= 1048576 ? (a.size / 1048576).toFixed(1) + ' MB' : Math.round(a.size / 1024) + ' KB';
     if (a.date) { $('date').textContent = a.date; $('date2').textContent = a.date; }
     $('notes').innerHTML = (a.notes && a.notes.length) ? a.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') : '<li>Mejoras generales.</li>';
   }).catch(function () { $('notes').innerHTML = '<li>Mejoras generales.</li>'; });
+  fetch('web.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (w) {
+    $('wver').textContent = 'v' + w.version; if (w.date) $('wdate').textContent = w.date;
+    $('wnotes').innerHTML = (w.notes && w.notes.length) ? w.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') : '<li>Mejoras generales.</li>';
+  }).catch(function () { $('wnotes').innerHTML = '<li>Mejoras generales.</li>'; });
 })();
 </script>
 </body>
