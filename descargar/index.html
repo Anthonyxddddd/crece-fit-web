@@ -3,91 +3,321 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
 <meta name="theme-color" content="#0e1120">
-<title>Crece Fit · Descargar</title>
+<meta name="description" content="Crece Fit: rutinas de ejercicio sin equipo para principiantes, con tutoriales animados, temporizadores, progresión automática y racha de días. Descarga gratis para Android.">
+<title>Crece Fit · Descargar para Android</title>
 <style>
-:root{--bg:#0e1120;--card:#1a1f3a;--card2:#252c52;--txt:#f3f5ff;--mut:#9aa4d0;--acc:#4aa8ff;--acc2:#2b7fe0;--on:#04182e;--line:#2c3460}
-@media (prefers-color-scheme:light){:root{--bg:#f1f4ff;--card:#fff;--card2:#e5eafa;--txt:#161a33;--mut:#5a6590;--line:#d3dbf2}}
+:root{
+  --bg:#0e1120;--bg2:#141831;--card:#1a1f3a;--card2:#252c52;--line:#2c3460;
+  --txt:#f3f5ff;--mut:#9aa4d0;--acc:#4aa8ff;--acc2:#2b7fe0;--on:#04182e;--fire:#ff8a3d;
+  --glow:rgba(74,168,255,.22);--shadow:0 20px 50px rgba(0,0,0,.45);
+}
+@media (prefers-color-scheme:light){
+  :root{--bg:#f1f4ff;--bg2:#e9eeff;--card:#ffffff;--card2:#e5eafa;--line:#d3dbf2;--txt:#161a33;--mut:#5a6590;--glow:rgba(74,168,255,.18);--shadow:0 20px 50px rgba(30,50,120,.18)}
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,Roboto,"Segoe UI",sans-serif;line-height:1.5}
-.wrap{max-width:560px;margin:0 auto;padding:28px 18px 60px}
-.hero{text-align:center;padding:14px 0 6px}
-.logo{font-size:72px;line-height:1}
-h1{font-size:34px;margin:8px 0 4px;letter-spacing:-.6px}
-.sub{color:var(--mut);margin:0 auto;max-width:420px}
-.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:18px;border-radius:18px;border:0;font-weight:800;font-size:19px;text-decoration:none;
-  background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on);box-shadow:0 8px 24px rgba(74,168,255,.3);margin-top:22px}
-.btn:active{transform:scale(.98)}
-.meta{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:12px}
-.chip{background:var(--card2);color:var(--mut);padding:6px 12px;border-radius:99px;font-size:13px;font-weight:700}
-.card{background:var(--card);border-radius:20px;padding:18px;margin-top:18px;border:1px solid var(--line)}
-h2{font-size:19px;margin:0 0 10px}
-.step{display:flex;gap:12px;margin:12px 0}
-.step i{flex:none;width:28px;height:28px;border-radius:50%;background:var(--acc);color:var(--on);font-style:normal;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:14px}
-.step>div>b:first-child{display:block}
-.mut{color:var(--mut);font-size:14px}
-ul{margin:8px 0 0;padding-left:20px}
-li{margin:6px 0}
-details{margin:10px 0;border-top:1px solid var(--line);padding-top:10px}
-summary{font-weight:700;cursor:pointer}
-details p{margin:8px 0 0;color:var(--mut);font-size:14px}
-.warn{background:rgba(255,138,61,.12);border:1px solid rgba(255,138,61,.35);border-radius:14px;padding:12px 14px;font-size:14px;margin-top:14px}
-footer{text-align:center;color:var(--mut);font-size:13px;margin-top:26px}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.55;-webkit-text-size-adjust:100%}
+img{max-width:100%;display:block}
+a{color:var(--acc)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+section{padding:64px 0}
+h1,h2,h3{margin:0;letter-spacing:-.02em;line-height:1.15}
+h2{font-size:clamp(26px,4vw,38px);text-align:center}
+.lead{color:var(--mut);text-align:center;max-width:620px;margin:12px auto 0;font-size:17px}
+.mut{color:var(--mut)}
+
+/* cabecera */
+header{position:sticky;top:0;z-index:50;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:18px;height:62px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:19px;color:var(--txt);text-decoration:none}
+.brand span{font-size:26px}
+nav{margin-left:auto;display:flex;gap:22px}
+nav a{color:var(--mut);text-decoration:none;font-weight:600;font-size:15px}
+nav a:hover{color:var(--txt)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;padding:14px 24px;border-radius:16px;border:0;font:inherit;font-weight:800;font-size:17px;text-decoration:none;cursor:pointer;
+  background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on);box-shadow:0 10px 28px var(--glow);transition:transform .12s,box-shadow .12s}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:scale(.97)}
+.btn.sm{padding:10px 18px;font-size:15px;border-radius:12px}
+.btn.sec{background:var(--card2);color:var(--txt);box-shadow:none}
+.btn.lg{padding:18px 30px;font-size:19px}
+.chip{display:inline-flex;align-items:center;gap:6px;background:var(--card2);color:var(--mut);padding:6px 12px;border-radius:99px;font-size:13px;font-weight:700}
+
+/* hero */
+.hero{padding:44px 0 30px;background:radial-gradient(900px 500px at 78% 10%,var(--glow),transparent 60%)}
+.hero .wrap{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
+.tag{display:inline-block;background:var(--card2);color:var(--acc);font-weight:800;font-size:13px;padding:6px 14px;border-radius:99px;margin-bottom:16px}
+.hero h1{font-size:clamp(38px,6vw,62px)}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--acc),#8fd0ff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{font-size:19px;color:var(--mut);margin:18px 0 26px;max-width:520px}
+.cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.qrbox{display:none;margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;gap:16px;align-items:center;max-width:470px}
+.qrbox img{width:112px;height:112px;border-radius:10px;background:#fff;flex:none}
+.qrbox b{display:block;margin-bottom:4px}
+.qrbox p{margin:0 0 10px;font-size:14px;color:var(--mut)}
+.notice{display:none;margin-top:18px;background:rgba(255,138,61,.12);border:1px solid rgba(255,138,61,.4);border-radius:14px;padding:12px 16px;font-size:15px;max-width:520px}
+body.desk .qrbox{display:flex}
+body.ios .notice{display:block}
+
+/* teléfono */
+.phone{position:relative;width:250px;aspect-ratio:390/844;border-radius:38px;border:9px solid #0a0c18;background:#0a0c18;box-shadow:var(--shadow),0 0 0 2px var(--line);overflow:hidden;flex:none}
+.phone img{width:100%;height:100%;object-fit:cover}
+.stage{position:relative;display:flex;justify-content:center;padding:10px 0}
+.stage .phone.main{width:min(270px,66vw)}
+.slides{position:relative;width:100%;height:100%}
+.slides img{position:absolute;inset:0;opacity:0;transition:opacity .7s}
+.slides img.on{opacity:1}
+.dots{display:flex;gap:8px;justify-content:center;margin-top:16px}
+.dots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.3s}
+.dots i.on{background:var(--acc);width:22px;border-radius:9px}
+
+/* características */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:24px}
+.feat .ic{font-size:34px;margin-bottom:10px}
+.feat h3{font-size:19px;margin-bottom:6px}
+.feat p{margin:0;color:var(--mut);font-size:15px}
+
+/* capturas */
+#capturas{background:var(--bg2)}
+.shots{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:34px 4px 24px;margin-top:10px;justify-content:flex-start}
+.shots::-webkit-scrollbar{height:6px}.shots::-webkit-scrollbar-thumb{background:var(--line);border-radius:9px}
+.shot{scroll-snap-align:center;text-align:center;flex:none}
+.shot .phone{width:210px;margin:0 auto}
+.shot b{display:block;margin-top:14px;font-size:15px}
+.shot span{font-size:13px;color:var(--mut)}
+
+/* instalar */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:38px;counter-reset:s}
+.step{position:relative;padding-top:40px}
+.step::before{counter-increment:s;content:counter(s);position:absolute;top:-16px;left:22px;width:40px;height:40px;border-radius:50%;background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on);font-weight:900;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px var(--glow)}
+.step h3{font-size:18px;margin-bottom:6px}
+.step p{margin:0;color:var(--mut);font-size:15px}
+.warn{margin-top:26px;background:rgba(255,138,61,.12);border:1px solid rgba(255,138,61,.4);border-radius:18px;padding:16px 20px;font-size:15px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:38px}
+.two h3{font-size:20px;margin-bottom:8px}
+.two ul{margin:8px 0 0;padding-left:20px;color:var(--mut)}
+.two li{margin:6px 0}
+
+/* faq */
+.faq{max-width:760px;margin:34px auto 0}
+details{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px 20px;margin-bottom:12px}
+summary{cursor:pointer;font-weight:700;font-size:16px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";color:var(--acc);font-weight:900;font-size:22px;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin:10px 0 0;color:var(--mut)}
+
+/* final */
+.final{text-align:center;background:radial-gradient(700px 300px at 50% 0,var(--glow),transparent 70%)}
+footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;color:var(--mut);font-size:14px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--txt);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;opacity:0;transition:.25s;pointer-events:none;z-index:99}
+#toast.on{opacity:1;transform:translateX(-50%)}
+.news ul{margin:0;padding-left:20px;color:var(--mut)}.news li{margin:8px 0}
+.news{max-width:640px;margin:34px auto 0}
+
+/* tablet y teléfono */
+@media (max-width:900px){
+  section{padding:48px 0}
+  .hero .wrap{grid-template-columns:1fr;text-align:center;gap:26px}
+  .hero p.sub{margin-left:auto;margin-right:auto}
+  .cta,.meta{justify-content:center}
+  .qrbox{margin-left:auto;margin-right:auto;text-align:left}
+  .notice{margin-left:auto;margin-right:auto}
+  .stage{order:-1}
+  .grid{grid-template-columns:1fr 1fr}
+  .steps{grid-template-columns:1fr 1fr;gap:34px 18px}
+  .two{grid-template-columns:1fr}
+  nav{display:none}
+  .bar .btn{margin-left:auto}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .grid{grid-template-columns:1fr}
+  .steps{grid-template-columns:1fr;gap:34px}
+  .hero{padding-top:26px}
+  .btn.lg{width:100%}
+  .cta{flex-direction:column;align-items:stretch}
+  .stage .phone.main{width:min(240px,64vw)}
+}
+@media (min-width:901px){
+  .shots{justify-content:center;overflow:visible;flex-wrap:nowrap}
+  .shot .phone{width:190px}
+}
 </style>
 </head>
 <body>
-<div class="wrap">
+
+<header>
+  <div class="wrap bar">
+    <a class="brand" href="#inicio"><span>💪</span>Crece Fit</a>
+    <nav>
+      <a href="#caracteristicas">Características</a>
+      <a href="#capturas">Capturas</a>
+      <a href="#instalar">Cómo instalar</a>
+      <a href="#novedades">Novedades</a>
+      <a href="#faq">Preguntas</a>
+    </nav>
+    <a class="btn sm" href="Crece-Fit.apk" download>⬇ Descargar</a>
+  </div>
+</header>
+
+<main id="inicio">
+  <!-- HERO -->
   <div class="hero">
-    <div class="logo">💪</div>
-    <h1>Crece Fit</h1>
-    <p class="sub">Rutinas de ejercicio sin equipo para principiantes: tutoriales animados, temporizadores, progresión automática y tu racha de días.</p>
-    <a class="btn" id="dl" href="Crece-Fit.apk" download>⬇️ Descargar para Android</a>
-    <div class="meta"><span class="chip" id="ver">APK</span><span class="chip" id="size"></span><span class="chip" id="date"></span></div>
+    <div class="wrap">
+      <div>
+        <span class="tag">100% gratis · sin equipo · en español</span>
+        <h1>Entrena, sé constante y <em>crece</em> fuerte.</h1>
+        <p class="sub">Rutinas para principiantes con un muñequito que te enseña cada ejercicio, temporizadores, progresión que sube sola y tu racha de días.</p>
+        <div class="cta">
+          <a class="btn lg" id="dl" href="Crece-Fit.apk" download>⬇ Descargar para Android</a>
+          <a class="btn lg sec" href="#instalar">Cómo instalar</a>
+        </div>
+        <div class="meta"><span class="chip" id="ver">Android</span><span class="chip" id="size"></span><span class="chip" id="date"></span></div>
+
+        <div class="qrbox" id="qrbox">
+          <img src="img/qr.svg" alt="Código QR para abrir esta página en el teléfono" width="112" height="112">
+          <div>
+            <b>📱 ¿Estás en la computadora?</b>
+            <p>Escanea el código con la cámara de tu teléfono Android para abrir esta página y descargar la app directo.</p>
+            <button class="btn sec sm" id="copy" type="button">🔗 Copiar enlace</button>
+          </div>
+        </div>
+        <div class="notice" id="iosnote">🍎 Crece Fit es solo para <b>Android</b>. Abre esta página desde un teléfono Android para instalarla.</div>
+      </div>
+
+      <div class="stage">
+        <div>
+          <div class="phone main"><div class="slides" id="slides">
+            <img class="on" src="img/home.webp" alt="Pantalla de inicio con racha, nivel y hábitos" width="780" height="1688">
+            <img src="img/player.webp" alt="Ejercicio con muñequito animado y contador" width="780" height="1688" loading="lazy">
+            <img src="img/ex.webp" alt="Lista de ejercicios" width="780" height="1688" loading="lazy">
+            <img src="img/prog.webp" alt="Pantalla de progreso" width="780" height="1688" loading="lazy">
+          </div></div>
+          <div class="dots" id="dots"><i class="on"></i><i></i><i></i><i></i></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="card">
-    <h2>📲 Cómo instalarla</h2>
-    <div class="step"><i>1</i><div><b>Descarga el archivo</b><span class="mut">Pulsa el botón de arriba desde tu teléfono Android. Se guarda como <code>Crece-Fit.apk</code>.</span></div></div>
-    <div class="step"><i>2</i><div><b>Ábrelo</b><span class="mut">Toca la notificación de descarga, o búscalo en la app <b>Archivos → Descargas</b>.</span></div></div>
-    <div class="step"><i>3</i><div><b>Permite la instalación</b><span class="mut">Android te pedirá permiso para instalar apps de esta fuente. Toca <b>Ajustes</b>, activa <b>“Permitir de esta fuente”</b> y vuelve atrás.</span></div></div>
-    <div class="step"><i>4</i><div><b>Instalar y listo</b><span class="mut">Toca <b>Instalar</b> y luego <b>Abrir</b>. ¡Ya puedes empezar a entrenar!</span></div></div>
-    <div class="warn">⚠️ Es normal que Android muestre un aviso de “app de origen desconocido”: la app no está en Play Store. Si prefieres no instalarla, no pasa nada.</div>
-  </div>
+  <!-- CARACTERÍSTICAS -->
+  <section id="caracteristicas">
+    <div class="wrap">
+      <h2>Todo lo que necesitas para empezar</h2>
+      <p class="lead">Una app completa pensada para principiantes: sin gimnasio, sin mancuernas y sin complicarte.</p>
+      <div class="grid">
+        <div class="card feat"><div class="ic">🧍</div><h3>Tutoriales animados</h3><p>Un muñequito te muestra cómo se hace cada uno de los más de 30 ejercicios, con los pasos y los errores más comunes.</p></div>
+        <div class="card feat"><div class="ic">⏱</div><h3>Temporizadores y repeticiones</h3><p>Cuenta atrás, descansos, contador de repeticiones, pitidos, vibración y voz que te guía en cada serie.</p></div>
+        <div class="card feat"><div class="ic">📈</div><h3>Progresión automática</h3><p>Cuando algo te resulta fácil, la app sube la dificultad sola: de flexión en pared a flexión normal y más allá.</p></div>
+        <div class="card feat"><div class="ic">🔥</div><h3>Racha y niveles</h3><p>Mantén tu racha de días, sube de nivel con XP, cumple tu meta semanal y desbloquea logros.</p></div>
+        <div class="card feat"><div class="ic">📅</div><h3>Plan de 4 semanas</h3><p>Un calendario listo con días de entrenamiento, estiramientos y descanso activo. También puedes crear tus propias rutinas.</p></div>
+        <div class="card feat"><div class="ic">🌱</div><h3>Pensada para crecer</h3><p>Estiramientos de columna, chequeo de postura y hábitos diarios de agua, proteína, sol y sueño.</p></div>
+      </div>
+    </div>
+  </section>
 
-  <div class="card">
-    <h2>🔄 ¿Ya tienes la app?</h2>
-    <p class="mut" style="margin:0">No necesitas descargar nada cada vez. La app se actualiza sola: al abrirla con internet te avisa y pulsas <b>Actualizar</b>. Solo vuelve a esta página si:</p>
-    <ul class="mut"><li>Es la primera vez que la instalas.</li><li>Se anuncia una versión especial que pide reinstalar.</li><li>Tu versión es antigua y no te sale el aviso de actualización.</li></ul>
-    <p class="mut" style="margin:10px 0 0">Si instalas encima de la que ya tienes, <b>no pierdes tu progreso ni tu racha</b>.</p>
-  </div>
+  <!-- CAPTURAS -->
+  <section id="capturas">
+    <div class="wrap">
+      <h2>Así se ve</h2>
+      <p class="lead">Colores a tu gusto, modo claro y oscuro, y todo en tu idioma.</p>
+      <div class="shots">
+        <div class="shot"><div class="phone"><img src="img/home.webp" alt="Inicio" loading="lazy" width="780" height="1688"></div><b>Inicio</b><span>Racha, nivel y hábitos</span></div>
+        <div class="shot"><div class="phone"><img src="img/home2.webp" alt="Rutina de hoy" loading="lazy" width="780" height="1688"></div><b>Rutina de hoy</b><span>Lista según tu plan</span></div>
+        <div class="shot"><div class="phone"><img src="img/player.webp" alt="Entrenando" loading="lazy" width="780" height="1688"></div><b>Entrenando</b><span>Tutorial y contador</span></div>
+        <div class="shot"><div class="phone"><img src="img/ex.webp" alt="Ejercicios" loading="lazy" width="780" height="1688"></div><b>Ejercicios</b><span>Más de 30 con animación</span></div>
+        <div class="shot"><div class="phone"><img src="img/prog.webp" alt="Progreso" loading="lazy" width="780" height="1688"></div><b>Progreso</b><span>Gráficas y récords</span></div>
+      </div>
+    </div>
+  </section>
 
-  <div class="card" id="newbox" style="display:none">
-    <h2>✨ Novedades</h2>
-    <ul class="mut" id="notes"></ul>
-  </div>
+  <!-- INSTALAR -->
+  <section id="instalar">
+    <div class="wrap">
+      <h2>Cómo instalarla</h2>
+      <p class="lead">Son 4 pasos y menos de un minuto. Tienes que hacerlo desde un teléfono Android.</p>
+      <div class="steps">
+        <div class="card step"><h3>Descarga</h3><p>Pulsa <b>Descargar para Android</b>. El archivo <code>Crece-Fit.apk</code> se guarda en tu teléfono.</p></div>
+        <div class="card step"><h3>Ábrelo</h3><p>Toca la notificación de descarga o búscalo en <b>Archivos → Descargas</b>.</p></div>
+        <div class="card step"><h3>Da permiso</h3><p>Si Android lo pide, toca <b>Ajustes</b> y activa <b>“Permitir de esta fuente”</b>. Vuelve atrás.</p></div>
+        <div class="card step"><h3>Instala y abre</h3><p>Toca <b>Instalar</b> y luego <b>Abrir</b>. ¡Listo para tu primer entrenamiento!</p></div>
+      </div>
+      <div class="warn">⚠️ <b>Es normal que Android muestre un aviso</b> de “app de origen desconocido” o de seguridad: la app no está en Play Store. Funciona sin cuenta y guarda tus datos solo en tu teléfono.</div>
 
-  <div class="card">
-    <h2>❓ Preguntas frecuentes</h2>
-    <details><summary>No me deja instalar</summary><p>Ve a Ajustes del teléfono → Seguridad (o Apps) → “Instalar apps desconocidas” y permite al navegador o a “Archivos” que instale. Luego abre el archivo otra vez.</p></details>
-    <details><summary>¿Es segura?</summary><p>Funciona sin cuenta y guarda tus datos solo en tu teléfono. No pide más permisos que vibración, notificaciones (para el recordatorio) e internet (para actualizarse).</p></details>
-    <details><summary>¿Funciona en iPhone?</summary><p>No, este archivo es solo para Android.</p></details>
-    <details><summary>¿Cómo hago copia de mi progreso?</summary><p>En la app: Ajustes → Copia de seguridad → Exportar. Guarda ese texto; para recuperar tu progreso usa Importar.</p></details>
-    <details><summary>Quiero desinstalarla</summary><p>Mantén pulsado el icono de la app → Desinstalar. Se borran tus datos, así que haz antes la copia de seguridad.</p></details>
-  </div>
-  <footer>Crece Fit · hecha con 💙 para entrenar y crecer</footer>
-</div>
+      <div class="two">
+        <div class="card"><h3>🔄 ¿Ya la tienes instalada?</h3><p class="mut" style="margin:0">No hace falta volver aquí cada vez: la app se actualiza sola. Al abrirla con internet te avisa y pulsas <b>Actualizar</b>.</p></div>
+        <div class="card"><h3>📦 Vuelve a esta página si…</h3><ul><li>Es la primera vez que la instalas.</li><li>Se anuncia una versión que pide reinstalar.</li><li>Tu versión es antigua y no te sale el aviso.</li></ul><p class="mut" style="margin:10px 0 0;font-size:14px">Instalar encima de la anterior <b>no borra tu progreso ni tu racha</b>.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOVEDADES -->
+  <section id="novedades" style="background:var(--bg2)">
+    <div class="wrap">
+      <h2>Novedades</h2>
+      <div class="card news"><div style="display:flex;align-items:center;gap:10px;margin-bottom:6px"><b style="font-size:18px">Versión <span id="ver2">—</span></b><span class="chip" id="date2"></span></div><ul id="notes"><li>Cargando…</li></ul></div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq">
+    <div class="wrap">
+      <h2>Preguntas frecuentes</h2>
+      <div class="faq">
+        <details><summary>No me deja instalar</summary><p>Ve a Ajustes del teléfono → Seguridad (o Apps) → “Instalar apps desconocidas”, y permite que el navegador o la app “Archivos” instale. Después abre el archivo otra vez.</p></details>
+        <details><summary>¿Es segura? ¿Qué permisos pide?</summary><p>No necesita cuenta y guarda tus datos solo en tu teléfono. Solo pide vibración, notificaciones (para el recordatorio diario) e internet (para actualizarse).</p></details>
+        <details><summary>¿Funciona en iPhone?</summary><p>No, por ahora es solo para Android.</p></details>
+        <details><summary>¿Cómo guardo mi progreso si cambio de teléfono?</summary><p>En la app: Ajustes → Copia de seguridad → Exportar. Guarda ese texto y, en el teléfono nuevo, usa Importar.</p></details>
+        <details><summary>¿De verdad ayuda a crecer en estatura?</summary><p>La altura depende sobre todo de la genética. La app fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda dormir 8–10 horas y comer bien: eso te ayuda a llegar a tu máximo y a verte más alto y erguido.</p></details>
+        <details><summary>¿Cómo la desinstalo?</summary><p>Mantén pulsado el icono → Desinstalar. Se borran tus datos, así que haz antes la copia de seguridad.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="final">
+    <div class="wrap">
+      <h2>¿Listo para empezar?</h2>
+      <p class="lead">Tu primer entrenamiento dura menos de 10 minutos.</p>
+      <p style="margin-top:26px"><a class="btn lg" href="Crece-Fit.apk" download>⬇ Descargar Crece Fit</a></p>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap">Crece Fit · hecha con 💙 para entrenar y crecer</div></footer>
+<div id="toast"></div>
+
 <script>
 (function () {
-  function $(i) { return document.getElementById(i); }
+  var $ = function (i) { return document.getElementById(i); };
+  var ua = navigator.userAgent || '', android = /Android/i.test(ua), ios = /iPhone|iPad|iPod/i.test(ua);
+  document.body.classList.add(android ? 'android' : ios ? 'ios' : 'desk');
+
+  function toast(m) { var t = $('toast'); t.textContent = m; t.className = 'on'; clearTimeout(toast.h); toast.h = setTimeout(function () { t.className = ''; }, 2200); }
+  $('copy').addEventListener('click', function () {
+    var url = location.href.split('#')[0];
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { toast('Enlace copiado ✅'); }, function () { prompt('Copia este enlace:', url); });
+    else prompt('Copia este enlace:', url);
+  });
+
+  // carrusel del teléfono
+  var imgs = document.querySelectorAll('#slides img'), dots = document.querySelectorAll('#dots i'), cur = 0;
+  function show(n) { imgs[cur].classList.remove('on'); dots[cur].classList.remove('on'); cur = n; imgs[cur].classList.add('on'); dots[cur].classList.add('on'); }
+  setInterval(function () { show((cur + 1) % imgs.length); }, 3200);
+  Array.prototype.forEach.call(dots, function (d, i) { d.style.cursor = 'pointer'; d.addEventListener('click', function () { show(i); }); });
+
+  // versión del APK
+  function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }
   fetch('apk.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (a) {
-    $('ver').textContent = 'Versión ' + a.version;
-    if (a.size) $('size').textContent = (a.size >= 1048576 ? (a.size / 1048576).toFixed(1) + ' MB' : Math.round(a.size / 1024) + ' KB');
-    if (a.date) $('date').textContent = a.date;
-    if (a.notes && a.notes.length) {
-      $('notes').innerHTML = a.notes.map(function (n) { return '<li>' + String(n).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }) + '</li>'; }).join('');
-      $('newbox').style.display = 'block';
-    }
-  }).catch(function () { $('ver').textContent = 'Android'; });
+    $('ver').textContent = 'Versión ' + a.version; $('ver2').textContent = a.version;
+    if (a.size) $('size').textContent = a.size >= 1048576 ? (a.size / 1048576).toFixed(1) + ' MB' : Math.round(a.size / 1024) + ' KB';
+    if (a.date) { $('date').textContent = a.date; $('date2').textContent = a.date; }
+    $('notes').innerHTML = (a.notes && a.notes.length) ? a.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') : '<li>Mejoras generales.</li>';
+  }).catch(function () { $('notes').innerHTML = '<li>Mejoras generales.</li>'; });
 })();
 </script>
 </body>
