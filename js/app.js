@@ -171,7 +171,7 @@
     var st = stats(), id = nextId(), w = WORKOUTS[id], steps = build(id), name = S.name ? ', ' + esc(S.name) : '';
     var msg = st.doneToday ? '¡Hoy ya cumpliste! 🎉' : (st.cur > 0 ? 'Entrena hoy para mantener tu racha' : 'Empieza tu racha hoy');
     var tip = TIPS[dnum(today()) % TIPS.length];
-    var h = '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes') + '</div></div></div>';
+    var h = '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes · ✅ actualización de prueba') + '</div></div></div>';
     h += '<div class="card streak' + (st.cur ? '' : ' off') + '" style="margin-top:16px"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
       '<div style="font-weight:800">' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</div></div><div class="sp"></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor racha</div><div style="font-size:22px;font-weight:900">' + st.best + '</div></div></div>' +
