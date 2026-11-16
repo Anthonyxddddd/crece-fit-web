@@ -147,9 +147,64 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
   .shots{justify-content:center;overflow:visible;flex-wrap:nowrap}
   .shot .phone{width:190px}
 }
+
+/* ===== animaciones ===== */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--acc),#8fd0ff);z-index:100;transition:width .1s}
+header{transition:box-shadow .3s,background .3s}
+header.scrolled{box-shadow:0 8px 30px rgba(0,0,0,.22)}
+.hero{position:relative;overflow:hidden}
+.hero .wrap{position:relative;z-index:1}
+.blob{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;animation:drift 14s ease-in-out infinite alternate}
+.blob.b1{width:360px;height:360px;background:rgba(74,168,255,.38);top:-90px;right:4%}
+.blob.b2{width:300px;height:300px;background:rgba(143,208,255,.28);bottom:-70px;left:-50px;animation-delay:-6s}
+@keyframes drift{to{transform:translate(46px,34px) scale(1.18)}}
+.hero .wrap>div:first-child>*{animation:rise .85s cubic-bezier(.2,.8,.2,1) both}
+.hero .wrap>div:first-child>*:nth-child(2){animation-delay:.08s}.hero .wrap>div:first-child>*:nth-child(3){animation-delay:.16s}
+.hero .wrap>div:first-child>*:nth-child(4){animation-delay:.24s}.hero .wrap>div:first-child>*:nth-child(5){animation-delay:.32s}
+.hero .wrap>div:first-child>*:nth-child(6){animation-delay:.4s}.hero .wrap>div:first-child>*:nth-child(7){animation-delay:.48s}
+@keyframes rise{from{opacity:0;transform:translateY(28px)}}
+.stage .phone.main{animation:enter 1s cubic-bezier(.2,.8,.2,1) .2s both,float 6s ease-in-out 1.2s infinite}
+@keyframes enter{from{opacity:0;transform:translateY(60px) rotate(4deg) scale(.92)}}
+@keyframes float{50%{transform:translateY(-14px) rotate(.8deg)}}
+.rv{opacity:0;transform:translateY(34px);transition:opacity .7s ease,transform .8s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d,0s)}
+.rv.in{opacity:1;transform:none}
+.btn:not(.sec){position:relative;overflow:hidden}
+.btn:not(.sec)::after{content:"";position:absolute;top:0;left:-70%;width:40%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.5),transparent);transform:skewX(-20deg);animation:sheen 3.8s ease-in-out infinite}
+@keyframes sheen{0%,55%{left:-70%}100%{left:140%}}
+.card{transition:transform .25s,box-shadow .25s,border-color .25s}
+.feat:hover,.step:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--acc)}
+.feat .ic{display:inline-block;transition:transform .3s}.feat:hover .ic{transform:scale(1.25) rotate(-8deg)}
+.step.in::before{animation:popb .7s .1s both}
+@keyframes popb{from{transform:scale(0)}60%{transform:scale(1.25)}to{transform:scale(1)}}
+details[open] p{animation:rise .35s ease-out both}
+.shot .phone{transition:transform .3s}.shot:hover .phone{transform:translateY(-10px) scale(1.03)}
+.dots i{cursor:pointer}
+/* cifras */
+.statsec{padding:10px 0 0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 14px}
+.stats div{text-align:center}
+.stats b{display:block;font-size:clamp(30px,5vw,44px);letter-spacing:-.03em;background:linear-gradient(180deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.stats span{color:var(--mut);font-size:14px;font-weight:600}
+/* demo */
+.demo{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:center;margin-top:34px;background:var(--card);border:1px solid var(--line);border-radius:28px;padding:26px}
+.demobox{background:radial-gradient(circle at 50% 40%,var(--card2),var(--bg2));border-radius:22px;overflow:hidden}
+.demobox svg{display:block;width:100%;height:auto}
+.dchips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.dchips button{border:2px solid transparent;background:var(--card2);color:var(--txt);font:inherit;font-weight:700;font-size:14px;padding:8px 14px;border-radius:99px;cursor:pointer;transition:.2s}
+.dchips button:hover{transform:translateY(-2px)}
+.dchips button.on{border-color:var(--acc);background:rgba(74,168,255,.15)}
+.demo h3{font-size:26px}
+.demo ol{padding-left:22px;margin:12px 0 0;color:var(--mut)}.demo li{margin:8px 0}
+.demoinfo{animation:rise .5s both}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:38px}
+.grid3 h3{font-size:19px;margin-bottom:8px}.grid3 p{margin:0;color:var(--mut);font-size:15px}
+.grid3 .ic{font-size:30px;margin-bottom:8px}
+@media (max-width:900px){.stats{grid-template-columns:1fr 1fr;row-gap:22px}.demo{grid-template-columns:1fr;padding:18px}.grid3{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}.rv{opacity:1;transform:none}}
 </style>
 </head>
 <body>
+<div id="progress"></div>
 
 <header>
   <div class="wrap bar">
@@ -168,6 +223,7 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
 <main id="inicio">
   <!-- HERO -->
   <div class="hero">
+    <i class="blob b1"></i><i class="blob b2"></i>
     <div class="wrap">
       <div>
         <span class="tag">100% gratis · sin equipo · en español</span>
@@ -204,6 +260,18 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
     </div>
   </div>
 
+  <!-- CIFRAS -->
+  <section class="statsec">
+    <div class="wrap">
+      <div class="stats">
+        <div><b data-count="31" data-suf="+">0</b><span>ejercicios animados</span></div>
+        <div><b data-count="28">0</b><span>días de plan listo</span></div>
+        <div><b data-count="5">0</b><span>colores a elegir</span></div>
+        <div><b data-count="100" data-suf="%">0</b><span>gratis y sin cuenta</span></div>
+      </div>
+    </div>
+  </section>
+
   <!-- CARACTERÍSTICAS -->
   <section id="caracteristicas">
     <div class="wrap">
@@ -216,6 +284,21 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
         <div class="card feat"><div class="ic">🔥</div><h3>Racha y niveles</h3><p>Mantén tu racha de días, sube de nivel con XP, cumple tu meta semanal y desbloquea logros.</p></div>
         <div class="card feat"><div class="ic">📅</div><h3>Plan de 4 semanas</h3><p>Un calendario listo con días de entrenamiento, estiramientos y descanso activo. También puedes crear tus propias rutinas.</p></div>
         <div class="card feat"><div class="ic">🌱</div><h3>Pensada para crecer</h3><p>Estiramientos de columna, chequeo de postura y hábitos diarios de agua, proteína, sol y sueño.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEMO -->
+  <section id="demo">
+    <div class="wrap">
+      <h2>Mira cómo te enseña</h2>
+      <p class="lead">Cada ejercicio tiene su muñequito animado con los pasos explicados. Pruébalo aquí mismo:</p>
+      <div class="demo">
+        <div class="demobox"><svg id="demofig" viewBox="0 -34 240 206" aria-label="Muñequito animado"></svg></div>
+        <div>
+          <div class="dchips" id="dchips"></div>
+          <div class="demoinfo" id="demoinfo"><h3 id="dname"></h3><div class="mut" id="dm"></div><ol id="dsteps"></ol></div>
+        </div>
       </div>
     </div>
   </section>
@@ -248,9 +331,12 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
       </div>
       <div class="warn">⚠️ <b>Es normal que Android muestre un aviso</b> de “app de origen desconocido” o de seguridad: la app no está en Play Store. Funciona sin cuenta y guarda tus datos solo en tu teléfono.</div>
 
-      <div class="two">
-        <div class="card"><h3>🔄 ¿Ya la tienes instalada?</h3><p class="mut" style="margin:0">No hace falta volver aquí cada vez: la app se actualiza sola. Al abrirla con internet te avisa y pulsas <b>Actualizar</b>.</p></div>
-        <div class="card"><h3>📦 Vuelve a esta página si…</h3><ul><li>Es la primera vez que la instalas.</li><li>Se anuncia una versión que pide reinstalar.</li><li>Tu versión es antigua y no te sale el aviso.</li></ul><p class="mut" style="margin:10px 0 0;font-size:14px">Instalar encima de la anterior <b>no borra tu progreso ni tu racha</b>.</p></div>
+      <h2 style="margin-top:64px">Cómo se actualiza</h2>
+      <p class="lead">Hay dos tipos de actualización y la propia app te dice cuál toca.</p>
+      <div class="grid3">
+        <div class="card"><div class="ic">⚡</div><h3>Actualización automática</h3><p>Ejercicios, rutinas y diseño llegan solos. Al abrir la app con internet aparece <b>“Actualización disponible”</b>: pulsas <b>Actualizar</b>, ves el porcentaje, la app se cierra sola y al volver ya está lista. <b>No instalas nada.</b></p></div>
+        <div class="card"><div class="ic">📦</div><h3>Nueva versión del APK</h3><p>Solo cuando un cambio necesita funciones del teléfono (permisos, notificaciones…). La app te avisa con un botón <b>“Ir a descargar”</b> que te trae a esta página. Instalas encima y <b>no pierdes tu progreso ni tu racha</b>.</p></div>
+        <div class="card"><div class="ic">🧭</div><h3>¿Cuál necesito?</h3><p>No tienes que adivinar: si la app no muestra ningún aviso, estás al día. Vuelve aquí solo si es tu <b>primera instalación</b> o si la app te lo pide.</p></div>
       </div>
     </div>
   </section>
@@ -291,6 +377,8 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
 <footer><div class="wrap">Crece Fit · hecha con 💙 para entrenar y crecer</div></footer>
 <div id="toast"></div>
 
+<script src="../js/figure.js"></script>
+<script src="../js/data.js"></script>
 <script>
 (function () {
   var $ = function (i) { return document.getElementById(i); };
@@ -309,6 +397,64 @@ footer{border-top:1px solid var(--line);padding:26px 0 40px;text-align:center;co
   function show(n) { imgs[cur].classList.remove('on'); dots[cur].classList.remove('on'); cur = n; imgs[cur].classList.add('on'); dots[cur].classList.add('on'); }
   setInterval(function () { show((cur + 1) % imgs.length); }, 3200);
   Array.prototype.forEach.call(dots, function (d, i) { d.style.cursor = 'pointer'; d.addEventListener('click', function () { show(i); }); });
+
+
+  // ===== animaciones al hacer scroll =====
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var prog = $('progress'), hdr = document.querySelector('header');
+  function onScroll() {
+    var h = document.documentElement, max = h.scrollHeight - h.clientHeight;
+    prog.style.width = (max > 0 ? (h.scrollTop / max * 100) : 0) + '%';
+    hdr.classList.toggle('scrolled', h.scrollTop > 8);
+    if (max > 0 && h.scrollTop >= max - 60) Array.prototype.forEach.call(document.querySelectorAll('.rv:not(.in)'), function (el) { el.classList.add('in'); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true }); onScroll();
+
+  var targets = document.querySelectorAll('section h2, section .lead, .card, .shot, details, .demo, .stats, .warn, .news');
+  Array.prototype.forEach.call(targets, function (el, i) {
+    if (el.closest('.hero')) return;
+    el.classList.add('rv');
+    var sibs = el.parentNode.children, idx = Array.prototype.indexOf.call(sibs, el);
+    el.style.setProperty('--d', Math.min(idx, 5) * 0.09 + 's');
+  });
+  function count(el) {
+    var to = +el.getAttribute('data-count'), suf = el.getAttribute('data-suf') || '', t0 = performance.now(), dur = 1400;
+    (function step(now) { var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(to * e) + (k >= 1 ? suf : ''); if (k < 1) requestAnimationFrame(step); })(t0);
+  }
+  if ('IntersectionObserver' in window && !reduce) {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add('in'); io.unobserve(e.target);
+        Array.prototype.forEach.call(e.target.querySelectorAll('[data-count]'), count);
+      });
+    }, { threshold: .15, rootMargin: '0px 0px -40px 0px' });
+    Array.prototype.forEach.call(document.querySelectorAll('.rv'), function (el) { io.observe(el); });
+  } else {
+    Array.prototype.forEach.call(document.querySelectorAll('.rv'), function (el) { el.classList.add('in'); });
+    Array.prototype.forEach.call(document.querySelectorAll('[data-count]'), function (el) { el.textContent = el.getAttribute('data-count') + (el.getAttribute('data-suf') || ''); });
+  }
+
+  // ===== demo del muñequito (usa los mismos archivos que la app) =====
+  if (window.Fig && window.ANIMS && window.EX) {
+    var dark = !(window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches);
+    window.FigColors = { near: '#4aa8ff', dark: '#2b7fe0', far: dark ? '#6f7bb5' : '#9aa4d0', ground: dark ? '#39406b' : '#b8c1e6', wall: dark ? '#2a3158' : '#c9d1f0', wallLine: dark ? '#5d68a8' : '#98a3d4', shadow: dark ? 'rgba(0,0,0,.28)' : 'rgba(0,0,0,.12)' };
+    var ids = ['squat', 'pushup', 'jacks', 'burpee', 'plank', 'lunge', 'bridge', 'climbers', 'cobra'], fig = null, chips = $('dchips');
+    function pick(id) {
+      if (fig) fig.destroy();
+      fig = new Fig($('demofig'), ANIMS[EX[id].anim]);
+      var e = EX[id];
+      $('dname').textContent = e.n; $('dm').textContent = e.cat + ' · ' + e.m;
+      $('dsteps').innerHTML = e.steps.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('');
+      var info = $('demoinfo'); info.style.animation = 'none'; void info.offsetWidth; info.style.animation = '';
+      Array.prototype.forEach.call(chips.children, function (b) { b.classList.toggle('on', b.getAttribute('data-id') === id); });
+    }
+    ids.forEach(function (id) {
+      var b = document.createElement('button'); b.type = 'button'; b.setAttribute('data-id', id); b.textContent = EX[id].n;
+      b.addEventListener('click', function () { pick(id); }); chips.appendChild(b);
+    });
+    pick('squat');
+  } else { var dm = $('demo'); if (dm) dm.style.display = 'none'; }
 
   // versión del APK
   function esc(s) { return String(s).replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; }); }

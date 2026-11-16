@@ -111,6 +111,35 @@
     } catch (e) { }
   }
 
+  /* ---------- efectos ---------- */
+  var fx = { hab: null, tab: false };
+  function countUp(el, to) {
+    if (!el || to <= 0) return;
+    var t0 = performance.now(), dur = 700;
+    el.textContent = '0';
+    (function step(now) {
+      var k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * e);
+      if (k < 1 && document.body.contains(el)) requestAnimationFrame(step); else el.textContent = to;
+    })(t0);
+  }
+  function confetti() {
+    var o = $('#overlay'); if (!o || (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches)) return;
+    var box = document.createElement('div'); box.className = 'confetti';
+    var cols = [accent(), window.FigColors.dark, '#ff8a3d', '#ffd166', '#c084fc', '#ff6fa8'], i;
+    for (i = 0; i < 46; i++) {
+      var p = document.createElement('i');
+      p.style.left = Math.random() * 100 + '%';
+      p.style.background = cols[i % cols.length];
+      p.style.animationDelay = (Math.random() * 0.6) + 's';
+      p.style.animationDuration = (1.8 + Math.random() * 1.6) + 's';
+      p.style.transform = 'rotate(' + Math.round(Math.random() * 360) + 'deg)';
+      p.style.width = (6 + Math.random() * 6) + 'px'; p.style.height = (9 + Math.random() * 8) + 'px';
+      box.appendChild(p);
+    }
+    o.appendChild(box); setTimeout(function () { if (box.parentNode) box.parentNode.removeChild(box); }, 4200);
+  }
+
   /* ---------- tema y voz ---------- */
   function applyTheme() {
     var st = S.settings, root = document.documentElement, mode = st.mode;
@@ -214,7 +243,7 @@
   function tabsHTML() {
     var T = [['home', '🏠', 'Inicio'], ['ex', '🏋️', 'Ejercicios'], ['prog', '📈', 'Progreso'], ['set', '⚙️', 'Ajustes']];
     return '<div class="tabs">' + T.map(function (t) {
-      return '<button class="tab' + (tab === t[0] ? ' on' : '') + '" data-a="tab" data-v="' + t[0] + '"><span class="i">' + t[1] + '</span>' + t[2] + '</button>';
+      return '<button class="tab' + (tab === t[0] ? ' on' + (fx.tab ? ' pop' : '') : '') + '" data-a="tab" data-v="' + t[0] + '"><span class="i">' + t[1] + '</span>' + t[2] + '</button>';
     }).join('') + '</div>';
   }
 
@@ -235,7 +264,12 @@
     var msg = st.doneToday ? '¡Hoy ya cumpliste! 🎉' : (st.cur > 0 ? 'Entrena hoy para mantener tu racha' : 'Empieza tu racha hoy');
     var tip = TIPS[dnum(today()) % TIPS.length];
     var left = S.freeze.m === today().slice(0, 7) ? 2 - S.freeze.used : 2;
-    var h = '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes') + '</div></div></div>';
+    var h = '';
+    if (apkInfo && (apkReq || S.apkDismiss !== apkInfo.code)) {
+      h += '<div class="card apkb"><div class="row"><div style="font-size:32px">📲</div><div class="sp"><b>' + (apkReq ? 'Necesitas instalar la nueva versión' : 'Nueva versión del APK: v' + esc(apkInfo.version)) + '</b><div class="mut small">' + esc(apkInfo.notes && apkInfo.notes[0] ? apkInfo.notes[0] : 'Descárgala desde la página y instálala encima. No pierdes tu progreso.') + '</div></div></div>' +
+        '<div class="row" style="margin-top:12px">' + (apkReq ? '' : '<button class="btn ghost sm sp" data-a="apkno">Después</button>') + '<button class="btn sm sp" data-a="gosite">🌐 Ir a descargar</button></div></div>';
+    }
+    h += '<div class="row"><div><div class="title">¡Hola' + name + '!</div><div class="mut small">' + (st.doneToday ? 'Gran trabajo hoy' : 'Vamos a crecer fuertes') + '</div></div></div>';
     h += '<div class="card streak' + (st.cur ? '' : ' off') + '" style="margin-top:16px"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
       '<div style="font-weight:800">' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</div></div><div class="sp"></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor racha</div><div style="font-size:22px;font-weight:900">' + st.best + '</div></div></div>' +
@@ -251,7 +285,7 @@
     // hábitos
     var hb = S.habits[today()] || { w: 0, p: 0, s: 0, sl: 0 }, hc = habCount(hb);
     h += '<div class="card"><div class="row"><b>✅ Hábitos para crecer</b><div class="sp"></div><span class="mut small">' + hc + '/4 hoy</span></div><div class="habs">' +
-      [['w', '💧', 'Agua'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) { return '<button class="hab' + (hb[x[0]] ? ' on' : '') + '" data-a="hab" data-v="' + x[0] + '"><span>' + x[1] + '</span>' + x[2] + '</button>'; }).join('') +
+      [['w', '💧', 'Agua'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) { return '<button class="hab' + (hb[x[0]] ? ' on' : '') + (fx.hab === x[0] ? ' bn' : '') + '" data-a="hab" data-v="' + x[0] + '"><span>' + x[1] + '</span>' + x[2] + '</button>'; }).join('') +
       '<div class="hab' + (hb.sl >= 8 ? ' on' : '') + '"><span>😴</span>Sueño</div></div>' +
       '<div class="row" style="margin-top:12px"><span class="mut small sp">¿Cuántas horas dormiste anoche?</span><button class="stp" data-a="slp" data-v="-1">−</button><b style="min-width:52px;text-align:center">' + (hb.sl ? hb.sl + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div></div>';
     // tarjeta de hoy
@@ -394,7 +428,7 @@
       '<div class="set"><div class="sp"><b>📳 Vibración</b><div class="mut small">Avisos con vibración</div></div>' + sw('vib') + '</div>' +
       '<div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Aviso para no perder tu racha</div></div>' + sw('rem') + '</div>' +
       (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') + '</div>' +
-      '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido de la app: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b><br>' + esc(updStatusText()) + '</p><button class="btn sec sm" data-a="updcheck">🔄 Buscar actualizaciones</button></div>' +
+      '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b> · APK: <b style="color:var(--txt)">v' + esc(apkName()) + '</b><br>' + esc(updStatusText()) + '</p><div class="row"><button class="btn sec sm sp" data-a="updcheck">🔄 Buscar</button><button class="btn sec sm sp" data-a="gosite">🌐 Página de descargas</button></div></div>' +
       '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="row"><button class="btn sec sm sp" data-a="backup">Exportar</button><button class="btn sec sm sp" data-a="restore">Importar</button></div></div>' +
       '<div class="card"><b>🌱 Sobre crecer</b><p class="mut small" style="margin-top:6px;line-height:1.5">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
       '<button class="btn warn" data-a="reset">Borrar todos mis datos</button><p class="mut small" style="text-align:center;margin-top:14px">Crece Fit</p>';
@@ -406,6 +440,7 @@
     var v = tab === 'home' ? homeV() : tab === 'ex' ? exV() : tab === 'prog' ? progV() : setV();
     $('#app').innerHTML = '<div class="view' + (anim ? ' anim' : '') + '" id="view">' + v + '</div>' + tabsHTML();
     $('#view').scrollTop = anim ? 0 : top;
+    if (anim && tab === 'home') { var sn = document.querySelector('.streak .num'); if (sn) countUp(sn, +sn.textContent); }
     Array.prototype.forEach.call(document.querySelectorAll('svg[data-fig]'), function (el) {
       var a = ANIMS[EX[el.getAttribute('data-fig')].anim];
       new Fig(el, Object.assign({}, a, { poses: [a.poses[a.poses.length > 1 ? 1 : 0]] }), { still: true });
@@ -499,7 +534,7 @@
     var rem = Math.max(0, P.end - Date.now()), s = Math.ceil(rem / 1000);
     P.rem = rem;
     if (P.onTick) P.onTick(rem, s);
-    if (s !== P.lastSec) { P.lastSec = s; if (s > 0 && s <= 3 && P.beepTick) { beep(700, 90); vib(25); if (P.sayTick) say(String(s)); } }
+    if (s !== P.lastSec) { P.lastSec = s; var rw = document.querySelector('.ringwrap'); if (rw) { rw.classList.remove('pulse'); void rw.offsetWidth; rw.classList.add('pulse'); } if (s > 0 && s <= 3 && P.beepTick) { beep(700, 90); vib(25); if (P.sayTick) say(String(s)); } }
     if (rem <= 0) { var f = P.onEnd; clearTimer(); if (f) f(); }
   }
   function pauseToggle() {
@@ -663,7 +698,7 @@
       '<p style="text-align:center;margin:8px 0 0;color:var(--mut);line-height:1.4">' + cheer(st.cur) + '</p>' +
       '<div class="card streak" style="margin-top:16px;text-align:center"><div class="flame" style="font-size:44px">🔥</div><div class="num">' + st.cur + '</div><div style="font-weight:800">' + (st.cur === 1 ? 'día de racha' : 'días de racha') + '</div></div>' +
       '<div class="row" style="justify-content:center;flex-wrap:wrap;margin-bottom:6px"><span class="chip on">+' + x.gain + ' XP</span>' + (P.goalHit ? '<span class="chip">🎯 ¡Meta semanal cumplida! +50</span>' : '') + (P.planDay ? '<span class="chip">📅 Día del plan ✓</span>' : '') + '</div>' +
-      (x.up ? '<div class="note" style="text-align:center;font-weight:800">⭐ ¡Subiste al nivel ' + x.up + ': ' + lvlName(x.up) + '!</div>' : '') +
+      (x.up ? '<div class="note shine" style="text-align:center;font-weight:800">⭐ ¡Subiste al nivel ' + x.up + ': ' + lvlName(x.up) + '!</div>' : '') +
       '<div class="sumgrid"><div><b>' + mmss(secs) + '</b><span>Tiempo</span></div><div><b>' + P.sets + '</b><span>Series</span></div><div><b>' + P.exs + '</b><span>Ejercicios</span></div></div>';
     if (!light && S.last && S.last.done.length) {
       html += '<div class="mut small" style="font-weight:800;margin-bottom:8px">¿CÓMO TE SENTISTE?</div><div class="fb"><button data-a="fb" data-v="2">😄 Fácil</button><button class="on" data-a="fb" data-v="1">👍 Justo</button><button data-a="fb" data-v="0">😓 Difícil</button></div><div id="chg">' + changesHTML() + '</div>';
@@ -671,11 +706,12 @@
     html += '<textarea class="note2" id="note" maxlength="200" placeholder="📝 Nota del día (opcional): ¿cómo te sentiste?"></textarea>';
     html += '</div><div class="pfoot"><button class="btn" data-a="close">Terminar</button></div>';
     ov(html);
+    confetti();
   }
   function closeOverlay() {
     var nt = $('#note'); if (nt && nt.value.trim()) { var dd = S.days[today()]; if (dd) { dd.note = nt.value.trim(); save(); } }
     $('#overlay').className = ''; $('#overlay').innerHTML = ''; P = null; tab = 'home'; render();
-    if (upd.wait) { upd.wait = false; showUpd(); } }
+    runWaiting(); }
 
   function quit() {
     dialog('¿Salir del entrenamiento?', 'Se perderá el avance de esta sesión.', 'Salir', function () { clearTimer(); destroyFigs(); keepAwake(false); closeOverlay(); }, true);
@@ -708,7 +744,7 @@
     var t = ev.target.closest('[data-a]'); if (!t) return;
     var a = t.getAttribute('data-a'), v = t.getAttribute('data-v');
     switch (a) {
-      case 'tab': tab = v; render(true); break;
+      case 'tab': tab = v; fx.tab = true; render(true); fx.tab = false; break;
       case 'start': startWorkout(v); break;
       case 'prev': openPrev(v); break;
       case 'ex': openEx(v); break;
@@ -743,7 +779,7 @@
         dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
       case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); render(); break;
       case 'hab':
-        var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); render(); break;
+        var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); fx.hab = v; render(); fx.hab = null; break;
       case 'slp':
         var hs = hab(); hs.sl = Math.max(3, Math.min(12, (hs.sl || 7.5) + 0.5 * (+v))); habDone(hs); save(); render(); break;
       case 'evx': progEx = v; render(); break;
@@ -764,8 +800,10 @@
         else S.custom.push({ id: 'U' + Date.now(), name: nm, slots: slots });
         save(); sheetClose(); toast('Rutina guardada ✅'); render(); break;
       case 'adj': adjust(+v); break;
+      case 'gosite': dialogClose(); openSite(); break;
+      case 'apkno': if (apkInfo) { S.apkDismiss = apkInfo.code; save(); } render(); break;
       case 'updcheck':
-        upd.shown = false; upd.force = true; toast('Buscando…');
+        upd.shown = false; upd.apkShown = false; toast('Buscando…');
         try { if (AND() && AND().checkNow) AND().checkNow(); } catch (e) { }
         jsCheck(true); break;
       case 'updno': dialogClose(); break;
@@ -780,14 +818,15 @@
       case 'obstart':
         S = fresh(); S.setup = true; S.name = ($('#obn').value || '').trim(); initChains(obLvl === 1);
         var hh = parseFloat($('#obh').value); if (hh >= 80 && hh <= 250) S.meas.push({ d: today(), h: hh, w: 0 });
-        save(); document.body.removeChild($('#ob')); render(); if (upd.wait) { upd.wait = false; showUpd(); } break;
+        save(); document.body.removeChild($('#ob')); render(); runWaiting(); break;
       // reproductor
       case 'quit': quit(); break;
       case 'pp': pauseToggle(); break;
       case 'cnt':
         P.count++; var st = P.steps[P.i], c = $('#cnt');
         $('#cn').textContent = P.count; vib(15); beep(900, 50, 0.15); say(String(P.count));
-        if (P.count >= st.val) { c.classList.add('full'); if (P.count === st.val) { beep(1200, 250, 0.3); vib(120); } }
+        c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit');
+        if (P.count >= st.val) { c.classList.add('full'); var db = document.querySelector('[data-a=done]'); if (db) db.classList.add('glow'); if (P.count === st.val) { beep(1200, 250, 0.3); vib(120); } }
         break;
       case 'done': completeStep(); break;
       case 'pnext': next(); break;
@@ -819,44 +858,101 @@
     return false;
   };
 
-  /* ---------- actualizaciones ---------- */
-  var upd = { v: 0, busy: false, wait: false, shown: false, force: false };
+  /* ---------- actualizaciones: dos tipos ----------
+     1) De contenido (sin instalar): botón Actualizar con porcentaje y la app se cierra.
+     2) De APK (hay que instalar): aviso con botón que lleva a la página de descargas. */
+  var SITE = 'https://anthonyxddddd.github.io/crece-fit-web/descargar/';
+  var REMOTE = 'https://raw.githubusercontent.com/Anthonyxddddd/crece-fit-web/main/';
+  var upd = { v: 0, busy: false, shown: false, apkShown: false, waitFn: null };
+  var jsStat = '', natStat = '', apkInfo = null, apkReq = false;
+  var APK_NAMES = { 1: '1.0', 2: '1.1', 3: '1.2', 4: '1.3', 5: '1.4', 6: '1.5' };
+
+  function apkCode() {
+    var a = AND(); if (!a) return 0;
+    try { if (a.apkCode) return a.apkCode(); } catch (e) { }
+    if (a.checkNow) return 5; if (a.startUpdate) return 4; if (a.speak) return 3; if (a.setReminder) return 2; return 1;
+  }
+  function apkName() {
+    try { if (AND() && AND().apkName) return AND().apkName(); } catch (e) { }
+    return APK_NAMES[apkCode()] || '?';
+  }
+  function openSite() {
+    try {
+      if (AND() && AND().openUrl) AND().openUrl(SITE);
+      else if (AND() && AND().copy) { AND().copy(SITE); toast('Enlace copiado: pégalo en tu navegador 🌐'); }
+      else window.open(SITE, '_blank');
+    } catch (e) { }
+  }
+  function deferOrShow(fn) { if (P || $('#ob')) { upd.waitFn = fn; return; } fn(); }
+  function runWaiting() { if (upd.waitFn) { var f = upd.waitFn; upd.waitFn = null; f(); } }
+
   function showUpd() {
     var m = $('#modal');
-    m.innerHTML = '<div class="dlg" id="upd"><h3>🚀 Actualización disponible</h3><p class="mut" style="line-height:1.45">Hay una versión nueva de la app. Al actualizar, la app se cerrará sola y la próxima vez que entres ya estará lista.</p>' +
+    m.innerHTML = '<div class="dlg" id="upd"><h3>🚀 Actualización disponible</h3><p class="mut" style="line-height:1.45">Hay mejoras nuevas y <b>no necesitas instalar nada</b>. Se descargan ahora: la app se cerrará sola y, al abrirla de nuevo, ya estará actualizada.</p>' +
       '<div class="row" style="margin-top:18px"><button class="btn ghost sm sp" data-a="updno">Más tarde</button><button class="btn sm sp" data-a="updgo">Actualizar</button></div></div>';
     m.className = 'on';
   }
-  var REMOTE = 'https://raw.githubusercontent.com/Anthonyxddddd/crece-fit-web/main/', jsStat = '', natStat = '';
+  function notesList(info) {
+    return (info && info.notes && info.notes.length) ? '<ul class="mut small" style="margin:10px 0 0;padding-left:18px;line-height:1.5">' + info.notes.slice(0, 3).map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>' : '';
+  }
+  function showApkDlg(info, required) {
+    var m = $('#modal'), v = info && info.version ? info.version : '?';
+    m.innerHTML = '<div class="dlg"><h3>📲 ' + (required ? 'Necesitas la nueva versión' : 'Nueva versión disponible') + '</h3><p class="mut" style="line-height:1.45">' +
+      (required ? 'Esta actualización necesita instalar un APK nuevo (v' + esc(v) + '). ' : 'Hay un APK nuevo (v' + esc(v) + ') con mejoras. ') +
+      'Descárgalo desde la página, ábrelo e instálalo encima: <b>no pierdes tu progreso ni tu racha</b>.</p>' + notesList(info) +
+      '<div class="row" style="margin-top:18px"><button class="btn ghost sm sp" data-a="updno">Más tarde</button><button class="btn sm sp" data-a="gosite">🌐 Ir a descargar</button></div></div>';
+    m.className = 'on';
+  }
   function updStatusText() {
     try { if (AND() && AND().updateStatus) natStat = AND().updateStatus(); } catch (e) { }
     return (natStat || 'La app busca actualizaciones al abrirse.') + (jsStat ? ' · ' + jsStat : '');
   }
+
+  /* trae version.json (contenido) y descargar/apk.json (APK) */
+  function loadMeta(cb) {
+    var out = { web: null, apk: null }, n = 0;
+    function fin() { if (++n === 2) cb(out); }
+    function get(path, key) {
+      try { fetch(REMOTE + path + '?t=' + Date.now()).then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (o) { out[key] = o; fin(); }, function () { fin(); }); }
+      catch (e) { fin(); }
+    }
+    get('version.json', 'web'); get('descargar/apk.json', 'apk');
+  }
+  /* decide qué avisar: APK obligatorio > actualización de contenido > APK opcional */
+  function decide(out, nativeV, manual) {
+    var code = apkCode(), web = out.web, apk = out.apk, canOta = !!(AND() && AND().startUpdate);
+    apkInfo = (apk && apk.code > code) ? apk : null;
+    apkReq = !!(web && (web.minApk || 0) > code);
+    var webNew = canOta && !!(nativeV || (web && web.version > (window.APP_VERSION || 0)));
+    if (!web && !apk) { if (nativeV) deferOrShow(showUpd); else if (manual) toast('No se pudo consultar. Revisa tu internet.'); return; }
+    if (apkReq) {
+      if (manual || !upd.apkShown) { upd.apkShown = true; deferOrShow(function () { showApkDlg(apk, true); }); }
+    } else if (webNew) {
+      if (manual) upd.shown = false;
+      if (!upd.shown) { upd.shown = true; upd.v = nativeV || (web && web.version); deferOrShow(showUpd); }
+    } else if (manual) {
+      toast(apkInfo ? 'Hay una versión nueva del APK 📲' : 'Ya tienes lo último ✅');
+      if (apkInfo) deferOrShow(function () { showApkDlg(apk, false); });
+    }
+    if (tab === 'home' && !P && !upd.busy) render();
+    if (tab === 'set' && !P && !upd.busy) render();
+  }
+  function jsCheck(manual) {
+    loadMeta(function (out) {
+      jsStat = out.web ? 'Web: v' + out.web.version : 'Sin conexión con la web';
+      decide(out, 0, manual);
+    });
+  }
+  // avisos que manda la app nativa
   window.__updateAvailable = function (v) {
     if (upd.busy) return;
-    if (upd.shown && !upd.force) return;
-    upd.shown = true; upd.force = false; upd.v = v;
-    if (P || $('#ob')) { upd.wait = true; return; }
-    showUpd();
+    loadMeta(function (out) { decide(out, v, false); });
   };
   window.__updateStatus = function (m, manual) {
     natStat = m;
-    if (manual) { toast(m); if (/nueva/i.test(m)) { upd.force = true; } }
+    if (manual) toast(m);
     if (tab === 'set' && !upd.busy && !P) render();
   };
-  // segunda vía de detección (desde la propia página); sirve de respaldo y de diagnóstico
-  function jsCheck(manual) {
-    try {
-      fetch(REMOTE + 'version.json?t=' + Date.now()).then(function (r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-        .then(function (o) {
-          jsStat = 'Web: v' + o.version;
-          if (o.version > (window.APP_VERSION || 0) && AND() && AND().startUpdate) { if (manual) upd.shown = false; window.__updateAvailable(o.version); }
-          else if (manual) toast('Ya tienes lo último ✅');
-          if (tab === 'set' && !upd.busy && !P) render();
-        })
-        .catch(function (e) { jsStat = 'Error web: ' + e; if (manual) toast('No se pudo consultar: ' + e); if (tab === 'set' && !P) render(); });
-    } catch (e) { jsStat = 'Error: ' + e; }
-  }
   window.__updateProgress = function (p) {
     var i = $('#upi'), t = $('#upt'), h = $('#uph');
     if (i) i.style.width = p + '%';
