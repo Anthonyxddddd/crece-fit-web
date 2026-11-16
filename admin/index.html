@@ -43,6 +43,12 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 #err{color:var(--bad);font-size:14px;margin-top:10px;min-height:20px}
 .mut{color:var(--mut)}.small{font-size:13px}
 [hidden]{display:none!important}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding:5px;background:var(--card);border:1px solid var(--line);border-radius:18px;margin:0 0 16px;scrollbar-width:none;position:sticky;top:0;z-index:5}
+.tabs::-webkit-scrollbar{display:none}
+.tabs button{flex:1 0 auto;border:0;background:none;color:var(--mut);font:inherit;font-weight:800;font-size:14px;padding:11px 18px;border-radius:13px;cursor:pointer;white-space:nowrap;transition:.2s}
+.tabs button.on{background:linear-gradient(180deg,var(--acc),var(--acc2));color:#04182e}
+.tp{display:none}.tp.on{display:block;animation:rise .4s both}
+@keyframes rise{from{opacity:0;transform:translateY(14px)}}
 .sec-h{margin:22px 0 10px;font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-weight:800}
 </style>
 </head>
@@ -68,25 +74,38 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       <select id="rng" style="width:auto"><option value="7">7 días</option><option value="14" selected>14 días</option><option value="30">30 días</option></select>
       <button class="btn sec" id="ref">🔄 Actualizar</button><button class="btn sec" id="exp">⬇ Exportar</button><button class="btn sec" id="out">Salir</button>
     </div>
-    <div class="grid kpis" id="kpis"></div>
-    <div class="grid cols">
-      <div class="card"><h2>🆕 Instalaciones nuevas por día</h2><div class="bars" id="c_new"></div></div>
-      <div class="card"><h2>👥 Usuarios activos por día</h2><div class="bars" id="c_act"></div></div>
-      <div class="card"><h2>💪 Entrenamientos por día</h2><div class="bars" id="c_wk"></div></div>
+    <div class="tabs" id="tabs"><button class="on" data-t="resumen">📊 Resumen</button><button data-t="usuarios">👥 Usuarios</button><button data-t="actualiz">🔄 Actualizaciones</button><button data-t="errores">⚠️ Errores</button></div>
+
+    <div class="tp on" id="t-resumen">
+      <div class="grid kpis" id="kpis"></div>
+      <div class="grid cols">
+        <div class="card"><h2>🆕 Instalaciones nuevas por día</h2><div class="bars" id="c_new"></div></div>
+        <div class="card"><h2>👥 Usuarios activos por día</h2><div class="bars" id="c_act"></div></div>
+        <div class="card"><h2>💪 Entrenamientos por día</h2><div class="bars" id="c_wk"></div></div>
+      </div>
     </div>
-    <div class="grid cols">
-      <div class="card"><h2>📲 Versión del APK</h2><div class="lst" id="l_apk"></div></div>
-      <div class="card"><h2>⚡ Versión del contenido</h2><div class="lst" id="l_web"></div></div>
-      <div class="card"><h2>🏋️ Rutinas más hechas</h2><div class="lst" id="l_rut"></div></div>
-      <div class="card"><h2>🎨 Temas y modo</h2><div class="lst" id="l_theme"></div></div>
-      <div class="card"><h2>🤖 Android</h2><div class="lst" id="l_and"></div></div>
-      <div class="card"><h2>⭐ Niveles</h2><div class="lst" id="l_lvl"></div></div>
+
+    <div class="tp" id="t-usuarios">
+      <div class="grid cols">
+        <div class="card"><h2>📲 Versión del APK</h2><div class="lst" id="l_apk"></div></div>
+        <div class="card"><h2>⚡ Versión del contenido</h2><div class="lst" id="l_web"></div></div>
+        <div class="card"><h2>🏋️ Rutinas más hechas</h2><div class="lst" id="l_rut"></div></div>
+        <div class="card"><h2>🎨 Temas y modo</h2><div class="lst" id="l_theme"></div></div>
+        <div class="card"><h2>🤖 Android</h2><div class="lst" id="l_and"></div></div>
+        <div class="card"><h2>⭐ Niveles</h2><div class="lst" id="l_lvl"></div></div>
+      </div>
+      <div class="card" style="margin-bottom:14px"><h2>👤 Instalaciones (más recientes)</h2><div class="sc" id="t_inst"></div></div>
     </div>
-    <div class="sec-h">Salud de las actualizaciones</div>
-    <div class="grid kpis" id="upk"></div>
-    <div class="card" style="margin-bottom:14px"><h2>⚠️ Errores y problemas recientes</h2><div class="sc" id="t_err"></div></div>
-    <div class="card" style="margin-bottom:14px"><h2>👤 Instalaciones (más recientes)</h2><div class="sc" id="t_inst"></div></div>
-    <div class="card"><h2>🧾 Eventos recientes</h2><div class="sc" id="t_ev"></div></div>
+
+    <div class="tp" id="t-actualiz">
+      <div class="grid kpis" id="upk"></div>
+      <div class="card" style="margin-bottom:14px"><h2>🔄 Eventos de actualización</h2><div class="sc" id="t_upd"></div></div>
+    </div>
+
+    <div class="tp" id="t-errores">
+      <div class="card" style="margin-bottom:14px"><h2>⚠️ Errores y problemas recientes</h2><div class="sc" id="t_err"></div></div>
+      <div class="card" style="margin-bottom:14px"><h2>🧾 Todos los eventos recientes</h2><div class="sc" id="t_ev"></div></div>
+    </div>
     <p class="mut small" style="margin-top:20px">Datos anónimos: solo usuarios que aceptaron enviar estadísticas. Los códigos son aleatorios; no hay nombres ni datos personales.</p>
   </div>
 </div>
@@ -172,6 +191,10 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
     list($('l_lvl'), tally(I, function (x) { return 'Nivel ' + (x.lvl || 1); }));
     var ap = E.filter(function (e) { return e.k === 'upd_applied'; }), na = E.filter(function (e) { return e.k === 'upd_noapply'; }), ue = E.filter(function (e) { return e.k === 'upd_err'; });
     $('upk').innerHTML = kpi(ap.length, 'Actualizaciones aplicadas') + kpi(na.length, 'Descargadas pero NO aplicadas') + kpi(ue.length, 'Errores al actualizar') + kpi(E.filter(function (e) { return e.k === 'err'; }).length, 'Errores de la app');
+    var ue2 = E.filter(function (e) { return e.k.indexOf('upd_') === 0; }).slice(0, 40);
+    $('t_upd').innerHTML = ue2.length ? '<table><tr><th>Cuándo</th><th>Resultado</th><th>Usuario</th><th>Versión</th><th>Detalle</th></tr>' + ue2.map(function (e) {
+      var cls = e.k === 'upd_applied' ? 'ok' : e.k === 'upd_noapply' ? 'warn' : 'bad', lbl = { upd_applied: '✅ aplicada', upd_noapply: '⚠️ no aplicada', upd_err: '❌ error' }[e.k] || e.k;
+      return '<tr><td>' + hm(e.t) + '</td><td><span class="tag ' + cls + '">' + lbl + '</span></td><td>' + esc(e.i) + '</td><td>APK ' + esc(e.a) + ' · web v' + esc(e.w) + '</td><td>' + esc(e.m || (e.to ? 'v' + e.f + ' → v' + e.to : (e.src ? 'origen: ' + e.src : ''))) + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Aún no hay eventos de actualización.</span>';
     var bad = E.filter(function (e) { return e.k === 'err' || e.k === 'upd_err' || e.k === 'upd_noapply'; }).slice(0, 30);
     $('t_err').innerHTML = bad.length ? '<table><tr><th>Cuándo</th><th>Tipo</th><th>Usuario</th><th>Versión</th><th>Detalle</th></tr>' + bad.map(function (e) {
       return '<tr><td>' + hm(e.t) + '</td><td><span class="tag ' + (e.k === 'upd_noapply' ? 'warn' : 'bad') + '">' + esc(e.k) + '</span></td><td>' + esc(e.i) + '</td><td>APK ' + esc(e.a) + ' · web v' + esc(e.w) + '</td><td>' + esc(e.m || (e.src ? 'origen: ' + e.src + ' (de v' + e.f + ')' : '') || '') + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Sin problemas registrados ✅</span>';
@@ -183,6 +206,21 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       return '<tr><td>' + hm(e.t) + '</td><td><span class="tag ' + (e.k === 'workout' ? 'ok' : '') + '">' + esc(e.k) + '</span></td><td>' + esc(e.i) + '</td><td>' + esc(e.a) + ' · v' + esc(e.w) + '</td><td>' + esc(d.join(' ')) + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Sin eventos todavía.</span>';
   }
 
+  var TABS = ['resumen', 'usuarios', 'actualiz', 'errores'], tcur = 'resumen';
+  function tab(t) {
+    tcur = t;
+    Array.prototype.forEach.call($('tabs').children, function (b) { var on = b.getAttribute('data-t') === t; b.classList.toggle('on', on); if (on) { try { $('tabs').scrollTo({ left: b.offsetLeft - 20, behavior: 'smooth' }); } catch (e) { } } });
+    TABS.forEach(function (k) { $('t-' + k).classList.toggle('on', k === t); });
+    window.scrollTo(0, 0);
+  }
+  Array.prototype.forEach.call($('tabs').children, function (b) { b.onclick = function () { tab(b.getAttribute('data-t')); }; });
+  var tx = 0, ty = 0;
+  document.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; ty = e.touches[0].clientY; }, { passive: true });
+  document.addEventListener('touchend', function (e) {
+    if ($('dash').hidden || e.target.closest && e.target.closest('.sc,.tabs')) return;
+    var dx = e.changedTouches[0].clientX - tx, dy = e.changedTouches[0].clientY - ty;
+    if (Math.abs(dx) > 70 && Math.abs(dy) < 60 && Math.abs(dx) > Math.abs(dy) * 1.8) { var i = TABS.indexOf(tcur) + (dx < 0 ? 1 : -1); if (i >= 0 && i < TABS.length) tab(TABS[i]); }
+  }, { passive: true });
   function enter() { $('login').hidden = true; $('dash').hidden = false; return load(); }
   $('f').addEventListener('submit', function (ev) {
     ev.preventDefault(); $('err').textContent = '';
