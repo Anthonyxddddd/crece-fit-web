@@ -134,6 +134,57 @@
     sheetClose(); dialogClose(); startWorkout(todayRoutineId());
   };
 
+  /* ---------- estadísticas anónimas (solo si el usuario acepta) ----------
+     Se envía: un código aleatorio, versión de la app, tema, nivel, racha, nº de entrenamientos
+     y cuántas veces hace cada rutina. NUNCA nombre, medidas, notas, fotos ni el código de la copia. */
+  var stat = { last: 0, errs: 0, opened: 0 };
+  function statsOn() { return !!(CLOUD_URL && S && S.settings.stats === true); }
+  function rnd(n) { var al = 'abcdefghijklmnopqrstuvwxyz0123456789', a = new Uint8Array(n), o = '', i; (window.crypto || window.msCrypto).getRandomValues(a); for (i = 0; i < n; i++) o += al[a[i] % al.length]; return o; }
+  function sid() { if (!S.sid) { S.sid = rnd(24); S.sfirst = Date.now(); save(); } return S.sid; }
+  function androidVer() { var m = /Android (\d+)/.exec(navigator.userAgent || ''); return m ? +m[1] : 0; }
+  function statsDoc() {
+    var st = stats(), cnt = {};
+    S.log.forEach(function (l) { var k = 'r_' + (/^U\d+/.test(l.id) ? 'U' : l.id); cnt[k] = (cnt[k] || 0) + 1; });
+    var doc = { first: S.sfirst || Date.now(), last: Date.now(), apk: apkName(), apkc: apkCode(), web: window.APP_VERSION || 0, src: window.__src || '', and: androidVer(),
+      theme: S.settings.theme, mode: S.settings.mode, lvl: st.lvl, tot: S.total, str: st.cur, best: st.best, cloud: !!(S.cloud && S.cloud.code), plan: !!S.plan, nj: !!S.settings.nojump, rem: !!S.settings.rem };
+    Object.keys(cnt).forEach(function (k) { doc[k] = cnt[k]; });
+    return doc;
+  }
+  function statsPing(force) {
+    if (!statsOn()) return;
+    if (!force && Date.now() - stat.last < 30 * 60 * 1000) return;
+    stat.last = Date.now();
+    try { fetch(CLOUD_URL + '/stats/installs/' + sid() + '.json', { method: 'PUT', body: JSON.stringify(statsDoc()), keepalive: true }); } catch (e) { }
+  }
+  function statEvent(k, x) {
+    if (!statsOn()) return;
+    var o = { t: Date.now(), k: k, i: sid().slice(0, 8), a: apkName(), w: window.APP_VERSION || 0 }, n;
+    if (x) for (n in x) o[n] = (typeof x[n] === 'string') ? x[n].slice(0, 150) : x[n];
+    try { fetch(CLOUD_URL + '/stats/events.json', { method: 'POST', body: JSON.stringify(o), keepalive: true }); } catch (e) { }
+  }
+  function statsDelete() { try { if (S.sid && CLOUD_URL) fetch(CLOUD_URL + '/stats/installs/' + S.sid + '.json', { method: 'DELETE' }); } catch (e) { } }
+  function statsStart() {
+    if (!statsOn()) return;
+    statsPing(true);
+    if (Date.now() - (S.sopen || 0) > 6 * 3600 * 1000) { S.sopen = Date.now(); save(); statEvent('open'); }
+    if (S.updTry) {   // ¿se aplicó la actualización que se pidió?
+      var u = S.updTry; S.updTry = null; save();
+      if ((window.APP_VERSION || 0) > u.from) statEvent('upd_applied', { f: u.from, to: window.APP_VERSION });
+      else if (Date.now() - u.t < 3 * 86400000) statEvent('upd_noapply', { f: u.from, src: window.__src || '' });
+    }
+  }
+  window.addEventListener('error', function (e) {
+    if (stat.errs++ < 5) statEvent('err', { m: String(e.message || e).slice(0, 140), l: (e.lineno || 0) });
+  });
+  function askStats(tries) {
+    if (!CLOUD_URL || !S.setup || S.settings.stats !== undefined) return;
+    if (P || $('#ob') || $('#modal').className === 'on' || $('#splash')) { if ((tries || 0) < 6) setTimeout(function () { askStats((tries || 0) + 1); }, 7000); return; }
+    var m = $('#modal');
+    m.innerHTML = '<div class="dlg"><h3>📊 Ayúdanos a mejorar</h3><p class="mut" style="line-height:1.5">¿Quieres enviar <b>estadísticas anónimas</b>? Solo se manda un código aleatorio, la versión de la app, tu nivel, racha y cuántos entrenamientos haces. <b>Nunca</b> tu nombre, medidas, notas ni datos personales. Puedes cambiarlo cuando quieras en Ajustes.</p>' +
+      '<div class="row" style="margin-top:18px"><button class="btn ghost sm sp" data-a="statsno">No, gracias</button><button class="btn sm sp" data-a="statsyes">Permitir</button></div></div>';
+    m.className = 'on';
+  }
+
   /* ---------- efectos ---------- */
   var fx = { hab: null, tab: false };
   function countUp(el, to) {
@@ -215,7 +266,7 @@
   function cloudOn() {
     if (!CLOUD_URL) return;
     var c = cloudCfg(); c.code = genCode(); c.auto = true; save();
-    cloudSave(false).then(function (ok) { if (!ok) { c.code = ''; save(); } render(); });
+    cloudSave(false).then(function (ok) { if (!ok) { c.code = ''; save(); } else statEvent('cloud_on'); render(); });
   }
   function cloudOff() {
     var c = cloudCfg(), id = cloudId(c.code);
@@ -235,7 +286,7 @@
         var n = data.total || 0;
         sheetClose();
         dialog('Copia encontrada ☁️', 'Tiene ' + n + ' entrenamiento' + (n === 1 ? '' : 's') + ' y nivel ' + levelOf(data.xp || 0) + '. Al restaurar se <b>reemplazan los datos de este teléfono</b>. ¿Continuar?', 'Restaurar', function () {
-          data.cloud = { code: code, auto: true, last: Date.now() };
+          data.cloud = { code: code, auto: true, last: Date.now() }; data.sid = S.sid; data.sfirst = S.sfirst;
           S = data; save(); load(); save(); applyTheme(); toast('Datos restaurados ✅'); render(true); syncReminder();
         });
       }).catch(function (e) { toast(e && e.message || 'No se pudo restaurar'); });
@@ -531,6 +582,10 @@
     return '<div class="seg">' + opts.map(function (o) { return '<button class="' + (String(cur) === String(o[0]) ? 'on' : '') + '" data-a="opt" data-v="' + key + ':' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>';
   }
   function nativeOk(fn) { try { return !!(AND() && AND()[fn]); } catch (e) { return false; } }
+  function statsCard() {
+    if (!CLOUD_URL) return '';
+    return '<div class="card"><div class="set" style="border:0;padding:0"><div class="sp"><b>📊 Estadísticas anónimas</b><div class="mut small" style="line-height:1.45;margin-top:4px">Ayudan a mejorar la app. Se envía un código aleatorio, la versión, tu nivel, racha y nº de entrenamientos. Nunca tu nombre, medidas ni notas. Al apagarlo se borra lo enviado.</div></div>' + sw('stats') + '</div></div>';
+  }
   function widgetCard() {
     return '<div class="card"><b>🧩 Widget de racha</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Mira tu racha 🔥 en la pantalla de inicio del teléfono y entra con un toque.</p>' +
       (nativeOk('pinWidget') ? '<button class="btn sec sm" data-a="pinw">➕ Añadir a la pantalla de inicio</button>' : '<p class="mut small" style="margin:0">Necesita la última versión del APK.</p>') + '</div>';
@@ -555,7 +610,7 @@
       (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') +
       '<div class="set" style="border-bottom:0"><div class="sp"><b>🔥 Aviso de racha en peligro</b><div class="mut small">A las 9 pm, solo si aún no entrenaste</div></div>' + sw('risk') + '</div>' +
       (nativeOk('setReminderPlus') ? '' : '<p class="mut small" style="margin:0">Los botones y este aviso necesitan la última versión del APK.</p>') + '</div>' +
-      widgetCard() + cloudCard() +
+      widgetCard() + cloudCard() + statsCard() +
       '<div class="card"><b>🔄 Actualizaciones</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Contenido: <b style="color:var(--txt)">v' + (window.APP_VERSION || '?') + '</b>' + (window.__src === 'ota' ? ' (descargado)' : window.__src === 'apk' ? ' (del APK)' : '') + ' · APK: <b style="color:var(--txt)">v' + esc(apkName()) + '</b><br>' + esc(updStatusText()) + '</p><div class="row"><button class="btn sec sm sp" data-a="updcheck">🔄 Buscar</button><button class="btn sec sm sp" data-a="gosite">🌐 Página de descargas</button></div></div>' +
       '<div class="card"><b>💾 Copia de seguridad</b><p class="mut small" style="margin:4px 0 12px">Guarda tu progreso por si cambias de teléfono.</p><div class="row"><button class="btn sec sm sp" data-a="backup">Exportar</button><button class="btn sec sm sp" data-a="restore">Importar</button></div></div>' +
       '<div class="card"><b>🌱 Sobre crecer</b><p class="mut small" style="margin-top:6px;line-height:1.5">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
@@ -807,6 +862,7 @@
     if (tp && tp.i >= 27) S.planDone = true;
     var up = addXP(gain); P.xp = { gain: gain, up: up };
     save(); syncReminder(); cloudAuto();
+    statEvent('workout', { r: /^U\d+/.test(id) ? 'U' : id, s: secs, n: P.sets }); statsPing(true);
     beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
     summary(secs, light);
   }
@@ -890,6 +946,7 @@
       case 'tog':
         setBool(v);
         if (v === 'voice' && S.settings.voice) say('Voz activada');
+        if (v === 'stats') { if (S.settings.stats) { statsPing(true); } else statsDelete(); }
         if (v === 'rem' || v === 'risk') { if ((S.settings.rem || S.settings.risk) && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
         render(); break;
       case 'backup': var js = JSON.stringify(S);
@@ -904,7 +961,7 @@
         try { var o = JSON.parse($('#rs').value); if (!o || !o.settings || !o.days) throw 0; S = o; save(); load(); save(); sheetClose(); toast('Datos restaurados ✅'); render(); syncReminder(); }
         catch (e) { toast('Texto no válido'); } break;
       case 'reset':
-        dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
+        dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { statsDelete(); try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
       case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); render(); break;
       case 'hab':
         var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); fx.hab = v; render(); fx.hab = null; break;
@@ -928,6 +985,8 @@
         else S.custom.push({ id: 'U' + Date.now(), name: nm, slots: slots });
         save(); sheetClose(); toast('Rutina guardada ✅'); render(); break;
       case 'adj': adjust(+v); break;
+      case 'statsyes': S.settings.stats = true; save(); dialogClose(); statsPing(true); statEvent('consent', { v: 1 }); toast('¡Gracias! 💙'); break;
+      case 'statsno': S.settings.stats = false; save(); dialogClose(); break;
       case 'pinw':
         try { if (AND().pinWidget()) toast('Elige dónde poner el widget 👆'); else toast('Mantén pulsado un espacio vacío de tu pantalla → Widgets → Crece Fit'); } catch (e) { }
         break;
@@ -948,7 +1007,7 @@
         jsCheck(true); break;
       case 'updno': dialogClose(); break;
       case 'updgo':
-        upd.busy = true;
+        upd.busy = true; S.updTry = { from: window.APP_VERSION || 0, t: Date.now() }; save();
         $('#upd').innerHTML = '<h3 id="uph">Actualizando…</h3><div class="pbar"><i id="upi"></i></div><div class="upct" id="upt">0%</div><p class="mut small" id="upn" style="text-align:center;margin-top:6px">No cierres la app</p>';
         try { if (AND() && AND().startUpdate) AND().startUpdate(); else { upd.busy = false; dialogClose(); location.reload(); } } catch (e) { window.__updateError(); }
         break;
@@ -1060,6 +1119,7 @@
   }
   /* decide qué avisar: APK obligatorio > actualización de contenido > APK opcional */
   function decide(out, nativeV, manual) {
+    if (!AND()) return;   // en un navegador (sin la app) no hay nada que actualizar
     var code = apkCode(), web = out.web, apk = out.apk, canOta = !!(AND() && AND().startUpdate);
     apkInfo = (apk && apk.code > code) ? apk : null;
     apkReq = !!(web && (web.minApk || 0) > code);
@@ -1100,6 +1160,7 @@
     if (p >= 100 && h) { h.textContent = '¡Listo! ✅ Cerrando la app…'; var n = $('#upn'); if (n) n.textContent = 'La próxima vez que entres ya estará actualizada'; }
   };
   window.__updateError = function (m) {
+    statEvent('upd_err', { m: String(m || '').slice(0, 120) });
     upd.busy = false; dialogClose(); natStat = m || natStat;
     dialog('No se pudo actualizar', esc(m || 'Revisa tu internet e inténtalo de nuevo.'), 'Entendido', function () { }, false);
     if (tab === 'set') render();
@@ -1115,6 +1176,8 @@
   load(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
   setTimeout(function () { jsCheck(false); }, 2500);
   setTimeout(cloudAuto, 6000);
+  setTimeout(statsStart, 4500);
+  setTimeout(askStats, 9000);
   if (!S.setup) onboarding();
   setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
 })();

@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="color-scheme" content="dark light">
+<title>Panel · Crece Fit</title>
+<style>
+:root{--bg:#0e1120;--bg2:#141831;--card:#1a1f3a;--card2:#252c52;--line:#2c3460;--txt:#f3f5ff;--mut:#9aa4d0;--acc:#4aa8ff;--acc2:#2b7fe0;--ok:#3ddc97;--bad:#ff5d73;--warn:#ffb347}
+@media (prefers-color-scheme:light){:root{--bg:#f1f4ff;--bg2:#e9eeff;--card:#fff;--card2:#e5eafa;--line:#d3dbf2;--txt:#161a33;--mut:#5a6590}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0}h2{font-size:17px;margin:0 0 12px}
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top .sp{flex:1}
+.btn{border:0;border-radius:12px;padding:10px 16px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;background:linear-gradient(180deg,var(--acc),var(--acc2));color:#04182e}
+.btn.sec{background:var(--card2);color:var(--txt)}
+select,input{font:inherit;color:var(--txt);background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px}
+.grid{display:grid;gap:14px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));margin-bottom:14px}
+.kpi b{display:block;font-size:30px;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi span{color:var(--mut);font-size:13px;font-weight:600}
+.cols{grid-template-columns:repeat(auto-fit,minmax(340px,1fr));margin-bottom:14px}
+.bars{display:flex;align-items:flex-end;gap:4px;height:120px}
+.bars div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;font-size:10px;color:var(--mut);gap:3px}
+.bars i{display:block;width:100%;border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,var(--acc),var(--acc2));min-height:2px}
+.lst .r{display:flex;align-items:center;gap:10px;padding:5px 0;font-size:14px}
+.lst .r b{flex:none;width:132px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lst .r .t{flex:1;height:10px;background:var(--card2);border-radius:9px;overflow:hidden}
+.lst .r .t i{display:block;height:100%;background:var(--acc);border-radius:9px}
+.lst .r span{flex:none;color:var(--mut);min-width:34px;text-align:right;font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{color:var(--mut);text-align:left;font-weight:700;padding:6px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.sc{overflow-x:auto}
+.tag{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:800;background:var(--card2);color:var(--mut)}
+.tag.ok{background:rgba(61,220,151,.18);color:var(--ok)}.tag.bad{background:rgba(255,93,115,.18);color:var(--bad)}.tag.warn{background:rgba(255,179,71,.2);color:var(--warn)}
+#login{max-width:380px;margin:12vh auto 0}
+#login label{display:block;font-size:13px;color:var(--mut);font-weight:700;margin:12px 0 6px}
+#err{color:var(--bad);font-size:14px;margin-top:10px;min-height:20px}
+.mut{color:var(--mut)}.small{font-size:13px}
+[hidden]{display:none!important}
+.sec-h{margin:22px 0 10px;font-size:15px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div id="login" class="card">
+    <h1>📊 Panel de Crece Fit</h1>
+    <p class="mut small" style="margin:6px 0 4px">Solo para el creador de la app. Inicia sesión con el usuario que creaste en Firebase.</p>
+    <form id="f">
+      <label>Correo</label><input type="email" id="em" autocomplete="username" required>
+      <label>Contraseña</label><input type="password" id="pw" autocomplete="current-password" required>
+      <div id="keybox" hidden><label>Clave de API web (Firebase → Configuración del proyecto)</label><input type="text" id="key" placeholder="AIza…"></div>
+      <button class="btn" style="width:100%;margin-top:16px" type="submit">Entrar</button>
+      <div id="err"></div>
+    </form>
+  </div>
+
+  <div id="dash" hidden>
+    <div class="top">
+      <h1>📊 Crece Fit · Panel</h1><span class="tag" id="upd">—</span><div class="sp"></div>
+      <select id="rng" style="width:auto"><option value="7">7 días</option><option value="14" selected>14 días</option><option value="30">30 días</option></select>
+      <button class="btn sec" id="ref">🔄 Actualizar</button><button class="btn sec" id="exp">⬇ Exportar</button><button class="btn sec" id="out">Salir</button>
+    </div>
+    <div class="grid kpis" id="kpis"></div>
+    <div class="grid cols">
+      <div class="card"><h2>🆕 Instalaciones nuevas por día</h2><div class="bars" id="c_new"></div></div>
+      <div class="card"><h2>👥 Usuarios activos por día</h2><div class="bars" id="c_act"></div></div>
+      <div class="card"><h2>💪 Entrenamientos por día</h2><div class="bars" id="c_wk"></div></div>
+    </div>
+    <div class="grid cols">
+      <div class="card"><h2>📲 Versión del APK</h2><div class="lst" id="l_apk"></div></div>
+      <div class="card"><h2>⚡ Versión del contenido</h2><div class="lst" id="l_web"></div></div>
+      <div class="card"><h2>🏋️ Rutinas más hechas</h2><div class="lst" id="l_rut"></div></div>
+      <div class="card"><h2>🎨 Temas y modo</h2><div class="lst" id="l_theme"></div></div>
+      <div class="card"><h2>🤖 Android</h2><div class="lst" id="l_and"></div></div>
+      <div class="card"><h2>⭐ Niveles</h2><div class="lst" id="l_lvl"></div></div>
+    </div>
+    <div class="sec-h">Salud de las actualizaciones</div>
+    <div class="grid kpis" id="upk"></div>
+    <div class="card" style="margin-bottom:14px"><h2>⚠️ Errores y problemas recientes</h2><div class="sc" id="t_err"></div></div>
+    <div class="card" style="margin-bottom:14px"><h2>👤 Instalaciones (más recientes)</h2><div class="sc" id="t_inst"></div></div>
+    <div class="card"><h2>🧾 Eventos recientes</h2><div class="sc" id="t_ev"></div></div>
+    <p class="mut small" style="margin-top:20px">Datos anónimos: solo usuarios que aceptaron enviar estadísticas. Los códigos son aleatorios; no hay nombres ni datos personales.</p>
+  </div>
+</div>
+<script src="config.js"></script>
+<script>
+(function () {
+  var $ = function (i) { return document.getElementById(i); };
+  var DB = (ADMIN_CFG.db || '').replace(/\/$/, ''), KEY = ADMIN_CFG.apiKey || localStorage.getItem('crece_apikey') || '';
+  var tok = '', rtok = '', timer = null, raw = null;
+  if (!KEY) $('keybox').hidden = false;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function pad(n) { return n < 10 ? '0' + n : '' + n; }
+  function dk(t) { var d = new Date(t); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function ago(t) { var s = (Date.now() - t) / 1000; if (s < 90) return 'ahora'; if (s < 3600) return Math.round(s / 60) + ' min'; if (s < 86400) return Math.round(s / 3600) + ' h'; return Math.round(s / 86400) + ' d'; }
+  function hm(t) { var d = new Date(t); return pad(d.getDate()) + '/' + pad(d.getMonth() + 1) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  var ERR = { EMAIL_NOT_FOUND: 'Ese correo no existe.', INVALID_PASSWORD: 'Contraseña incorrecta.', INVALID_LOGIN_CREDENTIALS: 'Correo o contraseña incorrectos.', USER_DISABLED: 'Usuario deshabilitado.', TOO_MANY_ATTEMPTS_TRY_LATER: 'Demasiados intentos. Espera un momento.', API_KEY_INVALID: 'La clave de API no es válida.', OPERATION_NOT_ALLOWED: 'Activa “Correo y contraseña” en Firebase → Authentication.' };
+
+  function login(email, pass) {
+    return fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, password: pass, returnSecureToken: true }) })
+      .then(function (r) { return r.json(); }).then(function (o) {
+        if (o.error) { var m = (o.error.message || '').split(' ')[0]; throw new Error(ERR[m] || o.error.message || 'Error de inicio de sesión'); }
+        tok = o.idToken; rtok = o.refreshToken; clearInterval(timer);
+        timer = setInterval(function () {
+          fetch('https://securetoken.googleapis.com/v1/token?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(rtok) })
+            .then(function (r) { return r.json(); }).then(function (t) { if (t.id_token) { tok = t.id_token; rtok = t.refresh_token; } });
+        }, 50 * 60 * 1000);
+      });
+  }
+  function get(path, q) {
+    return fetch(DB + path + '.json?auth=' + encodeURIComponent(tok) + (q || '')).then(function (r) {
+      if (r.status === 401 || r.status === 403) throw new Error('Sin permiso: revisa las reglas y el UID en Firebase.');
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    });
+  }
+  function load() {
+    $('upd').textContent = 'cargando…';
+    return Promise.all([get('/stats/installs'), get('/stats/events', '&orderBy=%22t%22&limitToLast=1500')]).then(function (a) {
+      raw = { installs: a[0] || {}, events: a[1] || {} }; render(); $('upd').textContent = 'actualizado ' + pad(new Date().getHours()) + ':' + pad(new Date().getMinutes());
+    });
+  }
+
+  function bars(el, map, days) {
+    var ks = [], i, mx = 1, now = Date.now(), h = '';
+    for (i = days - 1; i >= 0; i--) ks.push(dk(now - i * 86400000));
+    ks.forEach(function (k) { if ((map[k] || 0) > mx) mx = map[k]; });
+    ks.forEach(function (k) { var v = map[k] || 0; h += '<div title="' + k + ': ' + v + '">' + (v || '') + '<i style="height:' + Math.round(v / mx * 88) + 'px"></i>' + k.slice(8) + '</div>'; });
+    el.innerHTML = h;
+  }
+  function list(el, counts, fmt) {
+    var ks = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; }), mx = ks.length ? counts[ks[0]] : 1;
+    el.innerHTML = ks.length ? ks.slice(0, 8).map(function (k) { return '<div class="r"><b title="' + esc(fmt ? fmt(k) : k) + '">' + esc(fmt ? fmt(k) : k) + '</b><div class="t"><i style="width:' + Math.round(counts[k] / mx * 100) + '%"></i></div><span>' + counts[k] + '</span></div>'; }).join('') : '<span class="mut small">Sin datos todavía</span>';
+  }
+  function tally(arr, fn) { var o = {}; arr.forEach(function (x) { var k = fn(x); if (k != null && k !== '') o[k] = (o[k] || 0) + 1; }); return o; }
+  var RN = { A: 'A · Piernas', B: 'B · Pecho/espalda', C: 'C · Cuerpo completo', D: 'D · Core', Q5: 'Rápida 5', Q10: 'Rápida 10', S: 'Estiramientos', P: 'Postura', U: 'Propias' };
+
+  function render() {
+    var days = +$('rng').value, now = Date.now(), I = Object.keys(raw.installs).map(function (k) { var o = raw.installs[k]; o._id = k; return o; });
+    var E = Object.keys(raw.events).map(function (k) { return raw.events[k]; }).sort(function (a, b) { return b.t - a.t; });
+    var act = function (ms) { return I.filter(function (x) { return now - x.last < ms; }).length; };
+    var tot = I.reduce(function (s, x) { return s + (x.tot || 0); }, 0), withW = I.filter(function (x) { return x.tot > 0; });
+    var avgStr = withW.length ? (withW.reduce(function (s, x) { return s + (x.str || 0); }, 0) / withW.length) : 0;
+    var cloud = I.length ? Math.round(I.filter(function (x) { return x.cloud; }).length / I.length * 100) : 0;
+    var maxWeb = I.reduce(function (m, x) { return Math.max(m, x.web || 0); }, 0), upToDate = I.length ? Math.round(I.filter(function (x) { return (x.web || 0) === maxWeb; }).length / I.length * 100) : 0;
+    function kpi(v, t) { return '<div class="card kpi"><b>' + v + '</b><span>' + t + '</span></div>'; }
+    $('kpis').innerHTML = kpi(I.length, 'Instalaciones') + kpi(act(864e5), 'Activos hoy (24 h)') + kpi(act(7 * 864e5), 'Activos 7 días') + kpi(act(30 * 864e5), 'Activos 30 días') +
+      kpi(tot, 'Entrenamientos totales') + kpi(avgStr.toFixed(1), 'Racha promedio') + kpi(cloud + '%', 'Con copia en la nube') + kpi(upToDate + '%', 'Con el contenido más nuevo');
+    bars($('c_new'), tally(I, function (x) { return x.first ? dk(x.first) : null; }), days);
+    var seen = {}, a2 = {}; E.forEach(function (e) { if (e.k === 'open' || e.k === 'workout') { var k = dk(e.t) + '|' + e.i; if (!seen[k]) { seen[k] = 1; a2[dk(e.t)] = (a2[dk(e.t)] || 0) + 1; } } });
+    bars($('c_act'), a2, days);
+    bars($('c_wk'), tally(E.filter(function (e) { return e.k === 'workout'; }), function (e) { return dk(e.t); }), days);
+    list($('l_apk'), tally(I, function (x) { return x.apk ? 'v' + x.apk : '?'; }));
+    list($('l_web'), tally(I, function (x) { return 'v' + (x.web || '?'); }));
+    var rc = {}; I.forEach(function (x) { Object.keys(x).forEach(function (k) { if (k.indexOf('r_') === 0) rc[k.slice(2)] = (rc[k.slice(2)] || 0) + x[k]; }); });
+    list($('l_rut'), rc, function (k) { return RN[k] || k; });
+    var th = tally(I, function (x) { return x.theme; }), md = tally(I, function (x) { return x.mode; }), tm = {}; Object.keys(th).forEach(function (k) { tm['🎨 ' + k] = th[k]; }); Object.keys(md).forEach(function (k) { tm['🌓 ' + k] = md[k]; });
+    list($('l_theme'), tm);
+    list($('l_and'), tally(I, function (x) { return x.and ? 'Android ' + x.and : '?'; }));
+    list($('l_lvl'), tally(I, function (x) { return 'Nivel ' + (x.lvl || 1); }));
+    var ap = E.filter(function (e) { return e.k === 'upd_applied'; }), na = E.filter(function (e) { return e.k === 'upd_noapply'; }), ue = E.filter(function (e) { return e.k === 'upd_err'; });
+    $('upk').innerHTML = kpi(ap.length, 'Actualizaciones aplicadas') + kpi(na.length, 'Descargadas pero NO aplicadas') + kpi(ue.length, 'Errores al actualizar') + kpi(E.filter(function (e) { return e.k === 'err'; }).length, 'Errores de la app');
+    var bad = E.filter(function (e) { return e.k === 'err' || e.k === 'upd_err' || e.k === 'upd_noapply'; }).slice(0, 30);
+    $('t_err').innerHTML = bad.length ? '<table><tr><th>Cuándo</th><th>Tipo</th><th>Usuario</th><th>Versión</th><th>Detalle</th></tr>' + bad.map(function (e) {
+      return '<tr><td>' + hm(e.t) + '</td><td><span class="tag ' + (e.k === 'upd_noapply' ? 'warn' : 'bad') + '">' + esc(e.k) + '</span></td><td>' + esc(e.i) + '</td><td>APK ' + esc(e.a) + ' · web v' + esc(e.w) + '</td><td>' + esc(e.m || (e.src ? 'origen: ' + e.src + ' (de v' + e.f + ')' : '') || '') + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Sin problemas registrados ✅</span>';
+    var ins = I.slice().sort(function (a, b) { return b.last - a.last; }).slice(0, 40);
+    $('t_inst').innerHTML = ins.length ? '<table><tr><th>ID</th><th>Visto</th><th>APK</th><th>Web</th><th>Android</th><th>Nivel</th><th>Entren.</th><th>Racha</th><th>Nube</th><th>Origen</th></tr>' + ins.map(function (x) {
+      return '<tr><td>' + esc(x._id.slice(0, 6)) + '</td><td>' + ago(x.last) + '</td><td>' + esc(x.apk) + '</td><td>v' + esc(x.web) + '</td><td>' + esc(x.and || '?') + '</td><td>' + esc(x.lvl) + '</td><td>' + esc(x.tot) + '</td><td>' + esc(x.str) + '</td><td>' + (x.cloud ? '☁️' : '') + '</td><td>' + esc(x.src || '') + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Aún no hay instalaciones que hayan aceptado las estadísticas.</span>';
+    $('t_ev').innerHTML = E.length ? '<table><tr><th>Cuándo</th><th>Evento</th><th>Usuario</th><th>Versión</th><th>Detalle</th></tr>' + E.slice(0, 50).map(function (e) {
+      var d = []; ['r', 's', 'n', 'f', 'to', 'm'].forEach(function (k) { if (e[k] != null) d.push(k + '=' + e[k]); });
+      return '<tr><td>' + hm(e.t) + '</td><td><span class="tag ' + (e.k === 'workout' ? 'ok' : '') + '">' + esc(e.k) + '</span></td><td>' + esc(e.i) + '</td><td>' + esc(e.a) + ' · v' + esc(e.w) + '</td><td>' + esc(d.join(' ')) + '</td></tr>'; }).join('') + '</table>' : '<span class="mut small">Sin eventos todavía.</span>';
+  }
+
+  function enter() { $('login').hidden = true; $('dash').hidden = false; return load(); }
+  $('f').addEventListener('submit', function (ev) {
+    ev.preventDefault(); $('err').textContent = '';
+    if (!KEY) { KEY = $('key').value.trim(); if (KEY) localStorage.setItem('crece_apikey', KEY); }
+    if (!KEY) { $('err').textContent = 'Falta la clave de API web.'; return; }
+    login($('em').value.trim(), $('pw').value).then(enter).catch(function (e) { $('err').textContent = e.message; $('login').hidden = false; $('dash').hidden = true; });
+  });
+  $('ref').onclick = function () { load().catch(function (e) { alert(e.message); }); };
+  $('rng').onchange = function () { if (raw) render(); };
+  $('out').onclick = function () { tok = ''; raw = null; clearInterval(timer); $('pw').value = ''; $('dash').hidden = true; $('login').hidden = false; };
+  $('exp').onclick = function () { if (!raw) return; var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(raw, null, 1)], { type: 'application/json' })); a.download = 'crece-fit-stats-' + dk(Date.now()) + '.json'; a.click(); };
+})();
+</script>
+</body>
+</html>
