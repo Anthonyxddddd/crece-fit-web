@@ -75,14 +75,14 @@
 
   function draw(anim, p, J) {
     var front = anim.view === 'front';
-    var far = '#6f7bb5', near = '#4aa8ff', body = '#4aa8ff', skin = '#ffd9b3', dark = '#2b7fe0';
+    var C = g.FigColors, far = C.far, near = C.near, skin = '#ffd9b3', dark = C.dark;
     var s = '';
     // suelo y sombra
-    s += '<ellipse cx="' + J.p[0].toFixed(1) + '" cy="' + (GROUND + 2) + '" rx="62" ry="4" fill="rgba(0,0,0,.28)"/>';
-    s += '<line x1="14" y1="' + GROUND + '" x2="226" y2="' + GROUND + '" stroke="#39406b" stroke-width="2" stroke-linecap="round"/>';
+    s += '<ellipse cx="' + J.p[0].toFixed(1) + '" cy="' + (GROUND + 2) + '" rx="62" ry="4" fill="' + C.shadow + '"/>';
+    s += '<line x1="14" y1="' + GROUND + '" x2="226" y2="' + GROUND + '" stroke="' + C.ground + '" stroke-width="2" stroke-linecap="round"/>';
     if (anim.wall != null) {
-      s += '<rect x="' + anim.wall + '" y="-30" width="9" height="' + (GROUND + 30) + '" fill="#2a3158"/>';
-      s += '<line x1="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y1="-30" x2="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y2="' + GROUND + '" stroke="#5d68a8" stroke-width="2"/>';
+      s += '<rect x="' + anim.wall + '" y="-30" width="9" height="' + (GROUND + 30) + '" fill="' + C.wall + '"/>';
+      s += '<line x1="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y1="-30" x2="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y2="' + GROUND + '" stroke="' + C.wallLine + '" stroke-width="2"/>';
     }
     // extremidades lejanas
     s += limb(J.s2, J.e2, J.w2, 6.4, far);
@@ -147,5 +147,6 @@
   };
   Fig.prototype.destroy = function () { this.stop = true; if (this.raf) cancelAnimationFrame(this.raf); };
 
+  g.FigColors = g.FigColors || { near: '#4aa8ff', dark: '#2b7fe0', far: '#6f7bb5', ground: '#39406b', wall: '#2a3158', wallLine: '#5d68a8', shadow: 'rgba(0,0,0,.28)' };
   g.Fig = Fig; g.FigP = P; g.FigL = L; g.FigJoints = joints; g.FigPlace = place; g.FigGround = GROUND;
 })(typeof window !== 'undefined' ? window : globalThis);

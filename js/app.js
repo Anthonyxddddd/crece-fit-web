@@ -22,7 +22,7 @@
 
   /* ---------- estado ---------- */
   function fresh() {
-    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, rem: false, rh: 19, rm: 0 },
+    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0 }, recs: {},
       days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null };
   }
   function initChains(exp) {
@@ -35,6 +35,7 @@
     try { var r = localStorage.getItem(KEY); if (r) S = JSON.parse(r); } catch (e) { }
     if (!S) { S = fresh(); initChains(false); }
     Object.keys(CHAINS).forEach(function (k) { if (!S.chains[k]) S.chains[k] = { i: 0, v: CHAINS[k][0].s }; });
+    if (!S.recs) S.recs = {};
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
@@ -72,6 +73,20 @@
       AND().setReminder(!!S.settings.rem, S.settings.rh, S.settings.rm, msg, last);
     } catch (e) { }
   }
+
+  /* ---------- tema y voz ---------- */
+  function applyTheme() {
+    var st = S.settings, root = document.documentElement, mode = st.mode;
+    if (mode === 'auto') mode = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
+    root.setAttribute('data-mode', mode); root.setAttribute('data-theme', st.theme);
+    var cs = getComputedStyle(root), a = cs.getPropertyValue('--acc').trim(), b = cs.getPropertyValue('--acc2').trim();
+    var light = mode === 'light';
+    window.FigColors = { near: a, dark: b, far: light ? '#9aa4d0' : '#6f7bb5', ground: light ? '#b8c1e6' : '#39406b',
+      wall: light ? '#c9d1f0' : '#2a3158', wallLine: light ? '#98a3d4' : '#5d68a8', shadow: light ? 'rgba(0,0,0,.12)' : 'rgba(0,0,0,.28)' };
+    try { if (AND() && AND().bars) AND().bars(light ? '#f1f4ff' : '#0e1120', light); } catch (e) { }
+  }
+  function accent() { return window.FigColors.near; }
+  function say(t) { if (!S.settings.voice) return; try { if (AND() && AND().speak) AND().speak(t); } catch (e) { } }
 
   /* ---------- figuras ---------- */
   function destroyFigs() { figs.forEach(function (f) { f.destroy(); }); figs = []; }
@@ -160,7 +175,7 @@
     h += '<div class="card streak' + (st.cur ? '' : ' off') + '" style="margin-top:16px"><div class="row"><div class="flame">🔥</div><div><div class="num">' + st.cur + '</div>' +
       '<div style="font-weight:800">' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</div></div><div class="sp"></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor racha</div><div style="font-size:22px;font-weight:900">' + st.best + '</div></div></div>' +
-      '<div class="small" style="margin-top:10px;color:#ffd9b5;font-weight:700">' + msg + '</div>' + weekStrip() + '</div>';
+      '<div class="small" style="margin-top:10px;color:var(--st-t);font-weight:700">' + msg + '</div>' + weekStrip() + '</div>';
     if (!st.doneToday) {
       h += '<div class="card wcard"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
         '<div class="row" style="margin:12px 0 4px"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + w.slots.length + ' ejercicios</span><span class="chip">🌱 Estiramientos</span></div>' +
@@ -168,7 +183,7 @@
         '<div style="margin-top:14px" class="row"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div></div>';
     } else {
       h += '<div class="card wcard"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz estiramientos suaves para tu postura.</p>' +
-        '<button class="btn sec" data-a="start" data-v="S">🌱 Estiramientos (6 min)</button><div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:#fff">' + WORKOUTS[nextId()].name + '</b></div></div>';
+        '<button class="btn sec" data-a="start" data-v="S">🌱 Estiramientos (6 min)</button><div class="mut small" style="margin-top:12px">Siguiente rutina: <b style="color:var(--txt)">' + WORKOUTS[nextId()].name + '</b></div></div>';
     }
     h += '<div class="h2">Otras rutinas</div><div class="grid2">';
     ORDER.forEach(function (k) { if (k === id && !st.doneToday) return; h += '<button class="mini" data-a="prev" data-v="' + k + '"><div class="e">' + WORKOUTS[k].emoji + '</div><b>' + WORKOUTS[k].name + '</b><span>Rutina ' + k + '</span></button>'; });
@@ -202,15 +217,35 @@
     if (pts.length < 2) return '<p class="mut small" style="margin-top:10px">Guarda al menos dos medidas para ver tu gráfica de estatura.</p>';
     var W = 300, H = 120, mn = Math.min.apply(0, pts.map(function (p) { return p.h; })) - 1, mx = Math.max.apply(0, pts.map(function (p) { return p.h; })) + 1;
     var xy = pts.map(function (p, i) { return [14 + i * (W - 28) / (pts.length - 1), H - 22 - (p.h - mn) / (mx - mn) * (H - 44)]; });
-    return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '"><polyline fill="none" stroke="#4aa8ff" stroke-width="3" stroke-linejoin="round" points="' + xy.map(function (a) { return a[0].toFixed(1) + ',' + a[1].toFixed(1); }).join(' ') + '"/>' +
-      xy.map(function (a, i) { return '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="4" fill="#4aa8ff"/><text x="' + a[0].toFixed(1) + '" y="' + (a[1] - 8).toFixed(1) + '" fill="#cfd5ff" font-size="9" text-anchor="middle">' + pts[i].h + '</text>'; }).join('') + '</svg>';
+    return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '"><polyline fill="none" style="stroke:var(--acc)" stroke-width="3" stroke-linejoin="round" points="' + xy.map(function (a) { return a[0].toFixed(1) + ',' + a[1].toFixed(1); }).join(' ') + '"/>' +
+      xy.map(function (a, i) { return '<circle cx="' + a[0].toFixed(1) + '" cy="' + a[1].toFixed(1) + '" r="4" style="fill:var(--acc)"/><text x="' + a[0].toFixed(1) + '" y="' + (a[1] - 8).toFixed(1) + '" style="fill:var(--mut)" font-size="9" text-anchor="middle">' + pts[i].h + '</text>'; }).join('') + '</svg>';
   }
 
+  function weeklyHTML() {
+    var now = new Date(), wd = (now.getDay() + 6) % 7, mon = new Date(now.getFullYear(), now.getMonth(), now.getDate() - wd), out = [], i, mx = 1;
+    for (i = 7; i >= 0; i--) {
+      var a = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() - i * 7), n = 0, k;
+      for (k = 0; k < 7; k++) { var d = new Date(a.getFullYear(), a.getMonth(), a.getDate() + k); var r = S.days[dstr(d)]; if (r) n += r.w; }
+      out.push({ n: n, l: pad(a.getDate()) + '/' + pad(a.getMonth() + 1), cur: i === 0 }); if (n > mx) mx = n;
+    }
+    return '<div class="rbar">' + out.map(function (o) { return '<div' + (o.cur ? ' class="cur"' : '') + '>' + (o.n || '') + '<i style="height:' + Math.round(o.n / mx * 78) + 'px"></i>' + o.l + '</div>'; }).join('') + '</div>';
+  }
+  function recsHTML() {
+    var ks = Object.keys(S.recs).filter(function (k) { return EX[k]; }).sort(function (a, b) { return a < b ? -1 : 1; });
+    if (!ks.length) return '<p class="mut small">Aún no hay récords. ¡Completa tu primer entrenamiento!</p>';
+    return ks.map(function (k) { return '<div class="li" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bd)"><b style="font-size:14px">' + EX[k].n + '</b><span class="mut small">🏅 ' + targetTxt(k, S.recs[k]) + '</span></div>'; }).join('');
+  }
+  function notesHTML() {
+    var ks = Object.keys(S.days).filter(function (k) { return S.days[k].note; }).sort().reverse().slice(0, 5);
+    if (!ks.length) return '';
+    return '<div class="h2">Mis notas</div><div class="card">' + ks.map(function (k) { return '<div style="padding:8px 0;border-bottom:1px solid var(--bd)"><div class="mut small" style="font-weight:800">' + k + '</div><div style="font-size:14px;margin-top:2px">' + esc(S.days[k].note) + '</div></div>'; }).join('') + '</div>';
+  }
   function progV() {
     var st = stats();
     var h = '<div class="title">Tu progreso</div><div class="stats" style="margin-top:14px">' +
       '<div class="stat"><b>🔥 ' + st.cur + '</b><span>Racha actual</span></div><div class="stat"><b>🏆 ' + st.best + '</b><span>Mejor racha</span></div>' +
       '<div class="stat"><b>' + st.total + '</b><span>Entrenamientos</span></div><div class="stat"><b>' + st.mins + '</b><span>Minutos activos</span></div></div>';
+    h += '<div class="h2">Entrenamientos por semana</div><div class="card">' + weeklyHTML() + '</div>';
     h += '<div class="h2">Calendario</div><div class="card">' + calHTML() + '</div>';
     h += '<div class="h2">Mi estatura y peso</div><div class="card"><div class="row"><div class="sp"><label style="margin-top:0">Estatura (cm)</label><input type="number" id="mh" inputmode="decimal" placeholder="170"></div><div class="sp"><label style="margin-top:0">Peso (kg)</label><input type="number" id="mw" inputmode="decimal" placeholder="60"></div></div>' +
       '<button class="btn sec" style="margin-top:12px" data-a="meas">Guardar medida</button>' + chartHTML();
@@ -221,6 +256,7 @@
       var c = S.chains[k], v = CHAINS[k][c.i], e = EX[v.ex];
       return '<div class="li" style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)"><b style="font-size:14px">' + e.n + '</b><span class="mut small">' + targetTxt(v.ex, c.v) + (CHAINS[k].length > 1 ? ' · nivel ' + (c.i + 1) + '/' + CHAINS[k].length : '') + '</span></div>';
     }).join('') + '<p class="mut small" style="margin-top:10px">Sube sola cuando terminas tus rutinas.</p></div>';
+    h += '<div class="h2">Mis récords</div><div class="card">' + recsHTML() + '</div>' + notesHTML();
     h += '<div class="h2">Logros</div><div class="badges">' + BADGES.map(function (b) { var ok = b.f(st); return '<div class="badge' + (ok ? '' : ' lock') + '"><span class="e">' + b.e + '</span>' + b.n + '</div>'; }).join('') + '</div>';
     return h;
   }
@@ -231,7 +267,11 @@
     return '<div class="title">Ajustes</div>' +
       '<div class="card" style="margin-top:14px"><label style="margin-top:0">Tu nombre</label><input type="text" id="nm" data-set="name" value="' + esc(S.name) + '" placeholder="Opcional" maxlength="20">' +
       '<label>Descanso entre series: <b id="rv" style="color:var(--acc)">' + s.rest + ' s</b></label><input type="range" min="15" max="90" step="5" value="' + s.rest + '" data-set="rest"></div>' +
+      '<div class="card"><b>🎨 Apariencia</b><label style="margin-top:10px">Color de la app</label><div class="swrow">' +
+      [['blue', '#4aa8ff'], ['green', '#2fcf8a'], ['purple', '#a78bfa'], ['orange', '#ffa23d'], ['pink', '#ff6fa8']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" style="background:' + c[1] + '" data-a="theme" data-v="' + c[0] + '"></button>'; }).join('') +
+      '</div><label>Modo</label><div class="seg">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
       '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
+      '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +
       '<div class="set"><div class="sp"><b>📳 Vibración</b><div class="mut small">Avisos con vibración</div></div>' + sw('vib') + '</div>' +
       '<div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Aviso para no perder tu racha</div></div>' + sw('rem') + '</div>' +
       (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') + '</div>' +
@@ -240,12 +280,12 @@
       '<button class="btn warn" data-a="reset">Borrar todos mis datos</button><p class="mut small" style="text-align:center;margin-top:14px">Crece Fit</p>';
   }
 
-  function render() {
+  function render(anim) {
     var old = $('#view'), top = old ? old.scrollTop : 0;
     destroyFigs();
     var v = tab === 'home' ? homeV() : tab === 'ex' ? exV() : tab === 'prog' ? progV() : setV();
-    $('#app').innerHTML = '<div class="view" id="view">' + v + '</div>' + tabsHTML();
-    $('#view').scrollTop = top;
+    $('#app').innerHTML = '<div class="view' + (anim ? ' anim' : '') + '" id="view">' + v + '</div>' + tabsHTML();
+    $('#view').scrollTop = anim ? 0 : top;
     Array.prototype.forEach.call(document.querySelectorAll('svg[data-fig]'), function (el) {
       var a = ANIMS[EX[el.getAttribute('data-fig')].anim];
       new Fig(el, Object.assign({}, a, { poses: [a.poses[a.poses.length > 1 ? 1 : 0]] }), { still: true });
@@ -293,7 +333,7 @@
     var rem = Math.max(0, P.end - Date.now()), s = Math.ceil(rem / 1000);
     P.rem = rem;
     if (P.onTick) P.onTick(rem, s);
-    if (s !== P.lastSec) { P.lastSec = s; if (s > 0 && s <= 3 && P.beepTick) { beep(700, 90); vib(25); } }
+    if (s !== P.lastSec) { P.lastSec = s; if (s > 0 && s <= 3 && P.beepTick) { beep(700, 90); vib(25); if (P.sayTick) say(String(s)); } }
     if (rem <= 0) { var f = P.onEnd; clearTimer(); if (f) f(); }
   }
   function pauseToggle() {
@@ -303,7 +343,7 @@
     else if (P.paused) { P.paused = false; P.end = Date.now() + P.remPaused; P.timer = setInterval(tick, 100); if (b) b.innerHTML = '⏸ Pausa'; }
   }
   var RING = 2 * Math.PI * 76;
-  function ring(frac) { return '<svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="76" fill="none" stroke="#252c52" stroke-width="12"/><circle id="rc" cx="85" cy="85" r="76" fill="none" stroke="#4aa8ff" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + (RING * (1 - frac)).toFixed(1) + '"/></svg>'; }
+  function ring(frac) { return '<svg viewBox="0 0 170 170"><circle cx="85" cy="85" r="76" fill="none" style="stroke:var(--card2)" stroke-width="12"/><circle id="rc" cx="85" cy="85" r="76" fill="none" stroke="'+accent()+'" stroke-width="12" stroke-linecap="round" stroke-dasharray="' + RING.toFixed(1) + '" stroke-dashoffset="' + (RING * (1 - frac)).toFixed(1) + '"/></svg>'; }
   function setRing(frac, color) { var c = $('#rc'); if (c) { c.setAttribute('stroke-dashoffset', (RING * (1 - Math.max(0, Math.min(1, frac)))).toFixed(1)); if (color) c.setAttribute('stroke', color); } }
 
   function header() {
@@ -314,7 +354,7 @@
 
   function startWorkout(id) {
     unlockAudio(); sheetClose();
-    P = { id: id, steps: build(id), i: 0, t0: Date.now(), sets: 0, exs: 0, chains: {}, timer: null };
+    P = { id: id, steps: build(id), i: 0, t0: Date.now(), sets: 0, exs: 0, chains: {}, done: [], timer: null };
     keepAwake(true); showStep();
   }
 
@@ -322,7 +362,7 @@
     clearTimer(); destroyFigs();
     var st = P.steps[P.i];
     if (!st) return finish();
-    P.paused = false; P.count = 0; P.beepTick = false;
+    P.paused = false; P.count = 0; P.beepTick = false; P.sayTick = false;
     if (st.k === 'rest') return showRest(st);
     var e = EX[st.ex], isTime = st.type === 'time';
     var kind = st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (P.id === 'S' ? 'Estiramiento' : 'Enfriamiento · Crecer') : 'Serie ' + st.set + ' de ' + st.sets;
@@ -339,13 +379,15 @@
       '<button class="rb" data-a="pnext">›</button></div>';
     ov(html);
     mountFig($('#pfig'), st.ex);
+    say(e.n + (isTime ? '. ' + st.val + ' segundos' : '. ' + st.val + ' repeticiones'));
     if (isTime) {
       P.beepTick = true;
       startTimer(3, function (rem, s) { var n = $('#rn'); if (n) n.textContent = Math.max(1, s); setRing(rem / 3000, '#c084fc'); }, function () {
         beep(880, 160); vib(60);
         var l = $('#rl'); if (l) l.textContent = 'segundos';
-        P.beepTick = true;
-        startTimer(st.val, function (rem, s) { var n = $('#rn'); if (n) n.textContent = s; setRing(rem / (st.val * 1000), '#4aa8ff'); }, function () {
+        P.beepTick = true; P.sayTick = true; P.half = false;
+        startTimer(st.val, function (rem, s) {
+          if (!P.half && st.val >= 20 && rem <= st.val * 500) { P.half = true; say('Mitad'); } var n = $('#rn'); if (n) n.textContent = s; setRing(rem / (st.val * 1000), accent()); }, function () {
           beep(1200, 450, 0.4); vib(250); completeStep();
         });
       });
@@ -365,13 +407,14 @@
     html += '</div><div class="pfoot"><button class="btn sec sm" style="width:auto" data-a="plus">+15 s</button><button class="btn" data-a="pnext">Saltar descanso ›</button></div>';
     ov(html);
     if (nx) mountFig($('#pfig'), nx.ex);
-    P.beepTick = true;
+    P.beepTick = true; P.sayTick = true;
+    say((st.title ? st.title.replace(/[^\wáéíóúñ ]/gi, '') : 'Descanso') + (nx ? '. Siguiente: ' + EX[nx.ex].n : ''));
     startTimer(st.secs, function (rem, s) { var n = $('#rn'); if (n) n.textContent = s; setRing(rem / (P.total * 1000), '#c084fc'); }, function () { beep(1000, 300, 0.35); vib(150); next(); });
   }
 
   function completeStep() {
     var st = P.steps[P.i];
-    if (st && st.kind === 'main') { P.sets++; if (st.chain) P.chains[st.chain] = 1; }
+    if (st && st.kind === 'main') { P.sets++; if (st.chain) P.chains[st.chain] = 1; P.done.push({ ex: st.ex, val: st.val }); }
     if (st && st.k === 'ex') P.exs++;
     next();
   }
@@ -387,6 +430,7 @@
     var secs = Math.round((Date.now() - P.t0) / 1000), d = today(), isS = P.id === 'S';
     var day = S.days[d] || (S.days[d] = { w: 0, sec: 0, sets: 0 });
     day.w++; day.sec += secs; day.sets += P.sets;
+    P.done.forEach(function (x) { if (!S.recs[x.ex] || x.val > S.recs[x.ex]) S.recs[x.ex] = x.val; });
     S.total++; S.log.push({ d: d, id: P.id, sec: secs }); if (S.log.length > 300) S.log.shift();
     var done = Object.keys(P.chains);
     if (!isS) {
@@ -395,7 +439,7 @@
       S.chains = applyProg(S.last.prev, done, 1);
     } else S.last = null;
     save(); syncReminder();
-    beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400);
+    beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
     summary(secs, isS);
   }
 
@@ -416,10 +460,13 @@
     if (!isS && S.last && S.last.done.length) {
       html += '<div class="mut small" style="font-weight:800;margin-bottom:8px">¿CÓMO TE SENTISTE?</div><div class="fb"><button data-a="fb" data-v="2">😄 Fácil</button><button class="on" data-a="fb" data-v="1">👍 Justo</button><button data-a="fb" data-v="0">😓 Difícil</button></div><div id="chg">' + changesHTML() + '</div>';
     }
+    html += '<textarea class="note2" id="note" maxlength="200" placeholder="📝 Nota del día (opcional): ¿cómo te sentiste?"></textarea>';
     html += '</div><div class="pfoot"><button class="btn" data-a="close">Terminar</button></div>';
     ov(html);
   }
-  function closeOverlay() { $('#overlay').className = ''; $('#overlay').innerHTML = ''; P = null; tab = 'home'; render(); }
+  function closeOverlay() {
+    var nt = $('#note'); if (nt && nt.value.trim()) { var dd = S.days[today()]; if (dd) { dd.note = nt.value.trim(); save(); } }
+    $('#overlay').className = ''; $('#overlay').innerHTML = ''; P = null; tab = 'home'; render(); }
 
   function quit() {
     dialog('¿Salir del entrenamiento?', 'Se perderá el avance de esta sesión.', 'Salir', function () { clearTimer(); destroyFigs(); keepAwake(false); closeOverlay(); }, true);
@@ -447,7 +494,7 @@
     var t = ev.target.closest('[data-a]'); if (!t) return;
     var a = t.getAttribute('data-a'), v = t.getAttribute('data-v');
     switch (a) {
-      case 'tab': tab = v; render(); break;
+      case 'tab': tab = v; render(true); break;
       case 'start': startWorkout(v); break;
       case 'prev': openPrev(v); break;
       case 'ex': openEx(v); break;
@@ -460,8 +507,11 @@
         if (!h && !w) { toast('Escribe tu estatura o peso'); break; }
         if (h && (h < 80 || h > 250)) { toast('Revisa la estatura (cm)'); break; }
         S.meas.push({ d: today(), h: h || 0, w: w || 0 }); save(); toast('Medida guardada ✅'); render(); break;
+      case 'theme': S.settings.theme = v; save(); applyTheme(); render(); break;
+      case 'mode': S.settings.mode = v; save(); applyTheme(); render(); break;
       case 'tog':
         setBool(v);
+        if (v === 'voice' && S.settings.voice) say('Voz activada');
         if (v === 'rem') { if (S.settings.rem && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
         render(); break;
       case 'backup': var js = JSON.stringify(S);
@@ -476,7 +526,7 @@
         try { var o = JSON.parse($('#rs').value); if (!o || !o.settings || !o.days) throw 0; S = o; save(); load(); save(); sheetClose(); toast('Datos restaurados ✅'); render(); syncReminder(); }
         catch (e) { toast('Texto no válido'); } break;
       case 'reset':
-        dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); onboarding(); render(); syncReminder(); }, true); break;
+        dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
       case 'mno': dialogClose(); break;
       case 'myes': var f = dialog.fn; dialogClose(); if (f) f(); break;
       case 'oblvl': obLvl = +v; Array.prototype.forEach.call(document.querySelectorAll('.opt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
@@ -489,7 +539,7 @@
       case 'pp': pauseToggle(); break;
       case 'cnt':
         P.count++; var st = P.steps[P.i], c = $('#cnt');
-        $('#cn').textContent = P.count; vib(15); beep(900, 50, 0.15);
+        $('#cn').textContent = P.count; vib(15); beep(900, 50, 0.15); say(String(P.count));
         if (P.count >= st.val) { c.classList.add('full'); if (P.count === st.val) { beep(1200, 250, 0.3); vib(120); } }
         break;
       case 'done': completeStep(); break;
@@ -527,6 +577,7 @@
   };
 
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !P) render(); });
-  load(); render(); syncReminder();
+  load(); applyTheme(); render(true); syncReminder();
   if (!S.setup) onboarding();
+  setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
 })();
