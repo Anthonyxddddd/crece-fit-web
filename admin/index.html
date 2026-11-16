@@ -55,7 +55,9 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       <label>Correo</label><input type="email" id="em" autocomplete="username" required>
       <label>Contraseña</label><input type="password" id="pw" autocomplete="current-password" required>
       <div id="keybox" hidden><label>Clave de API web (Firebase → Configuración del proyecto)</label><input type="text" id="key" placeholder="AIza…"></div>
+      <p class="mut small" id="info" style="margin:12px 0 0"></p>
       <button class="btn" style="width:100%;margin-top:16px" type="submit">Entrar</button>
+      <button class="btn sec" id="chkey" type="button" style="width:100%;margin-top:8px" hidden>Cambiar clave de API</button>
       <div id="err"></div>
     </form>
   </div>
@@ -95,6 +97,9 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
   var DB = (ADMIN_CFG.db || '').replace(/\/$/, ''), KEY = ADMIN_CFG.apiKey || localStorage.getItem('crece_apikey') || '';
   var tok = '', rtok = '', timer = null, raw = null;
   if (!KEY) $('keybox').hidden = false;
+  $('info').textContent = 'Base de datos: ' + DB.replace('https://', '') + ' · Clave: ' + (KEY ? '…' + KEY.slice(-4) : 'falta');
+  if (KEY) $('chkey').hidden = false;
+  $('chkey').onclick = function () { localStorage.removeItem('crece_apikey'); KEY = ''; $('keybox').hidden = false; $('chkey').hidden = true; $('info').textContent = 'Pega la clave de API web.'; };
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function dk(t) { var d = new Date(t); return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
@@ -104,7 +109,8 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
 
   function login(email, pass) {
     return fetch('https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=' + encodeURIComponent(KEY), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, password: pass, returnSecureToken: true }) })
-      .then(function (r) { return r.json(); }).then(function (o) {
+      .then(function (r) { return r.json(); }, function () { throw new Error('No se pudo conectar con el inicio de sesión de Google (identitytoolkit.googleapis.com). Si usas Brave, apaga los Shields para esta página; o prueba otro navegador.'); })
+      .then(function (o) {
         if (o.error) { var m = (o.error.message || '').split(' ')[0]; throw new Error(ERR[m] || o.error.message || 'Error de inicio de sesión'); }
         tok = o.idToken; rtok = o.refreshToken; clearInterval(timer);
         timer = setInterval(function () {
@@ -114,7 +120,7 @@ td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
       });
   }
   function get(path, q) {
-    return fetch(DB + path + '.json?auth=' + encodeURIComponent(tok) + (q || '')).then(function (r) {
+    return fetch(DB + path + '.json?auth=' + encodeURIComponent(tok) + (q || '')).catch(function () { throw new Error('Iniciaste sesión bien, pero no se pudo conectar con la base de datos (' + DB.replace('https://', '') + '). Si usas Brave, apaga los Shields; o revisa la dirección.'); }).then(function (r) {
       if (r.status === 401 || r.status === 403) throw new Error('Sin permiso: revisa las reglas y el UID en Firebase.');
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
