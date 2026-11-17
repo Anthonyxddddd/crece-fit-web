@@ -321,3 +321,50 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .streak.sm .week{margin-top:8px}
 .wcard .exl{margin-top:8px}
 .wcard .exl .li{padding:7px 2px}
+
+/* ===== tutorial inicial ===== */
+.tut{position:fixed;inset:0;z-index:60;background:var(--bg);display:flex;flex-direction:column;padding:calc(var(--safe-t) + 14px) 22px calc(var(--safe-b) + 22px);animation:fu .35s ease-out}
+.tskip{align-self:flex-end;min-height:40px;padding:8px 14px;color:var(--mut);font-weight:800;font-size:15px}
+.tbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:0}
+.tvis{width:100%;display:flex;justify-content:center;margin-bottom:22px}
+.tvis .figbox{width:min(330px,84vw)}
+.temo{font-size:110px;line-height:1;animation:pop .6s ease-out;filter:drop-shadow(0 10px 24px rgba(var(--acc-rgb),.35))}
+.tt{font-size:27px;font-weight:900;letter-spacing:-.4px;margin:0 0 10px}
+.td{font-size:16px;line-height:1.5;color:var(--mut);max-width:340px;margin:0}
+.tdots{display:flex;justify-content:center;gap:8px;margin:18px 0}
+.tdots i{width:8px;height:8px;border-radius:50%;background:var(--line);transition:.3s}
+.tdots i.on{background:var(--acc);width:24px;border-radius:9px}
+
+/* ===== modo claro más pulido ===== */
+:root[data-mode=light]{--field:#eef1fb;--shadow-c:0 1px 2px rgba(30,45,110,.06),0 10px 28px rgba(30,45,110,.08)}
+:root[data-mode=light] .card,:root[data-mode=light] .mini,:root[data-mode=light] .exc,:root[data-mode=light] .stat,:root[data-mode=light] .badge,:root[data-mode=light] .seg2,:root[data-mode=light] .exitem{box-shadow:var(--shadow-c);border-color:transparent}
+:root[data-mode=light] .tabs{background:rgba(255,255,255,.94);border-top-color:#e1e6f6;box-shadow:0 -6px 24px rgba(30,45,110,.07)}
+:root[data-mode=light] input[type=number],:root[data-mode=light] input[type=text],:root[data-mode=light] input[type=time],:root[data-mode=light] textarea{background:var(--field);border-color:transparent}
+:root[data-mode=light] input:focus,:root[data-mode=light] textarea:focus{background:#fff;border-color:var(--acc)}
+:root[data-mode=light] .wcard{background:linear-gradient(135deg,rgba(var(--acc-rgb),.2),#fff 72%);box-shadow:var(--shadow-c)}
+:root[data-mode=light] .tip{background:linear-gradient(135deg,rgba(var(--acc-rgb),.14),#fff)}
+:root[data-mode=light] .streak{box-shadow:0 10px 28px rgba(255,138,61,.16);border-color:rgba(255,138,61,.3)}
+:root[data-mode=light] .streak .num{background:linear-gradient(180deg,#ff9a4d,#e8590c);-webkit-background-clip:text;background-clip:text}
+:root[data-mode=light] .wd .dot{background:rgba(120,70,20,.08)}
+:root[data-mode=light] .wd{color:#8a5a3a}
+:root[data-mode=light] .figbox{box-shadow:inset 0 0 0 1px rgba(30,45,110,.06)}
+:root[data-mode=light] .exc .fig,:root[data-mode=light] .exitem .fig{background:#eef1fb}
+:root[data-mode=light] .seg2 button.on,:root[data-mode=light] .btn{box-shadow:0 6px 18px rgba(var(--acc-rgb),.35)}
+:root[data-mode=light] .btn.sec,:root[data-mode=light] .btn.ghost{box-shadow:none}
+:root[data-mode=light] .hrow,:root[data-mode=light] .swt,:root[data-mode=light] .seg button{background:var(--field)}
+:root[data-mode=light] .hrow.on,:root[data-mode=light] .swt.on,:root[data-mode=light] .seg button.on{background:rgba(var(--acc-rgb),.16)}
+:root[data-mode=light] .counter{background:#fff;box-shadow:var(--shadow-c)}
+:root[data-mode=light] .cue{background:#fff;box-shadow:var(--shadow-c);color:var(--cue)}
+:root[data-mode=light] .up,:root[data-mode=light] .sumgrid div{background:#fff;box-shadow:var(--shadow-c)}
+:root[data-mode=light] .note{background:rgba(255,138,61,.12)}
+:root[data-mode=light] .badge.lock{opacity:.45}
+:root[data-mode=light] .bar,:root[data-mode=light] .xpbar,:root[data-mode=light] .ph .x{background:#dfe5f6}
+:root[data-mode=light] .sw{background:#cdd5ee}
+:root[data-mode=light] .sw.on{background:var(--acc)}
+:root[data-mode=light] .cal .d{color:#3a4470}
+:root[data-mode=light] .pc{background:var(--field)}
+:root[data-mode=light] #sheet{background:rgba(25,32,70,.35)}
+:root[data-mode=light] .sheet{box-shadow:0 -10px 40px rgba(30,45,110,.18)}
+:root[data-mode=light] .dlg{background:#fff;box-shadow:0 20px 60px rgba(30,45,110,.25)}
+:root[data-mode=light] .ob,:root[data-mode=light] .tut{background:var(--bg)}
+:root[data-mode=light] .rbar i{box-shadow:none}

@@ -129,6 +129,12 @@ body.desk .qrbox{display:flex}body.ios .notice{display:block}
 .upd3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:1000px;margin:10px auto 0}
 .upd3 h3{font-size:18px;margin-bottom:6px}.upd3 p{margin:0;color:var(--mut);font-size:14px}.upd3 .ic{font-size:28px;margin-bottom:6px}
 
+.avs{display:grid;grid-template-columns:1fr 1fr;gap:14px;max-width:980px;margin:0 auto}
+.av{position:relative;padding-left:62px}.av .n{position:absolute;left:18px;top:18px;width:32px;height:32px;border-radius:50%;background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on);font-weight:900;display:flex;align-items:center;justify-content:center}
+.av h3{font-size:15px;margin-bottom:4px}.av p{margin:0;color:var(--mut);font-size:14px}
+.avs3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:980px;margin:14px auto 0}
+.avs3 h3{font-size:16px;margin-bottom:4px}.avs3 p{margin:0;color:var(--mut);font-size:14px}
+@media (max-width:900px){.avs,.avs3{grid-template-columns:1fr}}
 /* novedades y faq */
 .news2{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;margin:28px auto 0}
 .news ul{margin:0;padding-left:20px;color:var(--mut)}.news li{margin:8px 0}
@@ -262,7 +268,7 @@ details[open] summary::after{content:"–"}details p{margin:10px 0 0;color:var(-
   <!-- INSTALAR -->
   <section class="page" id="instalar" data-name="Instalar" data-ic="📲"><div class="wrap">
     <h2 class="rv">Instálala en tu teléfono</h2>
-    <div class="sub rv" data-sub><button class="on" data-pane="pinst">📲 Instalar</button><button data-pane="pupd">🔄 Actualizar</button></div>
+    <div class="sub rv" data-sub><button class="on" data-pane="pinst">📲 Instalar</button><button data-pane="pupd">🔄 Actualizar</button><button data-pane="pavisos">⚠️ Avisos</button></div>
     <div class="pane on" id="pinst">
       <p class="lead" style="margin-bottom:26px">Son 4 pasos y menos de un minuto. Hazlo desde un teléfono Android.</p>
       <div class="steps">
@@ -280,6 +286,20 @@ details[open] summary::after{content:"–"}details p{margin:10px 0 0;color:var(-
         <div class="card"><div class="ic">⚡</div><h3>Automática</h3><p>Ejercicios, rutinas y diseño llegan solos. Al abrir la app con internet aparece <b>“Actualización disponible”</b>: pulsas <b>Actualizar</b>, ves el porcentaje y la app se cierra sola. <b>No instalas nada.</b></p></div>
         <div class="card"><div class="ic">📦</div><h3>Nueva versión del APK</h3><p>Solo cuando un cambio necesita funciones del teléfono. La app te avisa con <b>“Ir a descargar”</b> y te trae aquí. Instalas encima y <b>no pierdes tu progreso</b>.</p></div>
         <div class="card"><div class="ic">🧭</div><h3>¿Cuál necesito?</h3><p>No tienes que adivinar: si la app no muestra ningún aviso, estás al día. Vuelve aquí solo en tu <b>primera instalación</b> o si la app te lo pide.</p></div>
+      </div>
+    </div>
+    <div class="pane" id="pavisos">
+      <p class="lead" style="margin-bottom:22px">Al instalar fuera de Play Store, Android puede mostrar algunos avisos. <b>Son normales</b>: salen con cualquier app que se instala por archivo. Esto es lo que verás y qué tocar.</p>
+      <div class="avs">
+        <div class="card av"><span class="n">1</span><h3>“Este tipo de archivo puede dañar tu dispositivo”</h3><p>Es el aviso de <b>Chrome</b> al descargar cualquier APK. Toca <b>Conservar</b> (o <b>Descargar de todos modos</b>).</p></div>
+        <div class="card av"><span class="n">2</span><h3>“No permite instalar apps desconocidas de esta fuente”</h3><p>Toca <b>Ajustes</b>, activa <b>“Permitir de esta fuente”</b> y vuelve atrás. Solo se pide una vez.</p></div>
+        <div class="card av"><span class="n">3</span><h3>Play Protect: “¿Analizar app?” o “App bloqueada”</h3><p>Si pregunta, toca <b>Analizar app</b>: es seguro y ayuda a que Google la conozca. Si la bloquea, toca <b>Más detalles → Instalar de todos modos</b>.</p></div>
+        <div class="card av"><span class="n">4</span><h3>Después de instalar</h3><p>No debería haber más avisos. Al abrirla, la app pide permiso para <b>notificaciones</b>: acéptalo si quieres el recordatorio diario.</p></div>
+      </div>
+      <div class="avs3">
+        <div class="card"><h3>🤔 ¿Por qué salen?</h3><p>Porque la app no está en Play Store y Google todavía no conoce a su desarrollador. No significa que sea peligrosa.</p></div>
+        <div class="card"><h3>🔐 Permisos que pide</h3><p>Internet (actualizarse), vibración, notificaciones y arranque (recordatorio). No pide cámara, micrófono, contactos ni ubicación.</p></div>
+        <div class="card"><h3>✅ Comprobar el archivo</h3><p>Huella SHA-256 del APK:<br><code id="sha" style="word-break:break-all;font-size:12px">—</code></p></div>
       </div>
     </div>
   </div></section>
@@ -409,6 +429,7 @@ details[open] summary::after{content:"–"}details p{margin:10px 0 0;color:var(-
     $('ver').textContent = 'Versión ' + a.version; $('ver2').textContent = 'v' + a.version;
     if (a.size) $('size').textContent = a.size >= 1048576 ? (a.size / 1048576).toFixed(1) + ' MB' : Math.round(a.size / 1024) + ' KB';
     if (a.date) { $('date').textContent = a.date; $('date2').textContent = a.date; }
+    if (a.sha256) $('sha').textContent = a.sha256;
     $('notes').innerHTML = (a.notes && a.notes.length) ? a.notes.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') : '<li>Mejoras generales.</li>';
   }).catch(function () { $('notes').innerHTML = '<li>Mejoras generales.</li>'; });
   fetch('web.json?t=' + Date.now()).then(function (r) { return r.json(); }).then(function (w) {

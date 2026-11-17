@@ -23,7 +23,7 @@
   /* ---------- estado ---------- */
   function fresh() {
     return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0,
-      goal: 3, warm: 'cardio', cool: 'all', nojump: false, risk: false }, recs: {},
+      goal: 3, warm: 'cardio', cool: 'all', nojump: false, risk: false, hands: false, pace: 2.5 }, recs: {},
       days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null,
       xp: 0, freeze: { m: '', used: 0 }, habits: {}, custom: [], plan: null, planDone: false, exh: {}, goalsHit: {} };
   }
@@ -498,7 +498,8 @@
         h += '<div class="card wcard"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
           '<div class="row" style="margin:12px 0 4px;flex-wrap:wrap"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + cnt + ' ejercicios</span>' + planTag + (S.settings.nojump ? '<span class="chip">🤫 Sin saltos</span>' : '') + '</div>' +
           '<div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
-          '<div style="margin-top:14px"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div></div>';
+          '<div style="margin-top:14px"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div>' +
+          '<div class="set" style="border:0;padding:12px 0 0"><div class="sp"><b>🙌 Modo manos libres</b><div class="mut small">La voz cuenta y avanza sola</div></div>' + sw('hands') + '</div></div>';
       }
     } else if (k === 'avance') {
       var lv = st.lvl, a = xpAt(lv), b = xpAt(lv + 1), wc = weekCount(), g = S.settings.goal;
@@ -674,7 +675,9 @@
         '<div class="card"><label style="margin-top:0">Meta semanal (días por semana)</label>' + seg('goal', [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']], s.goal) +
         '<label>Calentamiento</label>' + seg('warm', [['cardio', '🏃 Cardio'], ['suave', '🧘 Suave'], ['none', 'Ninguno']], s.warm) +
         '<label>Estiramiento final</label>' + seg('cool', [['all', 'Todo'], ['legs', 'Piernas'], ['back', 'Espalda'], ['upper', 'Brazos'], ['none', 'Ninguno']], s.cool) + '</div>' +
-        '<div class="card"><div class="set" style="border:0;padding:0"><div class="sp"><b>🤫 Modo sin saltos</b><div class="mut small">Cambia saltos por ejercicios silenciosos</div></div>' + sw('nojump') + '</div></div>';
+        '<div class="card"><div class="set"><div class="sp"><b>🙌 Modo manos libres</b><div class="mut small">Cuenta las repeticiones con voz y avanza solo. Ideal con el teléfono apoyado.</div></div>' + sw('hands') + '</div>' +
+        '<label>Velocidad al contar</label>' + seg('pace', [[2, '⚡ Rápido (2 s)'], [2.5, '👍 Normal (2,5 s)'], [3.5, '🐢 Lento (3,5 s)']], s.pace) +
+        '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>🤫 Modo sin saltos</b><div class="mut small">Cambia saltos por ejercicios silenciosos</div></div>' + sw('nojump') + '</div></div>';
     } else if (k === 'look') {
       h += '<div class="card"><b>Color de la app</b><div class="swrow">' +
         [['blue', '#4aa8ff', 'Azul'], ['green', '#2fcf8a', 'Verde'], ['purple', '#a78bfa', 'Morado'], ['orange', '#ffa23d', 'Naranja'], ['pink', '#ff6fa8', 'Rosa']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i>' + c[2] + '</button>'; }).join('') +
@@ -695,7 +698,8 @@
     } else if (k === 'priv') {
       h += statsCard();
     } else {
-      h += '<div class="card"><p class="mut small" style="margin:0;line-height:1.6">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>';
+      h += '<div class="card"><p class="mut small" style="margin:0;line-height:1.6">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
+        '<button class="btn sec" style="margin-top:12px" data-a="tutopen">▶ Ver el tutorial</button>';
     }
     return h;
   }
@@ -787,7 +791,7 @@
   }
 
   /* ---------- reproductor ---------- */
-  function clearTimer() { if (P && P.timer) { clearInterval(P.timer); P.timer = null; } }
+  function clearTimer() { if (P && P.timer) { clearInterval(P.timer); P.timer = null; } if (P && P.autoT) { clearTimeout(P.autoT); P.autoT = null; } }
   function startTimer(secs, onTick, onEnd) {
     P.total = secs; P.end = Date.now() + secs * 1000; P.onTick = onTick; P.onEnd = onEnd; P.lastSec = null;
     clearTimer(); P.timer = setInterval(tick, 100); tick();
@@ -803,6 +807,7 @@
   function pauseToggle() {
     if (!P) return;
     var b = $('#pp');
+    if (P.auto) { P.autoPaused = !P.autoPaused; if (b) b.innerHTML = P.autoPaused ? '▶ Seguir' : '⏸ Pausa'; return; }
     if (P.timer) { P.remPaused = P.rem; clearTimer(); P.paused = true; if (b) b.innerHTML = '▶ Seguir'; }
     else if (P.paused) { P.paused = false; P.end = Date.now() + P.remPaused; P.timer = setInterval(tick, 100); if (b) b.innerHTML = '⏸ Pausa'; }
   }
@@ -812,7 +817,7 @@
 
   function header() {
     var pct = Math.round(P.i / P.steps.length * 100);
-    return '<div class="ph"><button class="x" data-a="quit">✕</button><div class="bar"><i style="width:' + pct + '%"></i></div><span class="mut small" style="font-weight:800">' + pct + '%</span></div>';
+    return '<div class="ph"><button class="x" data-a="quit">✕</button><div class="bar"><i style="width:' + pct + '%"></i></div><span class="mut small" style="font-weight:800">' + (S.settings.hands ? '🙌 ' : '') + pct + '%</span></div>';
   }
   function ov(html) { var o = $('#overlay'); o.innerHTML = html; o.className = 'on'; }
 
@@ -823,6 +828,24 @@
   }
 
   var ADJ = '<div class="adj"><button data-a="adj" data-v="-1">😅 Muy difícil</button><button data-a="adj" data-v="1">💪 Muy fácil</button></div>';
+  /* manos libres: cuenta las repeticiones solo, con voz y pitidos, y avanza al terminar */
+  function autoReps(st) {
+    var n = 0, pace = (S.settings.pace || 2.5) * 1000;
+    function tickRep() {
+      if (!P || P.steps[P.i] !== st) return;
+      if (P.autoPaused) { P.autoT = setTimeout(tickRep, 300); return; }
+      n++; P.count = n;
+      var cn = $('#cn'); if (cn) cn.textContent = n;
+      var c = $('#cnt'); if (c) { c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit'); }
+      beep(900, 50, 0.15); vib(15);
+      say(n === st.val ? 'Última' : String(n));
+      if (n >= st.val) {
+        if (c) c.classList.add('full'); beep(1200, 250, 0.3); vib(120);
+        P.autoT = setTimeout(function () { if (P && P.steps[P.i] === st) completeStep(); }, 1500);
+      } else P.autoT = setTimeout(tickRep, pace);
+    }
+    P.autoT = setTimeout(tickRep, 3800);   // tiempo para que la voz anuncie el ejercicio
+  }
   function showStep() {
     clearTimer(); destroyFigs();
     var st = P.steps[P.i];
@@ -836,16 +859,18 @@
     if (isTime) {
       html += '<div class="ringwrap">' + ring(1) + '<div class="tx"><b id="rn">3</b><span id="rl">¡Prepárate!</span></div></div>';
     } else {
-      html += '<div class="target">Haz <b id="tv">' + st.val + '</b> repeticiones</div><button class="counter" id="cnt" data-a="cnt"><b id="cn">0</b><span>toca para contar</span></button>';
+      html += '<div class="target">Haz <b id="tv">' + st.val + '</b> repeticiones</div><button class="counter" id="cnt" data-a="cnt"><b id="cn">0</b><span>' + (S.settings.hands ? '🙌 contando solo' : 'toca para contar') + '</span></button>';
       if (st.kind === 'main' && st.chain) html += ADJ;
     }
     html += '<div class="cue">' + e.steps.map(function (s, i) { return (i + 1) + '. ' + s; }).join('<br>') + '</div></div>';
     html += '<div class="pfoot"><button class="rb" data-a="pprev">‹</button>' +
-      (isTime ? '<button class="btn sec" id="pp" data-a="pp">⏸ Pausa</button>' : '<button class="btn" data-a="done">¡Listo! ✓</button>') +
+      ((isTime || S.settings.hands) ? '<button class="btn sec" id="pp" data-a="pp">⏸ Pausa</button>' : '<button class="btn" data-a="done">¡Listo! ✓</button>') +
       '<button class="rb" data-a="pnext">›</button></div>';
     ov(html);
     mountFig($('#pfig'), st.ex);
     say(e.n + (isTime ? '. ' + st.val + ' segundos' : '. ' + st.val + ' repeticiones'));
+    P.auto = !!(S.settings.hands && !isTime); P.autoPaused = false;
+    if (P.auto) autoReps(st);
     if (isTime) {
       P.beepTick = true;
       startTimer(3, function (rem, s) { var n = $('#rn'); if (n) n.textContent = Math.max(1, s); setRing(rem / 3000, '#c084fc'); }, function () {
@@ -981,6 +1006,40 @@
     dialog('¿Salir del entrenamiento?', 'Se perderá el avance de esta sesión.', 'Salir', function () { clearTimer(); destroyFigs(); keepAwake(false); closeOverlay(); }, true);
   }
 
+  /* ---------- tutorial inicial (también en Ajustes → Acerca de) ---------- */
+  var tutI = 0, tutFig = null;
+  var TUT = [
+    { fig: 'squat', t: '¡Bienvenido a Crece Fit!', d: 'Rutinas sin equipo para principiantes. Entrenas en casa, a tu ritmo y sin complicarte.' },
+    { fig: 'jacks', t: 'Un muñequito te enseña', d: 'Cada ejercicio tiene su animación y sus pasos. Mira todos en la pestaña Ejercicios antes de empezar.' },
+    { emoji: '🔥', t: 'Mantén tu racha', d: 'Entrena un poco cada día. Suma XP, sube de nivel, cumple tu meta semanal y desbloquea logros. Si faltas un día, un congelamiento salva tu racha.' },
+    { emoji: '👆', t: 'Todo por secciones', d: 'Cambia de sección tocando o deslizando hacia los lados. En Ajustes activas el modo manos libres, la voz, el widget y la copia en la nube.' }
+  ];
+  function tutDraw() {
+    var el = $('#tut'); if (!el) return;
+    var t = TUT[tutI], last = tutI === TUT.length - 1;
+    if (tutFig) { tutFig.destroy(); tutFig = null; }
+    el.innerHTML = '<button class="tskip" data-a="tutskip">' + (last ? '' : 'Saltar') + '</button><div class="tbody"><div class="tvis">' + (t.fig ? '<div class="figbox"><svg id="tfig"></svg></div>' : '<div class="temo">' + t.emoji + '</div>') + '</div><h2 class="tt">' + t.t + '</h2><p class="td">' + t.d + '</p></div>' +
+      '<div class="tdots">' + TUT.map(function (_, k) { return '<i class="' + (k === tutI ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
+      '<div class="tfoot"><button class="btn" data-a="tutnext">' + (last ? '¡Empezar! 💪' : 'Siguiente') + '</button></div>';
+    if (t.fig) tutFig = new Fig($('#tfig'), ANIMS[t.fig]);
+  }
+  function showTutorial() {
+    if ($('#tut')) return;
+    var el = document.createElement('div'); el.className = 'tut'; el.id = 'tut'; document.body.appendChild(el);
+    var x0 = 0;
+    el.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    el.addEventListener('touchend', function (e) {
+      var dx = e.changedTouches[0].clientX - x0;
+      if (Math.abs(dx) > 60) { if (dx < 0 && tutI < TUT.length - 1) { tutI++; tutDraw(); } else if (dx > 0 && tutI > 0) { tutI--; tutDraw(); } }
+    }, { passive: true });
+    tutI = 0; tutDraw();
+  }
+  function tutClose() {
+    var el = $('#tut'); if (tutFig) { tutFig.destroy(); tutFig = null; }
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+    S.tutDone = true; save();
+  }
+
   /* ---------- onboarding ---------- */
   var obLvl = 0;
   function onboarding() {
@@ -1009,6 +1068,9 @@
     var a = t.getAttribute('data-a'), v = t.getAttribute('data-v');
     switch (a) {
       case 'tab': if (v === 'set' && tab !== 'set') setSec = null; tab = v; fx.tab = true; render(true); fx.tab = false; break;
+      case 'tutnext': if (tutI < TUT.length - 1) { tutI++; tutDraw(); } else tutClose(); break;
+      case 'tutskip': tutClose(); break;
+      case 'tutopen': showTutorial(); break;
       case 'pn': var pq = v.split(':'); switchPanel(pq[0], pq.slice(1).join(':')); break;
       case 'sec': setSec = v; render(true); break;
       case 'secback': setSec = null; render(true); break;
@@ -1100,11 +1162,12 @@
       case 'obstart':
         S = fresh(); S.setup = true; S.name = ($('#obn').value || '').trim(); initChains(obLvl === 1);
         var hh = parseFloat($('#obh').value); if (hh >= 80 && hh <= 250) S.meas.push({ d: today(), h: hh, w: 0 });
-        save(); document.body.removeChild($('#ob')); render(); runWaiting(); break;
+        save(); document.body.removeChild($('#ob')); render(); showTutorial(); break;
       // reproductor
       case 'quit': quit(); break;
       case 'pp': pauseToggle(); break;
       case 'cnt':
+        if (S.settings.hands) break;
         P.count++; var st = P.steps[P.i], c = $('#cnt');
         $('#cn').textContent = P.count; vib(15); beep(900, 50, 0.15); say(String(P.count));
         c.classList.remove('hit'); void c.offsetWidth; c.classList.add('hit');
@@ -1145,6 +1208,7 @@
   // botón atrás de Android
   window.__back = function () {
     if (upd.busy) return true;
+    if ($('#tut')) { tutClose(); return true; }
     if ($('#modal').className === 'on') { dialogClose(); return true; }
     if ($('#sheet').className === 'on') { sheetClose(); return true; }
     if ($('#overlay').className === 'on') { if (P && P.steps[P.i]) quit(); else closeOverlay(); return true; }

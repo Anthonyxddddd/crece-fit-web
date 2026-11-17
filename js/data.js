@@ -108,6 +108,25 @@ ANIMS.dips = { view: 'side', fix: 'w1', fixX: 92, poses: [
   { t: 197.5, hd: -100, a1: [90, 90], a2: [90, 90], l1: [0, 90], l2: [0, 90], d: 1000, h: 400 },
   { t: 197.5, hd: -100, a1: [140.5, 31.3], a2: [140.5, 31.3], l1: [-30, 64], l2: [-30, 64], d: 1000, h: 400 }] };
 
+/* ---- ejercicios nuevos (2) ---- */
+ANIMS.legraise = { view: 'side', fix: 'p', fixX: 110, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-10, -10], l2: [-8, -8], d: 1100, h: 300 },
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-90, -90], l2: [-88, -88], d: 1100, h: 500 }] };
+ANIMS.bicycle = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 205, hd: 216, a1: [-150, -110], a2: [-140, -120], l1: [-70, 10], l2: [-15, -15], d: 650, h: 80 },
+  { t: 205, hd: 216, a1: [-150, -110], a2: [-140, -120], l2: [-70, 10], l1: [-15, -15], d: 650, h: 80 }] };
+ANIMS.revlunge = { view: 'side', fix: 'f1', fixX: 128, poses: [{ d: 800, h: 200 },
+  { t: -88, hd: -88, l1: [8, 92], l2: [115, 190], ft2: 50, d: 1000, h: 400 }] };
+ANIMS.sideplank = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { t: 204, hd: 196, a1: [90, 90], a2: [-100, -100], l1: [24, 24], l2: [22, 22], d: 1400, h: 600 },
+  { t: 204, hd: 192, tb: 2, a1: [90, 90], a2: [-80, -80], l1: [24, 24], l2: [22, 22], d: 1400, h: 600 }] };
+ANIMS.sumo = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, -10], a2: [80, 190], l1: [112, 98], l2: [68, 82], d: 1000, h: 300 },
+  { a1: [100, -10], a2: [80, 190], l1: [165, 95], l2: [15, 85], d: 1100, h: 500 }] };
+ANIMS.swimmers = { view: 'side', fix: 'p', fixX: 118, poses: [
+  { t: -6, hd: -28, a1: [-18, -18], a2: [0, 0], l1: [180, 180], l2: [194, 194], d: 600, h: 80 },
+  { t: -6, hd: -28, a2: [-18, -18], a1: [0, 0], l2: [180, 180], l1: [194, 194], d: 600, h: 80 }] };
+
 /* ---------- Ejercicios ---------- */
 var EX = {
   squat: { n: 'Sentadilla', cat: 'Piernas', type: 'reps', anim: 'squat', m: 'Cuádriceps, glúteos',
@@ -149,6 +168,27 @@ var EX = {
   dips: { n: 'Fondos en el suelo', cat: 'Pecho y brazos', type: 'reps', anim: 'dips', m: 'Tríceps, hombros',
     steps: ['Sentado, manos en el suelo detrás de ti, rodillas dobladas.', 'Sube la cadera y baja doblando los codos hacia atrás.', 'Empuja con los brazos para subir. Codos cerca del cuerpo.'],
     tip: 'No dejes que los hombros suban hacia las orejas. Baja solo hasta donde sea cómodo.' },
+  legraise: { n: 'Elevación de piernas', cat: 'Core', type: 'reps', anim: 'legraise', m: 'Abdomen bajo',
+    steps: ['Boca arriba, piernas estiradas y manos bajo la cadera.', 'Sube las piernas juntas hasta ponerlas verticales.', 'Baja despacio sin tocar el suelo y con la espalda baja pegada.'],
+    tip: 'Si la espalda baja se despega, dobla un poco las rodillas.' },
+  bicycle: { n: 'Bicicleta abdominal', cat: 'Core', type: 'reps', anim: 'bicycle', m: 'Abdomen y oblicuos', unit: 'reps (en total)',
+    steps: ['Boca arriba, manos detrás de la cabeza y hombros despegados.', 'Lleva un codo hacia la rodilla contraria mientras estiras la otra pierna.', 'Cambia de lado de forma controlada, como pedaleando.'],
+    tip: 'Gira desde el torso, no tires del cuello con las manos.' },
+  revlunge: { n: 'Zancada hacia atrás', cat: 'Piernas', type: 'reps', anim: 'revlunge', m: 'Glúteos y cuádriceps', unit: 'reps (en total)',
+    steps: ['De pie, da un paso largo hacia atrás.', 'Baja hasta que ambas rodillas formen unos 90°.', 'Empuja con el pie de adelante para volver y cambia de pierna.'],
+    tip: 'Es más amable con las rodillas que la zancada hacia adelante.' },
+  sideplank: { n: 'Plancha lateral', cat: 'Core', type: 'time', anim: 'sideplank', m: 'Oblicuos y hombros',
+    steps: ['De lado, apoya la mano (o el antebrazo) bajo el hombro.', 'Sube la cadera hasta formar una línea recta de pies a cabeza.', 'Aguanta respirando normal. Después cambia de lado.'],
+    tip: 'Si es muy difícil, apoya la rodilla de abajo en el suelo.' },
+  sumo: { n: 'Sentadilla sumo', cat: 'Piernas', type: 'reps', anim: 'sumo', m: 'Glúteos y aductores',
+    steps: ['Pies bien separados, puntas hacia afuera.', 'Baja con la espalda recta empujando las rodillas hacia afuera.', 'Sube apretando glúteos y aductores.'],
+    tip: 'Las rodillas siguen la dirección de las puntas de los pies.' },
+  swimmers: { n: 'Nadador', cat: 'Espalda', type: 'reps', anim: 'swimmers', m: 'Espalda baja y glúteos', unit: 'reps (en total)',
+    steps: ['Boca abajo, brazos estirados al frente.', 'Levanta un brazo y la pierna contraria a la vez.', 'Cambia de lado rápido, como nadando.'],
+    tip: 'Mira al suelo y mueve brazos y piernas desde la espalda.' },
+  diamond: { n: 'Flexión diamante', cat: 'Pecho y brazos', type: 'reps', anim: 'pushup', m: 'Tríceps y pecho',
+    steps: ['Posición de flexión con las manos juntas bajo el pecho, formando un rombo.', 'Baja el pecho hacia las manos manteniendo los codos pegados.', 'Empuja fuerte para subir.'],
+    tip: 'Trabaja mucho el tríceps. Si no puedes, haz la flexión de rodillas con las manos juntas.' },
   highknees: { n: 'Rodillas altas', cat: 'Cardio', type: 'time', anim: 'highknees', m: 'Cardio, piernas, core',
     steps: ['De pie, corre en el sitio.', 'Sube las rodillas hasta la altura de la cadera.', 'Mueve los brazos al ritmo, tronco erguido.'],
     tip: 'Aterriza sobre la parte delantera del pie, ligero y rápido.' },
@@ -207,9 +247,10 @@ var EX = {
 
 /* Cadenas de progresión: la rutina usa la variante y el valor actuales de cada cadena */
 var CHAINS = {
-  push: [{ ex: 'wallpush', s: 8, max: 20, st: 2 }, { ex: 'kneepush', s: 6, max: 16, st: 1 }, { ex: 'pushup', s: 5, max: 15, st: 1 }, { ex: 'pushpause', s: 4, max: 12, st: 1 }],
+  push: [{ ex: 'wallpush', s: 8, max: 20, st: 2 }, { ex: 'kneepush', s: 6, max: 16, st: 1 }, { ex: 'pushup', s: 5, max: 15, st: 1 }, { ex: 'pushpause', s: 4, max: 12, st: 1 }, { ex: 'diamond', s: 4, max: 12, st: 1 }],
   squat: [{ ex: 'squat', s: 10, max: 25, st: 2 }, { ex: 'jumpsquat', s: 8, max: 20, st: 2 }],
-  lunge: [{ ex: 'lunge', s: 8, max: 24, st: 2 }],
+  lunge: [{ ex: 'lunge', s: 8, max: 24, st: 2 }, { ex: 'revlunge', s: 8, max: 24, st: 2 }],
+  sumo: [{ ex: 'sumo', s: 10, max: 25, st: 2 }],
   wsit: [{ ex: 'wallsit', s: 20, max: 60, st: 5 }],
   calf: [{ ex: 'calf', s: 12, max: 30, st: 2 }],
   glute: [{ ex: 'bridge', s: 10, max: 25, st: 2 }, { ex: 'singlebridge', s: 6, max: 16, st: 2 }],
@@ -217,10 +258,10 @@ var CHAINS = {
   bird: [{ ex: 'birddog', s: 8, max: 20, st: 2 }],
   arms: [{ ex: 'dips', s: 6, max: 16, st: 1 }],
   burp: [{ ex: 'burpee', s: 5, max: 15, st: 1 }],
-  plank: [{ ex: 'plank', s: 15, max: 60, st: 5 }, { ex: 'climbers', s: 20, max: 45, st: 5 }],
+  plank: [{ ex: 'plank', s: 15, max: 60, st: 5 }, { ex: 'climbers', s: 20, max: 45, st: 5 }, { ex: 'sideplank', s: 15, max: 45, st: 5 }],
   cardio: [{ ex: 'highknees', s: 20, max: 45, st: 5 }],
-  core: [{ ex: 'crunch', s: 10, max: 30, st: 2 }, { ex: 'deadbug', s: 8, max: 20, st: 2 }, { ex: 'hollow', s: 15, max: 40, st: 5 }],
-  back: [{ ex: 'superman', s: 8, max: 20, st: 2 }],
+  core: [{ ex: 'crunch', s: 10, max: 30, st: 2 }, { ex: 'deadbug', s: 8, max: 20, st: 2 }, { ex: 'hollow', s: 15, max: 40, st: 5 }, { ex: 'bicycle', s: 12, max: 30, st: 2 }, { ex: 'legraise', s: 8, max: 20, st: 2 }],
+  back: [{ ex: 'superman', s: 8, max: 20, st: 2 }, { ex: 'swimmers', s: 10, max: 30, st: 2 }],
   vjump: [{ ex: 'jump', s: 8, max: 20, st: 2 }],
   angel: [{ ex: 'wallangel', s: 8, max: 15, st: 1 }]
 };
@@ -228,7 +269,7 @@ var CHAINS = {
 /* Rutinas (slots = [cadena, series]) */
 var WORKOUTS = {
   A: { name: 'Piernas y glúteos', emoji: '🦵', desc: 'Piernas fuertes y glúteos firmes.',
-    slots: [['squat', 3], ['lunge', 2], ['glute', 3], ['kick', 2], ['calf', 2], ['wsit', 2]] },
+    slots: [['squat', 3], ['sumo', 2], ['lunge', 2], ['glute', 3], ['kick', 2], ['calf', 2], ['wsit', 2]] },
   B: { name: 'Pecho, espalda y core', emoji: '💪', desc: 'Empuje, brazos, espalda y abdomen.',
     slots: [['push', 3], ['arms', 2], ['back', 2], ['core', 3], ['bird', 2], ['plank', 2]] },
   D: { name: 'Core y estabilidad', emoji: '🎯', desc: 'Abdomen, espalda y equilibrio para una postura fuerte.',
