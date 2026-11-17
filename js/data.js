@@ -127,6 +127,226 @@ ANIMS.swimmers = { view: 'side', fix: 'p', fixX: 118, poses: [
   { t: -6, hd: -28, a1: [-18, -18], a2: [0, 0], l1: [180, 180], l2: [194, 194], d: 600, h: 80 },
   { t: -6, hd: -28, a2: [-18, -18], a1: [0, 0], l2: [180, 180], l1: [194, 194], d: 600, h: 80 }] };
 
+/* ======================= 72 EJERCICIOS NUEVOS ======================= */
+var PLANK_FA = { t: -7, hd: -15, a1: [90, 0], a2: [90, 0], l1: [173, 173], l2: [173, 173], ft1: 75, ft2: 75 };
+var BSQ = { t: 0, hd: -20, a1: [90, 90], a2: [90, 90], l1: [30, 110], l2: [32, 108] };
+var CRUNCH_DN = { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-55, 58], l2: [-50, 62] };
+var HOLLOW = { t: 196, hd: 214, tb: 5, a1: [192, 192], a2: [190, 190], l1: [-22, -22], l2: [-20, -20] };
+
+/* ---- Piernas ---- */
+ANIMS.pulsesquat = { view: 'side', fix: 'f1', fixX: 125, poses: [X(SQ_DOWN, 500, 0),
+  { t: -66, hd: -78, a1: [10, 10], a2: [12, 12], l1: [42, 100], l2: [44, 98], d: 380, h: 0 }, X(SQ_DOWN, 380, 0)] };
+ANIMS.isosquat = { view: 'side', fix: 'f1', fixX: 125, poses: [{ d: 700, h: 200 }, X(SQ_DOWN, 1300, 1800)] };
+ANIMS.splitsquat = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { t: -90, hd: -90, l1: [78, 90], l2: [108, 108], ft2: 50, d: 1000, h: 300 },
+  { t: -88, hd: -88, l1: [8, 92], l2: [115, 190], ft2: 50, d: 1000, h: 400 }] };
+ANIMS.lateral = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, -10], a2: [80, 190], l1: [96, 92], l2: [84, 88], d: 600, h: 100 },
+  { t: -84, hd: -84, a1: [100, -10], a2: [80, 190], l1: [150, 78], l2: [48, 48], d: 900, h: 400 },
+  { a1: [100, -10], a2: [80, 190], l1: [96, 92], l2: [84, 88], d: 700, h: 100 },
+  { t: -96, hd: -96, a1: [100, -10], a2: [80, 190], l2: [30, 102], l1: [132, 132], d: 900, h: 400 }] };
+ANIMS.curtsy = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, -10], a2: [80, 190], l1: [96, 92], l2: [84, 88], d: 600, h: 100 },
+  { t: -90, hd: -90, a1: [100, -10], a2: [80, 190], l2: [58, 98], l1: [74, 86], d: 900, h: 400 },
+  { a1: [100, -10], a2: [80, 190], l1: [96, 92], l2: [84, 88], d: 700, h: 100 },
+  { t: -90, hd: -90, a1: [100, -10], a2: [80, 190], l1: [122, 82], l2: [106, 94], d: 900, h: 400 }] };
+ANIMS.skater = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { t: -98, hd: -98, a1: [140, 120], a2: [50, 80], l1: [112, 96], l2: [72, 92], lift: 8, d: 450, h: 60 },
+  { t: -82, hd: -82, a2: [40, 60], a1: [130, 100], l2: [68, 84], l1: [108, 92], lift: 8, d: 450, h: 60 }] };
+ANIMS.standkick = { view: 'side', fix: 'p', fixX: 120, poses: [{ d: 800, h: 200 },
+  { t: -84, hd: -86, a1: [60, 120], a2: [70, 110], l1: [125, 128], l2: [90, 95], d: 800, h: 500 }] };
+ANIMS.bridgemarch = { view: 'side', fix: 'p', fixX: 105, poses: [
+  { t: 141, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-50, 30], l2: [3, 77], d: 700, h: 300 },
+  { t: 141, hd: 204, a1: [0, 0], a2: [0, 0], l2: [-50, 30], l1: [0, 74], d: 700, h: 300 }] };
+ANIMS.singlecalf = { view: 'side', fix: 'p', fixX: 120, poses: [{ l1: [95, 165], d: 700, h: 300 },
+  { l1: [95, 165], ft2: 62, a1: [80, 80], d: 700, h: 500 }] };
+ANIMS.jumplunge = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { t: -88, hd: -88, l1: [8, 92], l2: [115, 190], ft2: 50, d: 500, h: 50 },
+  { t: -90, hd: -90, a1: [-60, -60], a2: [-50, -50], l1: [60, 100], l2: [110, 130], ft1: 40, ft2: 40, lift: 18, d: 330, h: 0 },
+  { t: -88, hd: -88, l2: [8, 92], l1: [115, 190], ft1: 50, d: 330, h: 50 },
+  { t: -90, hd: -90, a1: [-60, -60], a2: [-50, -50], l2: [60, 100], l1: [110, 130], ft1: 40, ft2: 40, lift: 18, d: 330, h: 0 }] };
+ANIMS.tuckjump = { view: 'side', fix: 'f1', fixX: 125, poses: [
+  { t: -70, hd: -80, a1: [120, 110], a2: [115, 110], l1: [35, 105], l2: [38, 105], d: 600, h: 100 },
+  { t: -85, hd: -88, a1: [-60, -60], a2: [-55, -55], l1: [15, 115], l2: [18, 112], lift: 20, d: 320, h: 80 }] };
+ANIMS.goodmorning = { view: 'side', fix: 'f1', fixX: 125, poses: [
+  { a1: [-160, -120], a2: [-150, -110], d: 900, h: 300 },
+  { t: -8, hd: -20, a1: [-160, -120], a2: [-150, -110], l1: [96, 92], l2: [96, 92], d: 1300, h: 500 }] };
+ANIMS.slrdl = { view: 'side', fix: 'f1', fixX: 125, poses: [{ l2: [90, 90], d: 800, h: 300 },
+  { t: -8, hd: -22, a1: [95, 95], a2: [100, 100], l1: [92, 92], l2: [188, 188], d: 1400, h: 600 }] };
+ANIMS.bridgehold = { view: 'side', fix: 'f1', fixX: 140, poses: [X(BR_DN, 800, 300), X(BR_UP, 900, 2200)] };
+
+/* ---- Pecho y brazos ---- */
+ANIMS.slowpush = { view: 'side', fix: 'w1', fixX: 152, poses: [X(PLANK_HI, 2500, 500), X(PUSH_DN, 2500, 900)] };
+ANIMS.plankshoulder = { view: 'side', fix: 'p', fixX: 110, poses: [
+  X(PLANK_HI, 500, 100),
+  { t: -18.4, hd: -26, a1: [20, -150], a2: [90, 90], l1: [161.6, 161.6], l2: [161.6, 161.6], ft1: 75, ft2: 75, d: 450, h: 150 },
+  X(PLANK_HI, 450, 100),
+  { t: -18.4, hd: -26, a2: [20, -150], a1: [90, 90], l1: [161.6, 161.6], l2: [161.6, 161.6], ft1: 75, ft2: 75, d: 450, h: 150 }] };
+ANIMS.plankupdown = { view: 'side', fix: 'p', fixX: 110, poses: [X(PLANK_FA, 700, 250), X(PLANK_HI, 700, 250)] };
+ANIMS.bearhold = { view: 'side', fix: 'p', fixX: 108, poses: [X(ALL4, 800, 300),
+  { t: -22, hd: -34, a1: [90, 90], a2: [90, 90], l1: [72, 158], l2: [72, 158], ft1: 88, ft2: 88, d: 800, h: 2000 }] };
+ANIMS.inchworm = { view: 'side', fix: 'p', fixX: 100, poses: [{ d: 1100, h: 200 }, X(BSQ, 1000, 150), X(PLANK_HI, 1100, 400), X(BSQ, 1000, 150)] };
+ANIMS.pressup = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [165, -100], a2: [15, -80], l1: [93, 90], l2: [87, 90], d: 900, h: 300 },
+  { a1: [-98, -92], a2: [-82, -88], l1: [93, 90], l2: [87, 90], d: 1000, h: 400 }] };
+ANIMS.tricepkick = { view: 'side', fix: 'f1', fixX: 125, poses: [
+  { t: -32, hd: -42, a1: [172, 100], a2: [170, 100], l1: [60, 100], l2: [62, 98], d: 700, h: 200 },
+  { t: -32, hd: -42, a1: [172, 172], a2: [170, 170], l1: [60, 100], l2: [62, 98], d: 700, h: 500 }] };
+ANIMS.kneeplank = { view: 'side', fix: 'w1', fixX: 165, poses: [
+  { t: -17.4, hd: -24, a1: [90, 0], a2: [90, 0], l1: [162.6, 192], l2: [162.6, 192], ft1: 20, ft2: 20, d: 1500, h: 500 },
+  { t: -17.4, hd: -20, tb: 2, a1: [90, 0], a2: [90, 0], l1: [162.6, 192], l2: [162.6, 192], ft1: 20, ft2: 20, d: 1500, h: 500 }] };
+
+/* ---- Core ---- */
+ANIMS.russian = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: -115, hd: -122, a1: [25, 25], a2: [22, 22], l1: [-40, 40], l2: [-42, 38], d: 650, h: 80 },
+  { t: -115, hd: -122, a1: [-20, -20], a2: [-22, -22], l1: [-40, 40], l2: [-42, 38], d: 650, h: 80 }] };
+ANIMS.vup = { view: 'side', fix: 'p', fixX: 108, poses: [
+  { t: 180, hd: 204, a1: [180, 180], a2: [180, 180], l1: [0, 0], l2: [3, 3], d: 900, h: 300 },
+  { t: 216, hd: 226, a1: [-12, -12], a2: [-10, -10], l1: [-45, -45], l2: [-43, -43], d: 900, h: 500 }] };
+ANIMS.flutter = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-24, -24], l2: [-8, -8], d: 280, h: 0 },
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l2: [-24, -24], l1: [-8, -8], d: 280, h: 0 }] };
+ANIMS.scissors = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 190, hd: 210, a1: [-150, -110], a2: [-140, -120], l1: [-52, -52], l2: [-12, -12], d: 650, h: 80 },
+  { t: 190, hd: 210, a1: [-150, -110], a2: [-140, -120], l2: [-52, -52], l1: [-12, -12], d: 650, h: 80 }] };
+ANIMS.reversecrunch = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-78, 40], l2: [-76, 42], d: 900, h: 200 },
+  { t: 168, hd: 196, a1: [0, 0], a2: [0, 0], l1: [-118, -20], l2: [-116, -18], d: 900, h: 500 }] };
+ANIMS.plankreach = { view: 'side', fix: 'p', fixX: 108, poses: [
+  X(PLANK_HI, 500, 100),
+  { t: -18.4, hd: -26, a1: [-8, -8], a2: [90, 90], l1: [161.6, 161.6], l2: [161.6, 161.6], ft1: 75, ft2: 75, d: 700, h: 500 },
+  X(PLANK_HI, 600, 100),
+  { t: -18.4, hd: -26, a2: [-8, -8], a1: [90, 90], l1: [161.6, 161.6], l2: [161.6, 161.6], ft1: 75, ft2: 75, d: 700, h: 500 }] };
+ANIMS.plankknee = { view: 'side', fix: 'p', fixX: 108, poses: [
+  { t: -7, hd: -15, a1: [90, 0], a2: [90, 0], l1: [60, 125], l2: [173, 173], ft1: 60, ft2: 75, d: 600, h: 150 },
+  X(PLANK_FA, 500, 100),
+  { t: -7, hd: -15, a1: [90, 0], a2: [90, 0], l2: [60, 125], l1: [173, 173], ft1: 75, ft2: 60, d: 600, h: 150 },
+  X(PLANK_FA, 500, 100)] };
+ANIMS.boat = { view: 'side', fix: 'p', fixX: 100, poses: [
+  { t: -90, hd: -90, a1: [20, 20], a2: [20, 20], l1: [0, 0], l2: [3, 0], ft1: -80, ft2: -80, d: 900, h: 300 },
+  { t: -118, hd: -124, a1: [0, 0], a2: [3, 3], l1: [-42, -42], l2: [-40, -40], ft1: -40, ft2: -40, d: 1100, h: 2200 }] };
+ANIMS.situp = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-55, 58], l2: [-50, 62], d: 900, h: 300 },
+  { t: 270, hd: 268, a1: [-5, -5], a2: [-3, -3], l1: [-55, 58], l2: [-50, 62], d: 1100, h: 400 }] };
+ANIMS.sidecrunch = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [-150, -110], a2: [-30, -70], l1: [96, 92], l2: [84, 88], d: 700, h: 100 },
+  { t: -102, hd: -102, a1: [-155, -100], a2: [-35, -80], l1: [118, 60], l2: [84, 88], d: 800, h: 300 },
+  { a1: [-150, -110], a2: [-30, -70], l1: [96, 92], l2: [84, 88], d: 700, h: 100 },
+  { t: -78, hd: -78, a1: [-145, -100], a2: [-25, -80], l2: [62, 120], l1: [96, 92], d: 800, h: 300 }] };
+ANIMS.legholds = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-10, -10], l2: [-8, -8], d: 900, h: 300 },
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-45, -45], l2: [-43, -43], d: 900, h: 2200 }] };
+ANIMS.hollowrock = { view: 'side', fix: 'p', fixX: 116, poses: [X(HOLLOW, 800, 100),
+  { t: 190, hd: 208, tb: 4, a1: [186, 186], a2: [184, 184], l1: [-30, -30], l2: [-28, -28], d: 800, h: 100 }] };
+
+/* ---- Espalda ---- */
+ANIMS.yraise = { view: 'side', fix: 'p', fixX: 118, poses: [
+  { t: 0, hd: -24, a1: [0, 0], a2: [0, 0], l1: [180, 180], l2: [180, 180], d: 900, h: 300 },
+  { t: -9, hd: -32, a1: [-26, -26], a2: [-24, -24], l1: [180, 180], l2: [180, 180], d: 900, h: 1000 }] };
+ANIMS.reversesnow = { view: 'side', fix: 'p', fixX: 118, poses: [
+  { t: -9, hd: -32, a1: [-24, -24], a2: [-22, -22], l1: [180, 180], l2: [180, 180], d: 900, h: 200 },
+  { t: -9, hd: -32, a1: [192, 192], a2: [190, 190], l1: [180, 180], l2: [180, 180], d: 1300, h: 400 }] };
+ANIMS.backext = { view: 'side', fix: 'p', fixX: 108, poses: [
+  { t: 0, hd: -24, a1: [205, -30], a2: [208, -28], l1: [180, 180], l2: [180, 180], d: 900, h: 300 },
+  { t: -22, hd: -40, tb: 4, a1: [205, -30], a2: [208, -28], l1: [180, 180], l2: [180, 180], d: 1100, h: 800 }] };
+ANIMS.scapsqueeze = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [150, -70], a2: [30, -110], l1: [93, 90], l2: [87, 90], d: 900, h: 300 },
+  { a1: [188, -96], a2: [-8, -84], l1: [93, 90], l2: [87, 90], d: 900, h: 1000 }] };
+ANIMS.supermanrow = { view: 'side', fix: 'p', fixX: 118, poses: [
+  { t: -9, hd: -32, a1: [-22, -22], a2: [-20, -20], l1: [190, 194], l2: [192, 196], d: 900, h: 300 },
+  { t: -9, hd: -32, a1: [150, 20], a2: [152, 22], l1: [190, 194], l2: [192, 196], d: 900, h: 800 }] };
+ANIMS.birddoghold = { view: 'side', fix: 'p', fixX: 100, poses: [X(ALL4, 800, 300),
+  { t: -17, hd: -22, a1: [-8, -8], a2: [90, 90], l1: [90, 180], l2: [186, 186], ft1: 180, ft2: 90, d: 1000, h: 3000 }] };
+ANIMS.reverseplank = { view: 'side', fix: 'w1', fixX: 92, poses: [
+  { t: 204, hd: -112, a1: [90, 90], a2: [90, 90], l1: [24, 24], l2: [22, 22], ft1: -70, ft2: -70, d: 1300, h: 800 },
+  { t: 204, hd: -108, tb: 3, a1: [90, 90], a2: [90, 90], l1: [24, 24], l2: [22, 22], ft1: -70, ft2: -70, d: 1300, h: 800 }] };
+ANIMS.supermanhold = { view: 'side', fix: 'p', fixX: 118, poses: [
+  { t: 0, hd: -24, a1: [0, 0], a2: [0, 0], l1: [180, 180], l2: [180, 180], d: 900, h: 300 },
+  { t: -10, hd: -35, tb: -3, a1: [-16, -16], a2: [-14, -14], l1: [190, 196], l2: [192, 198], d: 1000, h: 2600 }] };
+
+/* ---- Cardio ---- */
+ANIMS.jumprope = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { a1: [55, 20], a2: [60, 25], d: 260, h: 0 },
+  { a1: [65, 35], a2: [50, 15], ft1: 60, ft2: 60, lift: 8, d: 260, h: 0 }] };
+ANIMS.buttkicks = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { t: -92, hd: -92, a1: [140, 100], a2: [40, -60], l1: [90, 192], l2: [90, 90], d: 260, h: 0 },
+  { t: -92, hd: -92, a1: [40, -60], a2: [140, 100], l2: [90, 192], l1: [90, 90], d: 260, h: 0 }] };
+ANIMS.march = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { t: -90, hd: -90, a1: [140, 100], a2: [50, -50], l1: [32, 96], l2: [90, 90], d: 420, h: 60 },
+  { t: -90, hd: -90, a1: [50, -50], a2: [140, 100], l2: [32, 96], l1: [90, 90], d: 420, h: 60 }] };
+ANIMS.sidehop = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { t: -98, hd: -98, a1: [140, 120], a2: [45, 70], l1: [104, 98], l2: [94, 92], lift: 6, d: 380, h: 40 },
+  { t: -82, hd: -82, a2: [40, 60], a1: [135, 110], l2: [76, 82], l1: [86, 88], lift: 6, d: 380, h: 40 }] };
+ANIMS.shadowbox = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: -88, hd: -88, a1: [0, 0], a2: [-70, -150], l1: [14, 92], l2: [100, 120], ft2: 60, d: 280, h: 40 },
+  { t: -88, hd: -88, a2: [0, 0], a1: [-70, -150], l1: [14, 92], l2: [100, 120], ft2: 60, d: 280, h: 40 }] };
+ANIMS.halfburpee = { view: 'side', fix: 'p', fixX: 100, poses: [{ d: 500, h: 150 }, X(BSQ, 450, 120)] };
+ANIMS.starjump = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, 100], a2: [80, 80], l1: [118, 100], l2: [62, 80], d: 450, h: 60 },
+  { t: -90, a1: [-140, -130], a2: [-40, -50], l1: [128, 122], l2: [52, 58], lift: 16, d: 360, h: 80 }] };
+ANIMS.bearcrawl = { view: 'side', fix: 'p', fixX: 105, poses: [
+  { t: -22, hd: -34, a1: [60, 90], a2: [90, 90], l1: [90, 160], l2: [62, 125], ft1: 88, ft2: 70, d: 500, h: 40 },
+  { t: -22, hd: -34, a2: [60, 90], a1: [90, 90], l2: [90, 160], l1: [62, 125], ft2: 88, ft1: 70, d: 500, h: 40 }] };
+ANIMS.crab = { view: 'side', fix: 'w1', fixX: 92, poses: [
+  { t: 197.5, hd: -100, a1: [90, 90], a2: [90, 90], l1: [-30, -30], l2: [0, 90], d: 650, h: 100 },
+  { t: 197.5, hd: -100, a1: [90, 90], a2: [90, 90], l2: [-30, -30], l1: [0, 90], d: 650, h: 100 }] };
+ANIMS.fastfeet = { view: 'side', fix: 'p', fixX: 120, poses: [
+  { t: -88, hd: -88, a1: [70, 50], a2: [110, 70], l1: [60, 100], l2: [90, 90], d: 170, h: 0 },
+  { t: -88, hd: -88, a2: [70, 50], a1: [110, 70], l2: [60, 100], l1: [90, 90], d: 170, h: 0 }] };
+
+/* ---- Estiramientos y movilidad ---- */
+ANIMS.hamstringstand = { view: 'side', fix: 'p', fixX: 100, poses: [
+  { a1: [-100, -100], a2: [-95, -95], d: 900, h: 200 },
+  { t: 55, hd: 70, a1: [100, 100], a2: [104, 104], l1: [92, 92], l2: [92, 92], d: 1800, h: 2200 }] };
+ANIMS.quadstretch = { view: 'side', fix: 'p', fixX: 120, poses: [{ d: 800, h: 200 },
+  { t: -90, hd: -90, a1: [120, 168], a2: [88, 88], l1: [90, 192], l2: [90, 90], d: 1000, h: 2400 }] };
+ANIMS.calfstretch = { view: 'side', fix: 'p', fixX: 90, wall: 150, wallSide: 'r', poses: [
+  { t: -68, hd: -76, a1: [-5, -5], a2: [0, 0], l1: [30, 92], l2: [160, 160], ft2: 40, d: 900, h: 400 },
+  { t: -62, hd: -72, a1: [-8, -8], a2: [-3, -3], l1: [24, 92], l2: [160, 160], ft2: 40, d: 1200, h: 2200 }] };
+ANIMS.butterfly = { view: 'side', fix: 'p', fixX: 100, poses: [
+  { t: -90, hd: -90, a1: [60, 100], a2: [58, 100], l1: [-35, 150], l2: [-38, 148], d: 900, h: 300 },
+  { t: -62, hd: -70, a1: [60, 100], a2: [58, 100], l1: [-35, 150], l2: [-38, 148], d: 1600, h: 2200 }] };
+ANIMS.hipflexor = { view: 'side', fix: 'p', fixX: 110, poses: [
+  { t: -90, hd: -90, a1: [85, 85], a2: [95, 95], l1: [8, 92], l2: [100, 180], ft2: 150, d: 900, h: 300 },
+  { t: -92, hd: -94, tb: -2, a1: [-90, -90], a2: [-88, -88], l1: [8, 92], l2: [100, 180], ft2: 150, d: 1400, h: 2200 }] };
+ANIMS.kneehug = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 180, hd: 204, a1: [0, 0], a2: [0, 0], l1: [-55, 58], l2: [0, 0], d: 900, h: 300 },
+  { t: 180, hd: 204, a1: [-30, 150], a2: [-28, 152], l1: [-122, 50], l2: [0, 0], d: 1300, h: 2300 }] };
+ANIMS.backrock = { view: 'side', fix: 'p', fixX: 112, poses: [
+  { t: 172, hd: 198, a1: [-35, 150], a2: [-33, 152], l1: [-125, 55], l2: [-123, 57], d: 1100, h: 100 },
+  { t: 190, hd: 212, a1: [-35, 150], a2: [-33, 152], l1: [-125, 55], l2: [-123, 57], d: 1100, h: 100 }] };
+ANIMS.neckroll = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { hd: -90, d: 700, h: 300 }, { hd: -112, d: 1000, h: 600 }, { hd: -90, d: 800, h: 100 }, { hd: -68, d: 1000, h: 600 }] };
+ANIMS.armcircles = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [-160, -160], a2: [-20, -20], l1: [93, 90], l2: [87, 90], d: 450, h: 0 },
+  { a1: [180, 180], a2: [0, 0], l1: [93, 90], l2: [87, 90], d: 450, h: 0 },
+  { a1: [160, 160], a2: [20, 20], l1: [93, 90], l2: [87, 90], d: 450, h: 0 },
+  { a1: [180, 180], a2: [0, 0], l1: [93, 90], l2: [87, 90], d: 450, h: 0 }] };
+ANIMS.armhug = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [180, 180], a2: [0, 0], l1: [93, 90], l2: [87, 90], d: 800, h: 150 },
+  { a1: [14, 14], a2: [166, 166], l1: [93, 90], l2: [87, 90], d: 800, h: 300 }] };
+ANIMS.torsostand = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { t: -92, hd: -92, tb: 2, a1: [170, 160], a2: [200, 220], l1: [100, 95], l2: [80, 85], d: 900, h: 100 },
+  { t: -88, hd: -88, tb: -2, a1: [-20, -40], a2: [10, 20], l1: [100, 95], l2: [80, 85], d: 900, h: 100 }] };
+ANIMS.hipcircle = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { t: -96, hd: -92, a1: [140, 110], a2: [40, 70], l1: [100, 92], l2: [84, 88], d: 700, h: 0 },
+  { t: -90, hd: -90, tb: 3, a1: [140, 110], a2: [40, 70], l1: [92, 90], l2: [88, 90], d: 700, h: 0 },
+  { t: -84, hd: -88, a1: [140, 110], a2: [40, 70], l1: [96, 88], l2: [80, 92], d: 700, h: 0 },
+  { t: -90, hd: -90, tb: -3, a1: [140, 110], a2: [40, 70], l1: [92, 90], l2: [88, 90], d: 700, h: 0 }] };
+ANIMS.ankle = { view: 'side', fix: 'f2', fixX: 125, poses: [
+  { l1: [60, 120], ft1: -60, d: 450, h: 0 }, { l1: [60, 120], ft1: 0, d: 450, h: 0 },
+  { l1: [60, 120], ft1: 60, d: 450, h: 0 }, { l1: [60, 120], ft1: 0, d: 450, h: 0 }] };
+ANIMS.breathe = { view: 'side', fix: 'p', fixX: 120, poses: [{ d: 1500, h: 600 },
+  { t: -92, hd: -96, tb: -2, a1: [-70, -70], a2: [-65, -65], ft1: 30, ft2: 30, d: 3000, h: 1500 }] };
+ANIMS.shouldercross = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, 100], a2: [80, 80], l1: [93, 90], l2: [87, 90], d: 900, h: 300 },
+  { a1: [8, 14], a2: [-175, -25], l1: [93, 90], l2: [87, 90], d: 1000, h: 2300 }] };
+ANIMS.tricepstretch = { view: 'front', fix: 'p', fixX: 120, poses: [
+  { a1: [100, 100], a2: [80, 80], l1: [93, 90], l2: [87, 90], d: 900, h: 300 },
+  { a1: [-92, 150], a2: [-125, -170], l1: [93, 90], l2: [87, 90], d: 1000, h: 2300 }] };
+ANIMS.chestopen = { view: 'side', fix: 'p', fixX: 120, poses: [{ d: 900, h: 300 },
+  { t: -95, hd: -104, tb: -3, a1: [122, 122], a2: [126, 126], d: 1100, h: 2300 }] };
+
 /* ---------- Ejercicios ---------- */
 var EX = {
   squat: { n: 'Sentadilla', cat: 'Piernas', type: 'reps', anim: 'squat', m: 'Cuádriceps, glúteos',
@@ -309,6 +529,131 @@ var COOL_SETS = {
 var NOISY = { jumpsquat: ['squat', 1], jump: ['calf', 2], burpee: ['squat', 2], highknees: ['wallsit', 1], jacks: ['catcow', 1] };
 
 var LEVEL_NAMES = ['Novato', 'Aprendiz', 'Atleta', 'Guerrero', 'Experto', 'Máquina', 'Campeón', 'Titán', 'Leyenda', 'Mito'];
+
+
+/* ---- textos de los 72 ejercicios nuevos ---- */
+var NEWEX = {
+  pulsesquat: { n: "Sentadilla con pulsos", cat: "Piernas", type: "reps", anim: "pulsesquat", m: "Cuádriceps y glúteos", steps: ["Baja a una sentadilla con la espalda recta.", "Sin subir del todo, haz pequeños rebotes arriba y abajo.", "Pecho alto y rodillas alineadas con los pies."], tip: "Sentirás ardor en los muslos: es normal. Para si te duelen las rodillas.", lv: 2, g: "MF" },
+  isosquat: { n: "Sentadilla isométrica", cat: "Piernas", type: "time", anim: "isosquat", m: "Cuádriceps y glúteos", steps: ["Baja hasta que los muslos queden casi paralelos al suelo.", "Mantén la posición sin moverte.", "Respira normal y aprieta los glúteos."], tip: "Si tiemblan las piernas es normal. Sube un poco si lo necesitas.", lv: 2, g: "MF" },
+  splitsquat: { n: "Sentadilla dividida", cat: "Piernas", type: "reps", anim: "splitsquat", m: "Cuádriceps y glúteos", steps: ["Da un paso largo con una pierna y deja los pies fijos.", "Baja recto hasta que ambas rodillas estén cerca de 90°.", "Sube sin mover los pies. Haz todas las repeticiones y cambia de pierna."], tip: "Es más estable que la zancada caminando: ideal para empezar.", lv: 1, g: "MFS" },
+  lateral: { n: "Zancada lateral", cat: "Piernas", type: "reps", anim: "lateral", m: "Aductores, glúteos y cuádriceps", steps: ["Pies juntos; da un paso largo hacia un lado.", "Dobla esa rodilla llevando la cadera atrás; la otra pierna queda estirada.", "Empuja con el pie para volver y cambia de lado."], tip: "Pecho alto y los dos pies apuntando al frente.", lv: 2, g: "MFS" },
+  curtsy: { n: "Zancada cruzada", cat: "Piernas", type: "reps", anim: "curtsy", m: "Glúteos y muslos", steps: ["De pie, lleva una pierna hacia atrás cruzándola detrás de la otra.", "Dobla ambas rodillas como en una reverencia.", "Sube y repite; luego cambia de pierna."], tip: "La rodilla de adelante no debe irse hacia adentro.", lv: 2, g: "MF" },
+  skater: { n: "Patinador", cat: "Piernas", type: "reps", anim: "skater", m: "Piernas y equilibrio", steps: ["Desplázate de lado a lado apoyando una sola pierna.", "La otra pierna pasa por detrás, como un patinador.", "Mueve los brazos al contrario para equilibrarte."], tip: "Empieza sin salto (pasos largos) si tu equilibrio aún es flojo.", lv: 2, g: "MF" },
+  standkick: { n: "Patada de glúteo de pie", cat: "Piernas", type: "reps", anim: "standkick", m: "Glúteos", steps: ["De pie, apóyate en una pierna con la rodilla un poco flexionada.", "Lleva la otra pierna hacia atrás y arriba apretando el glúteo.", "Vuelve sin tocar el suelo y repite; luego cambia."], tip: "Mantén el torso firme, sin arquear la espalda baja.", lv: 1, g: "MFS" },
+  bridgemarch: { n: "Puente con marcha", cat: "Piernas", type: "reps", anim: "bridgemarch", m: "Glúteos y core", steps: ["Haz un puente de glúteos y mantén la cadera arriba.", "Levanta una rodilla hacia el pecho sin mover la cadera.", "Baja el pie y levanta la otra rodilla, alternando."], tip: "Si la cadera cae o se balancea, hazlo más lento.", lv: 2, g: "MF" },
+  singlecalf: { n: "Talones a una pierna", cat: "Piernas", type: "reps", anim: "singlecalf", m: "Gemelos y equilibrio", steps: ["Apóyate en una pierna (puedes tocar la pared).", "Sube sobre la punta del pie lo más alto posible.", "Baja despacio y repite; luego cambia de pierna."], tip: "Pausa un segundo arriba. Es mucho más difícil que con dos piernas.", lv: 2, g: "MF" },
+  jumplunge: { n: "Zancada con salto", cat: "Piernas", type: "reps", anim: "jumplunge", m: "Piernas y cardio", steps: ["Empieza en posición de zancada.", "Salta y cambia de pierna en el aire.", "Aterriza suave en otra zancada con control."], tip: "Aterriza sin ruido. Si te duelen las rodillas, usa la zancada normal.", lv: 3, g: "MF" },
+  tuckjump: { n: "Salto con rodillas al pecho", cat: "Piernas", type: "reps", anim: "tuckjump", m: "Potencia de piernas", steps: ["Flexiona un poco las rodillas y balancea los brazos.", "Salta y lleva las rodillas hacia el pecho.", "Aterriza suave con las rodillas flexionadas."], tip: "Salta con fuerza pero aterriza con control.", lv: 3, g: "MF" },
+  goodmorning: { n: "Buenos días", cat: "Piernas", type: "reps", anim: "goodmorning", m: "Isquios y espalda baja", steps: ["De pie, manos detrás de la cabeza y rodillas un poco flexionadas.", "Inclina el torso llevando la cadera hacia atrás.", "Sube apretando los glúteos, con la espalda siempre recta."], tip: "Es una bisagra de cadera: la espalda no se redondea.", lv: 1, g: "MFS" },
+  slrdl: { n: "Peso muerto a una pierna", cat: "Piernas", type: "reps", anim: "slrdl", m: "Isquios, glúteos y equilibrio", steps: ["Apóyate en una pierna con la rodilla ligeramente flexionada.", "Inclina el torso mientras la otra pierna sube hacia atrás.", "Vuelve a la posición de pie y repite; luego cambia."], tip: "Mira un punto fijo en el suelo para no perder el equilibrio.", lv: 3, g: "M" },
+  bridgehold: { n: "Puente isométrico", cat: "Piernas", type: "time", anim: "bridgehold", m: "Glúteos y espalda baja", steps: ["Boca arriba, rodillas dobladas y pies en el suelo.", "Sube la cadera hasta formar una línea recta.", "Mantén apretando los glúteos y respirando normal."], tip: "No arquees la espalda baja.", lv: 1, g: "MFS" },
+  widepush: { n: "Flexión abierta", cat: "Pecho y brazos", type: "reps", anim: "pushup", m: "Pecho y hombros", steps: ["Posición de flexión con las manos más abiertas que los hombros.", "Baja el pecho hasta casi tocar el suelo.", "Empuja para subir con el cuerpo recto."], tip: "Trabaja más el pecho. Si es muy difícil, hazla de rodillas.", lv: 2, g: "MF" },
+  slowpush: { n: "Flexión lenta", cat: "Pecho y brazos", type: "reps", anim: "slowpush", m: "Pecho, hombros y tríceps", steps: ["Posición de flexión normal.", "Baja contando 3 segundos.", "Sube en 1 segundo, controlando todo el recorrido."], tip: "Lento = más músculo trabajando con menos repeticiones.", lv: 2, g: "M" },
+  plankshoulder: { n: "Plancha con toque de hombro", cat: "Pecho y brazos", type: "time", anim: "plankshoulder", m: "Core y hombros", steps: ["Posición de plancha alta con los pies un poco abiertos.", "Lleva una mano al hombro contrario sin girar la cadera.", "Cambia de mano con ritmo constante."], tip: "Abre más los pies para estabilizar la cadera.", lv: 2, g: "MF" },
+  plankupdown: { n: "Plancha arriba y abajo", cat: "Pecho y brazos", type: "time", anim: "plankupdown", m: "Core, hombros y tríceps", steps: ["Empieza en plancha de antebrazos.", "Sube una mano y luego la otra hasta la plancha alta.", "Baja de nuevo de a una mano y alterna cuál empieza."], tip: "Mantén la cadera quieta, sin balancearla.", lv: 3, g: "M" },
+  bearhold: { n: "Posición de oso", cat: "Pecho y brazos", type: "time", anim: "bearhold", m: "Core, hombros y piernas", steps: ["En cuatro apoyos, manos bajo los hombros y rodillas bajo la cadera.", "Levanta las rodillas unos 3 cm del suelo.", "Mantén la espalda plana y respira normal."], tip: "No subas la cadera: la espalda debe quedar como una mesa.", lv: 2, g: "MF" },
+  inchworm: { n: "Gusano", cat: "Pecho y brazos", type: "reps", anim: "inchworm", m: "Cuerpo completo y movilidad", steps: ["De pie, inclínate y apoya las manos en el suelo (rodillas flexionadas si hace falta).", "Camina con las manos hacia adelante hasta la plancha.", "Camina hacia los pies y ponte de pie."], tip: "Es un excelente calentamiento y estira los isquios.", lv: 2, g: "MFS" },
+  pressup: { n: "Press de hombros sin peso", cat: "Pecho y brazos", type: "reps", anim: "pressup", m: "Hombros y tríceps", steps: ["De pie, codos a los lados a 90° con las manos arriba.", "Estira los brazos sobre la cabeza.", "Baja controlado a la posición inicial."], tip: "Aprieta el abdomen para que la espalda no se arquee.", lv: 1, g: "MFS" },
+  tricepkick: { n: "Patada de tríceps", cat: "Pecho y brazos", type: "reps", anim: "tricepkick", m: "Tríceps", steps: ["Inclina el torso con la espalda recta y los codos pegados hacia atrás.", "Estira los antebrazos hacia atrás hasta enderezar los brazos.", "Dobla de nuevo despacio."], tip: "Solo se mueve el antebrazo; el codo queda quieto.", lv: 1, g: "MF" },
+  kneeplank: { n: "Plancha de rodillas", cat: "Pecho y brazos", type: "time", anim: "kneeplank", m: "Core y hombros", steps: ["Apoya antebrazos y rodillas en el suelo.", "Forma una línea recta de rodillas a cabeza.", "Aprieta abdomen y glúteos y respira normal."], tip: "Es el primer paso antes de la plancha completa.", lv: 1, g: "MFS" },
+  tricepknee: { n: "Flexión de tríceps de rodillas", cat: "Pecho y brazos", type: "reps", anim: "kneepush", m: "Tríceps y pecho", steps: ["Apoya las rodillas y pon las manos bajo los hombros.", "Baja el pecho con los codos pegados al cuerpo hacia atrás.", "Empuja para subir sin abrir los codos."], tip: "Con los codos pegados trabajas más el tríceps.", lv: 1, g: "MF" },
+  russian: { n: "Giro ruso", cat: "Core", type: "reps", anim: "russian", m: "Oblicuos y abdomen", steps: ["Sentado, inclínate hacia atrás con los pies levantados o apoyados.", "Gira el torso llevando las manos de un lado al otro.", "Mantén la espalda recta y el abdomen firme."], tip: "Si te cuesta, apoya los talones en el suelo.", lv: 2, g: "MF" },
+  vup: { n: "Abdominal en V", cat: "Core", type: "reps", anim: "vup", m: "Abdomen completo", steps: ["Boca arriba con brazos y piernas estirados.", "Sube a la vez torso y piernas formando una V.", "Baja con control sin tocar el suelo."], tip: "Si es muy difícil, dobla las rodillas.", lv: 3, g: "M" },
+  flutter: { n: "Patadas de aleteo", cat: "Core", type: "time", anim: "flutter", m: "Abdomen bajo", steps: ["Boca arriba con las manos bajo la cadera y las piernas estiradas.", "Levanta los pies unos 20 cm del suelo.", "Sube y baja las piernas alternando en movimientos cortos."], tip: "Pega la espalda baja al suelo.", lv: 2, g: "MF" },
+  scissors: { n: "Tijeras", cat: "Core", type: "time", anim: "scissors", m: "Abdomen bajo", steps: ["Boca arriba, manos detrás de la cabeza y piernas estiradas arriba.", "Abre y cruza las piernas como unas tijeras.", "Hombros despegados y espalda baja pegada al suelo."], tip: "Cuanto más bajas las piernas, más difícil.", lv: 2, g: "MF" },
+  reversecrunch: { n: "Abdominal inverso", cat: "Core", type: "reps", anim: "reversecrunch", m: "Abdomen bajo", steps: ["Boca arriba con las rodillas dobladas sobre la cadera.", "Lleva las rodillas al pecho subiendo ligeramente la cadera.", "Baja despacio sin dejar caer las piernas."], tip: "No te des impulso: sube con el abdomen.", lv: 2, g: "MF" },
+  plankreach: { n: "Plancha con alcance", cat: "Core", type: "time", anim: "plankreach", m: "Core y hombros", steps: ["Posición de plancha alta con los pies abiertos.", "Estira un brazo hacia adelante sin mover la cadera.", "Vuelve y alterna."], tip: "Cuanto más abiertos los pies, más fácil.", lv: 3, g: "M" },
+  plankknee: { n: "Plancha con rodilla al codo", cat: "Core", type: "time", anim: "plankknee", m: "Core y oblicuos", steps: ["Empieza en plancha de antebrazos.", "Lleva una rodilla hacia el codo del mismo lado.", "Vuelve a la plancha y alterna."], tip: "Mantén los hombros sobre los codos.", lv: 3, g: "MF" },
+  mountainslow: { n: "Escalador lento", cat: "Core", type: "time", anim: "mountainslow", m: "Core y hombros", steps: ["Posición de plancha alta.", "Lleva una rodilla al pecho despacio y controlada.", "Regresa y cambia; la cadera se mantiene baja."], tip: "Más lento = más control y más trabajo de abdomen.", lv: 2, g: "MF" },
+  boat: { n: "Postura del bote", cat: "Core", type: "time", anim: "boat", m: "Abdomen y flexores de cadera", steps: ["Sentado con las rodillas dobladas, inclínate un poco hacia atrás.", "Levanta los pies y estira los brazos al frente.", "Mantén la espalda larga y respira."], tip: "Si es muy duro, deja los pies en el suelo.", lv: 2, g: "MFS" },
+  situp: { n: "Abdominal completo", cat: "Core", type: "reps", anim: "situp", m: "Abdomen", steps: ["Boca arriba con las rodillas dobladas y los brazos al frente.", "Sube el torso hasta quedar sentado, sin tirar del cuello.", "Baja despacio."], tip: "Sube y baja sin impulso.", lv: 1, g: "MF" },
+  sidecrunch: { n: "Abdominal lateral de pie", cat: "Core", type: "reps", anim: "sidecrunch", m: "Oblicuos", steps: ["De pie, manos detrás de la cabeza.", "Lleva una rodilla hacia el codo del mismo lado inclinando el torso.", "Vuelve y cambia de lado."], tip: "Muy cómodo para las rodillas y la espalda.", lv: 1, g: "MFS" },
+  legholds: { n: "Piernas elevadas isométrico", cat: "Core", type: "time", anim: "legholds", m: "Abdomen bajo", steps: ["Boca arriba, piernas estiradas y manos bajo la cadera.", "Sube las piernas a unos 45° y mantén.", "No dejes que la espalda baja se despegue."], tip: "Si la espalda se despega, sube más las piernas.", lv: 2, g: "MF" },
+  hollowrock: { n: "Balanceo hueco", cat: "Core", type: "reps", anim: "hollowrock", m: "Abdomen profundo", steps: ["Adopta la postura de hueco abdominal.", "Balancéate hacia adelante y atrás como una mecedora.", "Mantén la forma de banana todo el tiempo."], tip: "Es avanzado: domina antes el hueco isométrico.", lv: 3, g: "M" },
+  yraise: { n: "Elevación en Y", cat: "Espalda", type: "reps", anim: "yraise", m: "Espalda alta y hombros", steps: ["Boca abajo con los brazos estirados formando una Y.", "Levanta brazos y pecho del suelo.", "Baja despacio."], tip: "Mira al suelo, con los pulgares hacia el techo.", lv: 1, g: "MFSC" },
+  reversesnow: { n: "Ángel de nieve invertido", cat: "Espalda", type: "reps", anim: "reversesnow", m: "Espalda alta y hombros", steps: ["Boca abajo con los brazos al frente y el pecho levantado.", "Lleva los brazos hacia atrás hasta las caderas.", "Regresa sin bajar el pecho."], tip: "Mueve los brazos despacio y con control.", lv: 2, g: "MFSC" },
+  backext: { n: "Extensión de espalda", cat: "Espalda", type: "reps", anim: "backext", m: "Espalda baja", steps: ["Boca abajo con las manos detrás de la cabeza.", "Sube el pecho del suelo apretando la espalda.", "Baja despacio."], tip: "No eleves demasiado el cuello: mira al suelo.", lv: 1, g: "MFSC" },
+  scapsqueeze: { n: "Retracción de omóplatos", cat: "Espalda", type: "reps", anim: "scapsqueeze", m: "Espalda alta y postura", steps: ["De pie con los codos doblados a 90° al frente.", "Junta los omóplatos llevando los codos hacia atrás.", "Aguanta 2 segundos y suelta."], tip: "Ideal si pasas mucho tiempo sentado.", lv: 1, g: "FSC" },
+  supermanrow: { n: "Superman con remo", cat: "Espalda", type: "reps", anim: "supermanrow", m: "Espalda y glúteos", steps: ["Boca abajo con los brazos al frente, levanta pecho y piernas.", "Lleva los codos hacia atrás como remando.", "Vuelve a estirar los brazos."], tip: "Aprieta los omóplatos al remar.", lv: 2, g: "MF" },
+  birddoghold: { n: "Perro–pájaro isométrico", cat: "Espalda", type: "time", anim: "birddoghold", m: "Espalda baja y core", steps: ["En cuatro apoyos con la espalda plana.", "Estira un brazo y la pierna contraria y mantén.", "Cambia de lado a mitad del tiempo."], tip: "Imagina un vaso de agua sobre tu espalda.", lv: 2, g: "MFS" },
+  reverseplank: { n: "Plancha invertida", cat: "Espalda", type: "time", anim: "reverseplank", m: "Glúteos, espalda y hombros", steps: ["Sentado con las manos atrás y las piernas estiradas.", "Sube la cadera formando una línea recta.", "Mantén mirando al frente."], tip: "Si te cuesta, dobla las rodillas.", lv: 2, g: "MF" },
+  supermanhold: { n: "Superman isométrico", cat: "Espalda", type: "time", anim: "supermanhold", m: "Espalda baja y glúteos", steps: ["Boca abajo con los brazos al frente.", "Levanta brazos, pecho y piernas del suelo.", "Mantén respirando con calma."], tip: "Mira al suelo para cuidar el cuello.", lv: 1, g: "MFSC" },
+  jumprope: { n: "Cuerda imaginaria", cat: "Cardio", type: "time", anim: "jumprope", m: "Cardio y gemelos", steps: ["De pie, manos a los lados como sosteniendo una cuerda.", "Salta suavemente sobre las puntas de los pies.", "Gira las muñecas al ritmo."], tip: "Saltos pequeños y ligeros.", lv: 1, g: "MFS" },
+  buttkicks: { n: "Talones al glúteo", cat: "Cardio", type: "time", anim: "buttkicks", m: "Cardio y piernas", steps: ["Trota en el sitio.", "Lleva los talones hacia los glúteos.", "Mueve los brazos al ritmo."], tip: "Mantén el torso erguido.", lv: 1, g: "MF" },
+  march: { n: "Marcha en el sitio", cat: "Cardio", type: "time", anim: "march", m: "Cardio suave", steps: ["De pie, camina sin avanzar.", "Sube las rodillas hasta la cadera con un ritmo cómodo.", "Mueve los brazos opuestos."], tip: "Perfecta si empiezas o necesitas bajo impacto.", lv: 1, g: "FS" },
+  sidehop: { n: "Saltos laterales", cat: "Cardio", type: "time", anim: "sidehop", m: "Cardio y piernas", steps: ["Salta de lado a lado con los pies juntos.", "Aterriza suave.", "Mueve los brazos para impulsarte."], tip: "Empieza con saltos pequeños.", lv: 2, g: "MF" },
+  shadowbox: { n: "Boxeo al aire", cat: "Cardio", type: "time", anim: "shadowbox", m: "Cardio, hombros y core", steps: ["Posición de guardia con las rodillas flexionadas.", "Lanza golpes rectos alternando brazos.", "Gira un poco la cadera con cada golpe."], tip: "Mantén siempre una mano protegiendo la cara.", lv: 1, g: "MFS" },
+  halfburpee: { n: "Medio burpee", cat: "Cardio", type: "reps", anim: "halfburpee", m: "Cuerpo completo", steps: ["De pie, agáchate y apoya las manos.", "Lleva los pies atrás a plancha y regresa.", "Ponte de pie sin saltar."], tip: "La versión amable del burpee.", lv: 1, g: "MF" },
+  starjump: { n: "Salto estrella", cat: "Cardio", type: "reps", anim: "starjump", m: "Cardio y piernas", steps: ["Agáchate un poco con los brazos abajo.", "Salta abriendo brazos y piernas como una estrella.", "Aterriza suave y repite."], tip: "Aterriza con las rodillas flexionadas.", lv: 2, g: "MF" },
+  bearcrawl: { n: "Caminata de oso", cat: "Cardio", type: "time", anim: "bearcrawl", m: "Cuerpo completo", steps: ["En cuatro apoyos con las rodillas despegadas.", "Mueve mano y pie contrarios dando pasos cortos.", "Mantén la espalda plana."], tip: "Hazlo despacio y controlado.", lv: 2, g: "MF" },
+  crab: { n: "Cangrejo", cat: "Cardio", type: "time", anim: "crab", m: "Hombros, tríceps y core", steps: ["Sentado con las manos atrás y la cadera arriba.", "Levanta una pierna estirada y cambia.", "Mantén la cadera alta."], tip: "Mira al frente y no dejes caer la cadera.", lv: 2, g: "MF" },
+  fastfeet: { n: "Pies rápidos", cat: "Cardio", type: "time", anim: "fastfeet", m: "Cardio y coordinación", steps: ["Pies a la anchura de la cadera, rodillas flexionadas.", "Mueve los pies muy rápido y ligero.", "Brazos relajados."], tip: "Pasos muy cortos y rápidos.", lv: 1, g: "MF" },
+  hamstringstand: { n: "Estiramiento de isquios de pie", cat: "Crecer", type: "time", anim: "hamstringstand", m: "Isquiotibiales y espalda", steps: ["De pie, estira los brazos hacia arriba.", "Inclínate hacia adelante desde la cadera con la espalda larga.", "Deja colgar brazos y cabeza."], tip: "Dobla un poco las rodillas si tiras demasiado.", lv: 1, g: "SC", grow: 1 },
+  quadstretch: { n: "Estiramiento de cuádriceps", cat: "Crecer", type: "time", anim: "quadstretch", m: "Cuádriceps", steps: ["De pie, dobla una rodilla llevando el talón al glúteo.", "Sujeta el pie con la mano del mismo lado.", "Mantén las rodillas juntas y cambia de pierna."], tip: "Apóyate en la pared si pierdes el equilibrio.", lv: 1, g: "SC", grow: 1 },
+  calfstretch: { n: "Estiramiento de gemelos en pared", cat: "Crecer", type: "time", anim: "calfstretch", m: "Gemelos", steps: ["Frente a una pared, apoya las manos.", "Da un paso atrás con una pierna estirada y el talón en el suelo.", "Inclina el cuerpo hacia la pared y cambia de pierna."], tip: "El talón de atrás no debe despegarse.", lv: 1, g: "SC", grow: 1 },
+  butterfly: { n: "Mariposa", cat: "Crecer", type: "time", anim: "butterfly", m: "Cadera y aductores", steps: ["Sentado, junta las plantas de los pies.", "Deja caer las rodillas hacia los lados.", "Inclínate suavemente con la espalda recta."], tip: "No empujes las rodillas con fuerza.", lv: 1, g: "SC", grow: 1 },
+  hipflexor: { n: "Estiramiento de cadera", cat: "Crecer", type: "time", anim: "hipflexor", m: "Flexores de cadera", steps: ["En zancada con la rodilla de atrás en el suelo.", "Lleva la cadera hacia adelante y sube los brazos.", "Mantén y cambia de pierna."], tip: "Aprieta el glúteo de la pierna de atrás.", lv: 1, g: "SC", grow: 1 },
+  kneehug: { n: "Abrazo de rodilla", cat: "Crecer", type: "time", anim: "kneehug", m: "Cadera y espalda baja", steps: ["Boca arriba, lleva una rodilla al pecho.", "Abrázala con ambas manos.", "Mantén y cambia de pierna."], tip: "La otra pierna se queda estirada en el suelo.", lv: 1, g: "SC", grow: 1 },
+  backrock: { n: "Balanceo de espalda", cat: "Crecer", type: "time", anim: "backrock", m: "Columna y espalda", steps: ["Boca arriba, abraza ambas rodillas.", "Balancéate suavemente hacia atrás y adelante.", "Respira profundo."], tip: "Un masaje suave para la columna.", lv: 1, g: "SC", grow: 1 },
+  neckroll: { n: "Rotación de cuello", cat: "Movilidad", type: "time", anim: "neckroll", m: "Cuello y trapecios", steps: ["De pie, hombros relajados.", "Inclina suavemente la cabeza de un lado a otro.", "Movimientos lentos, sin forzar."], tip: "Nunca fuerces el cuello ni gires con prisa.", lv: 1, g: "SC", grow: 1 },
+  armcircles: { n: "Círculos de brazos", cat: "Movilidad", type: "time", anim: "armcircles", m: "Hombros", steps: ["Brazos abiertos a los lados.", "Haz círculos pequeños hacia adelante.", "Luego hacia atrás, aumentando el tamaño."], tip: "Excelente calentamiento para los hombros.", lv: 1, g: "FSC", grow: 1 },
+  armhug: { n: "Aperturas de brazos", cat: "Movilidad", type: "time", anim: "armhug", m: "Pecho y espalda alta", steps: ["Brazos abiertos a los lados.", "Abrázate cruzando los brazos.", "Ábrelos con fuerza hacia atrás."], tip: "Mantén el torso erguido.", lv: 1, g: "FSC", grow: 1 },
+  torsostand: { n: "Giro de torso de pie", cat: "Movilidad", type: "time", anim: "torsostand", m: "Columna y oblicuos", steps: ["Pies al ancho de los hombros.", "Gira el torso a un lado con los brazos sueltos.", "Cambia de lado de forma fluida."], tip: "Gira desde el torso, no desde las rodillas.", lv: 1, g: "FSC", grow: 1 },
+  hipcircle: { n: "Círculos de cadera", cat: "Movilidad", type: "time", anim: "hipcircle", m: "Cadera", steps: ["Manos en la cintura.", "Dibuja círculos grandes con la cadera.", "Cambia de sentido."], tip: "Movimientos amplios y suaves.", lv: 1, g: "FSC", grow: 1 },
+  ankle: { n: "Círculos de tobillo", cat: "Movilidad", type: "time", anim: "ankle", m: "Tobillos", steps: ["Apoya una pierna y levanta el otro pie.", "Dibuja círculos con la punta del pie.", "Cambia de sentido y de pie."], tip: "Excelente para prevenir esguinces.", lv: 1, g: "FSC", grow: 1 },
+  breathe: { n: "Respiración profunda", cat: "Movilidad", type: "time", anim: "breathe", m: "Pulmones y columna", steps: ["De pie, brazos abajo.", "Inhala subiendo los brazos hacia arriba.", "Exhala bajándolos despacio."], tip: "Respira por la nariz y suelta el aire lento.", lv: 1, g: "FSC", grow: 1 },
+  shouldercross: { n: "Hombro cruzado", cat: "Movilidad", type: "time", anim: "shouldercross", m: "Hombros", steps: ["Lleva un brazo estirado a través del pecho.", "Con el otro brazo presiónalo suavemente.", "Mantén y cambia."], tip: "No gires el torso.", lv: 1, g: "SC", grow: 1 },
+  tricepstretch: { n: "Estiramiento de tríceps", cat: "Movilidad", type: "time", anim: "tricepstretch", m: "Tríceps y hombros", steps: ["Sube un brazo y dobla el codo llevando la mano a la espalda.", "Con la otra mano empuja el codo hacia atrás.", "Mantén y cambia."], tip: "Mantén el cuello relajado.", lv: 1, g: "SC", grow: 1 },
+  chestopen: { n: "Apertura de pecho", cat: "Movilidad", type: "time", anim: "chestopen", m: "Pecho y hombros", steps: ["De pie, junta las manos detrás de la espalda.", "Estira los brazos hacia atrás y abajo.", "Saca el pecho y mira al frente."], tip: "Excelente contra la postura encorvada.", lv: 1, g: "FSC", grow: 1 },
+};
+Object.keys(NEWEX).forEach(function (k) { EX[k] = NEWEX[k]; });
+var OLDLV = {"squat": [1, "MF"], "jumpsquat": [3, "MFC"], "jump": [2, "MFC"], "lunge": [1, "MF"], "wallsit": [1, "MF"], "calf": [1, "MFS"], "bridge": [1, "MFS"], "highknees": [1, "MF"], "jacks": [1, "MFS"], "wallpush": [1, "MFS"], "kneepush": [1, "MF"], "pushup": [2, "MF"], "pushpause": [3, "M"], "plank": [1, "MFS"], "climbers": [2, "MF"], "crunch": [1, "MF"], "deadbug": [1, "MFS"], "superman": [1, "MFSC"], "wallangel": [1, "FSC"], "reach": [1, "SC"], "cobra": [1, "SC"], "child": [1, "SC"], "catcow": [1, "SC"], "seatedfold": [1, "SC"], "sidebend": [1, "SC"], "singlebridge": [2, "MF"], "donkeykick": [1, "MFS"], "birddog": [1, "MFS"], "hollow": [3, "M"], "burpee": [3, "MF"], "dips": [2, "MF"], "legraise": [2, "MF"], "bicycle": [2, "MF"], "revlunge": [2, "MF"], "sideplank": [2, "MF"], "sumo": [1, "MF"], "swimmers": [2, "MFC"], "diamond": [3, "M"]};
+Object.keys(OLDLV).forEach(function (k) { if (EX[k]) { EX[k].lv = OLDLV[k][0]; EX[k].g = OLDLV[k][1]; } });
+ANIMS.mountainslow = { view: 'side', fix: 'w1', fixX: 160, poses: [
+  { t: -18.4, hd: -26, a1: [90, 90], a2: [90, 90], l1: [161.6, 161.6], ft1: 75, l2: [40, 125], ft2: 60, d: 900, h: 150 },
+  { t: -18.4, hd: -26, a1: [90, 90], a2: [90, 90], l2: [161.6, 161.6], ft2: 75, l1: [40, 125], ft1: 60, d: 900, h: 150 }] };
+
+/* progresiones: variantes nuevas al final de cada cadena (no cambian el índice de quien ya avanzó) */
+CHAINS.glute.push({ ex: 'bridgemarch', s: 8, max: 20, st: 2 });
+CHAINS.vjump.push({ ex: 'tuckjump', s: 6, max: 16, st: 2 });
+
+
+
+/* ======================= OBJETIVOS, NIVELES Y PROGRAMAS ======================= */
+var GOALS = {
+  musculo: { n: 'Ganar masa muscular', e: '💪', d: 'Más fuerza y músculo con ejercicios que van subiendo de dificultad.', tag: 'M', rest: 60, days: 4 },
+  forma: { n: 'Mantenerme en forma', e: '⚖️', d: 'Un poco de todo: fuerza, cardio y movilidad para sentirte bien.', tag: 'F', rest: 40, days: 3 },
+  salud: { n: 'Salud y bienestar', e: '❤️', d: 'Bajo impacto, movilidad, postura y energía para el día a día.', tag: 'S', rest: 30, days: 3 },
+  crecer: { n: 'Crecer y postura', e: '🌱', d: 'Estiramientos, postura y fuerza suave para dar lo mejor de ti.', tag: 'C', rest: 40, days: 4 }
+};
+var LEVELS = [
+  { n: 'Principiante', e: '🌱', d: 'Empiezo ahora o hace mucho que no entreno.' },
+  { n: 'Intermedio', e: '💪', d: 'Entreno de vez en cuando y domino lo básico.' },
+  { n: 'Experto', e: '🔥', d: 'Entreno con constancia y busco retos.' }
+];
+/* cada día = lista de [categoría, cuántos ejercicios] */
+var PROG_T = {
+  musculo: [
+    { name: 'Piernas y glúteos', emoji: '🦵', desc: 'Fuerza de piernas y glúteos.', picks: [['Piernas', 4], ['Core', 1]] },
+    { name: 'Pecho, brazos y hombros', emoji: '💪', desc: 'Empuje y brazos.', picks: [['Pecho y brazos', 5], ['Core', 1]] },
+    { name: 'Espalda y core', emoji: '🛡', desc: 'Espalda fuerte y abdomen firme.', picks: [['Espalda', 3], ['Core', 3]] },
+    { name: 'Cuerpo completo', emoji: '⚡', desc: 'Todo el cuerpo con un final de cardio.', picks: [['Piernas', 2], ['Pecho y brazos', 2], ['Core', 1], ['Cardio', 1]] }],
+  forma: [
+    { name: 'Cardio y piernas', emoji: '🏃', desc: 'Corazón y piernas en marcha.', picks: [['Cardio', 3], ['Piernas', 3]] },
+    { name: 'Tren superior y core', emoji: '💪', desc: 'Brazos, espalda y abdomen.', picks: [['Pecho y brazos', 3], ['Core', 2], ['Espalda', 1]] },
+    { name: 'Circuito completo', emoji: '⚡', desc: 'Un poco de todo.', picks: [['Piernas', 2], ['Pecho y brazos', 1], ['Core', 1], ['Cardio', 1], ['Espalda', 1]] },
+    { name: 'Movilidad y core', emoji: '🧘', desc: 'Flexibilidad y abdomen.', picks: [['Movilidad', 2], ['Core', 3], ['Crecer', 1]] }],
+  salud: [
+    { name: 'Cardio suave y movilidad', emoji: '🚶', desc: 'Activa el cuerpo sin impacto.', picks: [['Cardio', 2], ['Movilidad', 3], ['Crecer', 1]] },
+    { name: 'Fuerza suave', emoji: '🦵', desc: 'Piernas, espalda y core con cuidado.', picks: [['Piernas', 2], ['Espalda', 2], ['Core', 2]] },
+    { name: 'Postura y espalda', emoji: '🧍', desc: 'Espalda fuerte y buena postura.', picks: [['Espalda', 3], ['Movilidad', 2], ['Crecer', 1]] },
+    { name: 'Estirar y respirar', emoji: '🌬', desc: 'Relajación y flexibilidad.', picks: [['Crecer', 3], ['Movilidad', 3]] }],
+  crecer: [
+    { name: 'Piernas y saltos', emoji: '🦘', desc: 'Piernas fuertes y ejercicios de impacto controlado.', picks: [['Piernas', 4], ['Cardio', 1], ['Crecer', 1]] },
+    { name: 'Postura y espalda', emoji: '🧍', desc: 'Espalda erguida y hombros abiertos.', picks: [['Espalda', 3], ['Movilidad', 2], ['Crecer', 1]] },
+    { name: 'Estiramientos de columna', emoji: '🌱', desc: 'Alarga y descomprime la columna.', picks: [['Crecer', 4], ['Movilidad', 2]] },
+    { name: 'Core y cardio', emoji: '🔥', desc: 'Abdomen firme y energía.', picks: [['Core', 3], ['Cardio', 2], ['Crecer', 1]] }]
+};
 
 var WARMUP = [{ ex: 'jacks', val: 30 }];
 var COOLDOWN = [{ ex: 'child', val: 30 }, { ex: 'cobra', val: 30 }, { ex: 'reach', val: 20 }, { ex: 'sidebend', val: 30 }, { ex: 'seatedfold', val: 30 }];
