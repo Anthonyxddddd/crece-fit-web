@@ -1,1 +1,1 @@
-{"version": 30, "date": "18/11/2026", "notes": ["Pantalla de entrada: la animación ya no se corta, dura lo suficiente y funciona aunque el teléfono tenga animaciones reducidas"]}
+{"version": 31, "date": "18/11/2026", "notes": ["La entrada de la app ahora toma el color que elegiste", "Entrada más limpia y sin lag: la pantalla se desvanece y el inicio aparece en escalera"]}

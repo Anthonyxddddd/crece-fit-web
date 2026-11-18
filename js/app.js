@@ -1,6 +1,6 @@
 /* Crece Fit — lógica de la app */
 (function () {
-  var SPLASH_HTML = "<div id=\"splash\"><div class=\"sgl\"></div><div class=\"slogo\"><svg class=\"lgo\" viewBox=\"0 0 512 512\" aria-hidden=\"true\">\n<defs>\n<linearGradient id=\"bg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2a1f7a\"/><stop offset=\".55\" stop-color=\"#2b7fe0\"/><stop offset=\"1\" stop-color=\"#22d3ee\"/></linearGradient>\n<radialGradient id=\"gl\" cx=\".28\" cy=\".18\" r=\".8\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".38\"/><stop offset=\".6\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient>\n<linearGradient id=\"ar\" gradientUnits=\"userSpaceOnUse\" x1=\"256\" y1=\"340\" x2=\"256\" y2=\"198\"><stop offset=\"0\" stop-color=\"#7ee33a\"/><stop offset=\"1\" stop-color=\"#d9f99d\"/></linearGradient>\n</defs>\n<rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#bg)\"/>\n<rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#gl)\"/>\n<path class=\"rg\" pathLength=\"1\" d=\"M366.3,181.8 A140,140 0 1 0 366.3,354.2\" fill=\"none\" stroke=\"#fff\" stroke-width=\"58\" stroke-linecap=\"round\"/>\n<g class=\"ar\" fill=\"none\" stroke=\"url(#ar)\" stroke-width=\"44\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M256,336V206\"/><path d=\"M204,254L256,202L308,254\"/></g>\n</svg></div><b class=\"sname\"><span>C</span><span>r</span><span>e</span><span>c</span><span>e</span><span class=\"sp\">&nbsp;</span><span>F</span><span>i</span><span>t</span></b><div class=\"stag\">Entrena · Crece · Sé constante</div></div>";
+  var SPLASH_HTML = "<div id=\"splash\"><div class=\"sgl\"></div><div class=\"slogo\"><svg class=\"lgo\" viewBox=\"0 0 512 512\" aria-hidden=\"true\"><defs><linearGradient id=\"lbg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" class=\"s0\"/><stop offset=\"1\" class=\"s1\"/></linearGradient><radialGradient id=\"lgl\" cx=\".28\" cy=\".18\" r=\".8\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".22\"/><stop offset=\".6\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient><linearGradient id=\"lar\" gradientUnits=\"userSpaceOnUse\" x1=\"256\" y1=\"340\" x2=\"256\" y2=\"198\"><stop offset=\"0\" class=\"a0\"/><stop offset=\"1\" class=\"a1\"/></linearGradient></defs><rect width=\"512\" height=\"512\" rx=\"116\" fill=\"#0c1030\"/><rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#lbg)\"/><rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#lgl)\"/><rect class=\"rim\" x=\"3\" y=\"3\" width=\"506\" height=\"506\" rx=\"113\" fill=\"none\" stroke-width=\"6\"/><path class=\"rg\" pathLength=\"1\" d=\"M366.3,181.8 A140,140 0 1 0 366.3,354.2\" fill=\"none\" stroke-width=\"58\" stroke-linecap=\"round\"/><g class=\"ar\" fill=\"none\" stroke=\"url(#lar)\" stroke-width=\"44\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M256,336V206\"/><path d=\"M204,254L256,202L308,254\"/></g></svg></div><b class=\"sname\"><span>C</span><span>r</span><span>e</span><span>c</span><span>e</span><span class=\"sp\">&nbsp;</span><span>F</span><span>i</span><span>t</span></b><div class=\"stag\">Entrena · Crece · Sé constante</div></div>";
   'use strict';
   var KEY = 'crece.v1';
   var S = null, tab = 'home', calOff = 0, exCat = 'Todos', P = null, figs = [], AC = null;
@@ -1832,12 +1832,16 @@
   if (!S.setup) onboarding();
   (function () {
     var sp = $('#splash'), swapped = false;
-    if (sp && !sp.querySelector('.slogo')) { var t = document.createElement('div'); t.innerHTML = SPLASH_HTML; sp.parentNode.replaceChild(t.firstChild, sp); swapped = true; }
+    if (sp && !sp.querySelector('.s0')) { var t = document.createElement('div'); t.innerHTML = SPLASH_HTML; sp.parentNode.replaceChild(t.firstChild, sp); swapped = true; }
     // la animación dura ~1,9 s desde que se ve el logo: no se corta aunque la app cargue rápido
     var begin = swapped ? performance.now() : Math.min(performance.now(), 250), wait = Math.max(500, begin + 2000 - performance.now());
     setTimeout(function () {
-      var e = $('#splash'); document.body.classList.add('entered');
-      if (e) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); document.body.classList.remove('entered'); }, 850); }
+      // dos frames de espera: la app ya está pintada debajo y la salida no compite con nada
+      requestAnimationFrame(function () { requestAnimationFrame(function () {
+        var e = $('#splash'); document.body.classList.add('entered');
+        if (e) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); }, 460); }
+        setTimeout(function () { document.body.classList.remove('entered'); }, 1100);
+      }); });
     }, wait);
   })();
 })();
