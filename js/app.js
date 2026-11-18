@@ -136,10 +136,12 @@
       var st = stats(), k = lastKeys();
       if (a.updateWidget) a.updateWidget(st.cur, k.any, k.w, rdef(todayRoutineId()).name);
       if (a.updateWidget2) {
-        var ks = Object.keys(S.days).sort().slice(-28), dates = [], fz = [], lv = levelOf(S.xp || 0), x0 = xpAt(lv), x1 = xpAt(lv + 1), acc = '#4aa8ff';
+        var ks = Object.keys(S.days).sort().slice(-62), dates = [], fz = [], lv = levelOf(S.xp || 0), x0 = xpAt(lv), x1 = xpAt(lv + 1), acc = '#4aa8ff';
         ks.forEach(function (d) { if (S.days[d].w > 0) dates.push(d); else if (S.days[d].freeze) fz.push(d); });
         try { var cs = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim(); if (/^#[0-9a-f]{6}$/i.test(cs)) acc = cs; } catch (e) { }
-        a.updateWidget2(JSON.stringify({ dates: dates, fz: fz, goal: S.settings.goal, wc: weekCount(), lvl: lv, xp: Math.round((S.xp - x0) / (x1 - x0) * 100), best: st.best, hbd: S.hb ? hbTodayDone() : 0, hbt: S.hb ? hbActive().length : 0, acc: acc }));
+        a.updateWidget2(JSON.stringify({ dates: dates, fz: fz, goal: S.settings.goal, wc: weekCount(), lvl: lv, xp: Math.round((S.xp - x0) / (x1 - x0) * 100), best: st.best, hbd: S.hb ? hbTodayDone() : 0, hbt: S.hb ? hbActive().length : 0, acc: acc, ln: lvlName(lv),
+          ch: S.chal ? { n: CHALLENGES[S.chal.id].n.replace('Reto de ', '').replace('Reto ', ''), day: chalNext(), d: Object.keys(S.chal.done).filter(function (k) { return S.chal.done[k]; }).map(Number) } : null,
+          hb: S.hb ? hbActive().slice(0, 4).map(function (id) { return { n: hbInfo(id).n, ok: hbDone(today(), id) ? 1 : 0 }; }) : [] }));
       }
       if (a.setReminderPlus) a.setReminderPlus(!!S.settings.risk, JSON.stringify(NOTIF_MSGS));
     } catch (e) { }
@@ -937,7 +939,9 @@
   }
   function widgetCard() {
     var ok = nativeOk('pinWidget2');
-    var W = [['streak', '🔥', 'Racha', 'Tu racha en grande, cuadrado'], ['week', '📅', 'Mi semana', 'Los 7 días y tu meta semanal'], ['today', '🏋️', 'Entrenar hoy', 'Tu rutina y un botón para empezar']];
+    var W = [['streak', '🔥', 'Racha', 'Fondo negro, llama y tu racha en grande'], ['week', '📅', 'Mi semana', 'Los 7 días y tu meta semanal'], ['today', '🏋️', 'Entrenar hoy', 'Tu rutina y un botón para empezar'],
+      ['goal', '🎯', 'Meta semanal', 'Anillo con tus entrenos de la semana'], ['level', '⭐', 'Nivel y XP', 'Tu nivel y lo que falta para el siguiente'], ['habits', '✅', 'Hábitos de hoy', 'Anillo y lista de tus hábitos'],
+      ['month', '🗓', 'Calendario', 'Los días que entrenaste este mes'], ['challenge', '🏆', 'Reto de 30 días', 'Tu avance en el reto activo']];
     return '<div class="card"><b>🧩 Widgets</b><p class="mut small" style="margin:6px 0 4px;line-height:1.5">Ponlos en la pantalla de inicio o búscalos en el apartado de widgets de tu teléfono: mantén pulsado un espacio vacío → Widgets → Crece Fit.</p>' +
       (ok ? W.map(function (w) { return '<div class="set"><div class="sp"><b>' + w[1] + ' ' + w[2] + '</b><div class="mut small">' + w[3] + '</div></div><button class="btn sec sm" style="width:auto;padding:10px 14px" data-a="pinw" data-v="' + w[0] + '">Añadir</button></div>'; }).join('') : '<p class="mut small" style="margin:8px 0 0">Necesitan la última versión del APK.</p>') + '</div>';
   }
