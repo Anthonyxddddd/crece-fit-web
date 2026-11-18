@@ -1,5 +1,6 @@
 /* Crece Fit — lógica de la app */
 (function () {
+  var SPLASH_HTML = "<div id=\"splash\"><div class=\"sgl\"></div><div class=\"slogo\"><svg class=\"lgo\" viewBox=\"0 0 512 512\" aria-hidden=\"true\">\n<defs>\n<linearGradient id=\"bg\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\"><stop offset=\"0\" stop-color=\"#2a1f7a\"/><stop offset=\".55\" stop-color=\"#2b7fe0\"/><stop offset=\"1\" stop-color=\"#22d3ee\"/></linearGradient>\n<radialGradient id=\"gl\" cx=\".28\" cy=\".18\" r=\".8\"><stop offset=\"0\" stop-color=\"#fff\" stop-opacity=\".38\"/><stop offset=\".6\" stop-color=\"#fff\" stop-opacity=\"0\"/></radialGradient>\n<linearGradient id=\"ar\" gradientUnits=\"userSpaceOnUse\" x1=\"256\" y1=\"340\" x2=\"256\" y2=\"198\"><stop offset=\"0\" stop-color=\"#7ee33a\"/><stop offset=\"1\" stop-color=\"#d9f99d\"/></linearGradient>\n</defs>\n<rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#bg)\"/>\n<rect width=\"512\" height=\"512\" rx=\"116\" fill=\"url(#gl)\"/>\n<path class=\"rg\" pathLength=\"1\" d=\"M366.3,181.8 A140,140 0 1 0 366.3,354.2\" fill=\"none\" stroke=\"#fff\" stroke-width=\"58\" stroke-linecap=\"round\"/>\n<g class=\"ar\" fill=\"none\" stroke=\"url(#ar)\" stroke-width=\"44\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M256,336V206\"/><path d=\"M204,254L256,202L308,254\"/></g>\n</svg></div><b class=\"sname\"><span>C</span><span>r</span><span>e</span><span>c</span><span>e</span><span class=\"sp\">&nbsp;</span><span>F</span><span>i</span><span>t</span></b><div class=\"stag\">Entrena · Crece · Sé constante</div></div>";
   'use strict';
   var KEY = 'crece.v1';
   var S = null, tab = 'home', calOff = 0, exCat = 'Todos', P = null, figs = [], AC = null;
@@ -1478,7 +1479,7 @@
   }
   function onboarding() {
     var o = document.createElement('div'); o.className = 'ob'; o.id = 'ob';
-    o.innerHTML = '<div style="text-align:center;font-size:64px">💪</div><div class="title" style="text-align:center;margin:6px 0 4px">Crece Fit</div>' +
+    o.innerHTML = '<div class="oblogo">' + (SPLASH_HTML.match(/<svg[\s\S]*?<\/svg>/) || [''])[0].replace('class="lgo"', 'class="lgo" width="84" height="84"') + '</div><div class="title" style="text-align:center;margin:6px 0 4px">Crece Fit</div>' +
       '<p class="mut" style="text-align:center;line-height:1.45;margin-bottom:18px">Rutinas sin equipo, con tutoriales animados, temporizadores y tu racha diaria.</p>' +
       '<label>¿Cómo te llamas? (opcional)</label><input type="text" id="obn" maxlength="20" placeholder="Tu nombre">' +
       '<label>Tu estatura actual en cm (opcional)</label><input type="number" id="obh" inputmode="decimal" placeholder="Ej. 168">' +
@@ -1829,5 +1830,12 @@
   setTimeout(statsStart, 4500);
   setTimeout(askStats, 9000);
   if (!S.setup) onboarding();
-  setTimeout(function () { var sp = $('#splash'); if (sp) { sp.classList.add('out'); setTimeout(function () { sp.remove(); }, 500); } }, 900);
+  (function () {
+    var sp = $('#splash');
+    if (sp && !sp.querySelector('.slogo')) { var t = document.createElement('div'); t.innerHTML = SPLASH_HTML; sp.parentNode.replaceChild(t.firstChild, sp); }
+    setTimeout(function () {
+      var e = $('#splash'); document.body.classList.add('entered');
+      if (e) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); document.body.classList.remove('entered'); }, 800); }
+    }, 1750);
+  })();
 })();

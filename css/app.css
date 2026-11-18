@@ -187,13 +187,6 @@ input[type=range]{width:100%;accent-color:var(--acc)}
 .view.anim>*:nth-child(4){animation-delay:.12s}.view.anim>*:nth-child(5){animation-delay:.16s}
 .view.anim>*:nth-child(n+6){animation-delay:.2s}
 @keyframes fu{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
-#splash{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity .45s}
-#splash.out{opacity:0;pointer-events:none}
-#splash .lg{font-size:84px;animation:pop .7s ease-out}
-#splash b{font-size:30px;font-weight:900;letter-spacing:-.5px}
-#splash i{width:120px;height:5px;border-radius:9px;background:var(--card2);overflow:hidden;display:block;margin-top:10px}
-#splash i::after{content:"";display:block;height:100%;width:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transform:translateX(-100%);animation:ld 1s ease-out forwards}
-@keyframes ld{to{transform:none}}
 .btn,.mini,.exitem,.tab,.rb,.counter{transition:transform .12s,background .2s}
 .mini:active,.exitem:active{transform:scale(.97)}
 .rbar{display:flex;align-items:flex-end;gap:8px;height:110px;margin-top:8px}
@@ -442,7 +435,6 @@ ul.ing,ol.ing{margin:6px 0 12px;padding-left:20px;line-height:1.55;font-size:14p
 @keyframes glowp{0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb),.45)}50%{box-shadow:0 0 0 10px rgba(var(--acc-rgb),0)}}
 .trophy{animation:trophy 2s ease-in-out infinite}
 @keyframes trophy{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
-#splash .lg{animation:floaty 2.2s ease-in-out infinite}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .fbt i,.bar i,.xpbar i{background-size:200% 100%;animation:flow 3s linear infinite}
 @keyframes flow{to{background-position:-200% 0}}
@@ -503,8 +495,7 @@ html[data-style=glass] .card::before{background:linear-gradient(120deg,rgba(255,
 :root[data-theme=black][data-mode=light]{--acc:#20232d;--acc2:#0b0c10;--acc-rgb:32,35,45;--on-acc:#ffffff}
 :root[data-mode=dark][data-black=on]{--bg:#000;--bg2:#08080b;--card:#111116;--card2:#1b1b22;--line:#25252d;--bd:rgba(255,255,255,.07);--fb-a:#16161c;--fb-b:#0a0a0e}
 :root[data-mode=dark][data-black=on] .tabs{background:#000}
-:root[data-mode=dark][data-black=on] #splash{background:#000}
-.sw2 i[style*="#2a2d36"]{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),inset 0 2px 3px rgba(255,255,255,.2),0 3px 10px rgba(0,0,0,.4)}
+:root[data-mode=dark][data-black=on] .sw2 i[style*="#2a2d36"]{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),inset 0 2px 3px rgba(255,255,255,.2),0 3px 10px rgba(0,0,0,.4)}
 
 /* ===================== MÁS REDONDEADO ===================== */
 :root{--r:28px}
@@ -555,8 +546,7 @@ html[data-perf=low] .card,html[data-perf=low] .mini,html[data-perf=low] .exc,htm
 html[data-perf=low][data-style=glass]{--g-fill:rgba(18,22,52,.62);--g-fill2:rgba(20,24,56,.78)}
 html[data-perf=low][data-style=glass][data-mode=light]{--g-fill:rgba(255,255,255,.8);--g-fill2:rgba(255,255,255,.9)}
 html[data-perf=low] #bgfx i{animation:none}
-html[data-perf=low] .btn::after,html[data-perf=low] .lvl,html[data-perf=low] .trophy,html[data-perf=low] #splash .lg{animation:none!important}
-html[data-perf=low] .pnl>*,html[data-perf=low] .view.anim>*{animation-duration:.2s}
+html[data-perf=low] .btn::after,html[data-perf=low] .lvl,html[data-perf=low] .trophy,html[data-perf=low] html[data-perf=low] .pnl>*,html[data-perf=low] .view.anim>*{animation-duration:.2s}
 html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass] .exc,html[data-style=glass] .stat,html[data-style=glass] .badge,html[data-style=glass] .rcard,html[data-style=glass] .seg2,html[data-style=glass] .dlg,html[data-style=glass] .opt,html[data-style=glass] .hrow,html[data-style=glass] .sw2,html[data-style=glass] .counter,html[data-style=glass] .fb button,html[data-style=glass] .hab,html[data-style=glass] .exitem,html[data-style=glass] .li{-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
 
 /* ===================== MÁS BONITO ===================== */
@@ -695,3 +685,86 @@ button,.tab,.mini,.rcard,.exc,.chip{touch-action:manipulation}
 .hring .p,.fbt i,.bar i,.xpbar i,.pbar i{will-change:stroke-dashoffset,width}
 :root[data-perf=low] .view{scroll-behavior:auto}
 :root[data-perf=low] ::view-transition-old(root),:root[data-perf=low] ::view-transition-new(root){animation:none}
+
+/* ===================== ALINEACIÓN Y LISTAS ===================== */
+.chips{flex-wrap:wrap!important;overflow:visible!important;margin-left:0!important;margin-right:0!important;padding-left:0!important;padding-right:0!important}
+.chip{max-width:100%;white-space:normal;line-height:1.25;text-align:left}
+.chips .chip{flex:0 1 auto}
+.sp,.mt,.hbt,.rt,.ft,.tipc>div,.hero .hg,.row>div{min-width:0}
+.card,.mini,.rcard,.hbr,.hbx,.note,.tip,.li,.frow,.opt,.hrow{overflow-wrap:anywhere;word-break:normal}
+.exl .li{align-items:flex-start}
+.exl .li b{min-width:0;flex:1 1 auto}
+.exl .li span{flex:none;text-align:right;max-width:55%;white-space:normal}
+.set>.sp{min-width:0}
+.sumgrid>div{min-width:0}
+.sumgrid span{overflow-wrap:anywhere}
+#toast{width:max-content;max-width:calc(100% - 40px);white-space:normal;line-height:1.3}
+/* dentro de un recuadro: los elementos se separan con una línea, no con otro cristal */
+html[data-style=glass] .li,html[data-style=glass] .frow,html[data-style=glass] .chk{background:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;border:0!important;border-bottom:1px solid var(--g-line)!important;border-radius:0!important;box-shadow:none!important}
+html[data-style=glass] .li:last-child,html[data-style=glass] .frow:last-child{border-bottom:0!important}
+.li,.frow{border-radius:0}
+/* listas agrupadas: un solo recuadro con líneas entre filas */
+.vlist{display:block;background:var(--card);border:1px solid var(--bd);border-radius:26px;overflow:hidden;margin-bottom:14px}
+.vlist>.mini{background:none!important;border:0!important;border-radius:0!important;box-shadow:none!important;border-bottom:1px solid var(--bd)!important;margin:0!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.vlist>.mini:last-child{border-bottom:0!important}
+html[data-style=glass] .vlist{background:var(--g-fill);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);border:1px solid var(--g-line);box-shadow:inset 0 1px 0 var(--g-hi),var(--g-sh)}
+html[data-style=glass] .vlist>.mini{border-bottom:1px solid var(--g-line)!important}
+html[data-style=glass] .vlist>.mini:last-child{border-bottom:0!important}
+:root[data-mode=light] .vlist{background:#fff}
+.hblist{gap:0;background:var(--card);border:1px solid var(--bd);border-radius:26px;overflow:hidden}
+.hblist .hbr{background:none;border:0;border-radius:0;border-bottom:1px solid var(--bd);box-shadow:none}
+.hblist .hbr:last-child{border-bottom:0}
+.hblist .hbr.on{background:rgba(var(--acc-rgb),.14)}
+html[data-style=glass] .hblist{background:var(--g-fill);-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%);border:1px solid var(--g-line);box-shadow:inset 0 1px 0 var(--g-hi),var(--g-sh)}
+html[data-style=glass] .hblist .hbr{background:none;-webkit-backdrop-filter:none;backdrop-filter:none;border:0;border-bottom:1px solid var(--g-line);box-shadow:none}
+html[data-style=glass] .hblist .hbr:last-child{border-bottom:0}
+
+/* ===================== ENTRADA (SPLASH) ===================== */
+#splash{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 38%,#1d2a78 0,#0e1130 55%,#070914 100%);color:#fff;overflow:hidden;clip-path:circle(150% at 50% 42%)}
+#splash .sgl{position:absolute;left:50%;top:42%;width:132px;height:132px;margin:-66px 0 0 -66px;border-radius:50%;pointer-events:none}
+#splash .sgl::before,#splash .sgl::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid rgba(120,190,255,.55);opacity:0;animation:sring 1.8s ease-out .5s infinite}
+#splash .sgl::after{animation-delay:1.1s}
+@keyframes sring{0%{transform:scale(.8);opacity:.7}100%{transform:scale(3.4);opacity:0}}
+#splash .slogo{width:132px;height:132px;position:relative;filter:drop-shadow(0 18px 40px rgba(43,127,224,.55));animation:slogo .75s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes slogo{from{transform:scale(.55) rotate(-12deg);opacity:0}to{transform:none;opacity:1}}
+#splash .lgo{width:100%;height:100%;display:block;overflow:visible}
+#splash .rg{stroke-dasharray:1;stroke-dashoffset:1;animation:sdraw .9s cubic-bezier(.5,0,.2,1) .25s forwards}
+@keyframes sdraw{to{stroke-dashoffset:0}}
+#splash .ar{transform-box:fill-box;transform-origin:50% 100%;opacity:0;animation:sarrow .6s cubic-bezier(.2,1.5,.4,1) .85s forwards}
+@keyframes sarrow{0%{transform:translateY(46px) scaleY(.5);opacity:0}100%{transform:none;opacity:1}}
+#splash .sname{margin-top:22px;font-size:34px;font-weight:900;letter-spacing:-.5px;display:flex}
+#splash .sname span{display:inline-block;opacity:0;transform:translateY(14px);animation:sletter .45s cubic-bezier(.2,1.2,.4,1) forwards}
+#splash .sname span:nth-child(1){animation-delay:1.0s}#splash .sname span:nth-child(2){animation-delay:1.04s}#splash .sname span:nth-child(3){animation-delay:1.08s}#splash .sname span:nth-child(4){animation-delay:1.12s}#splash .sname span:nth-child(5){animation-delay:1.16s}#splash .sname span:nth-child(6){animation-delay:1.2s}#splash .sname span:nth-child(7){animation-delay:1.24s}#splash .sname span:nth-child(8){animation-delay:1.28s}#splash .sname span:nth-child(9){animation-delay:1.32s}
+@keyframes sletter{to{opacity:1;transform:none}}
+#splash .stag{margin-top:8px;font-size:13px;color:#9aa4d0;font-weight:600;letter-spacing:.4px;opacity:0;animation:sletter .6s ease-out 1.35s forwards}
+/* salida: el círculo se cierra sobre el logo y la app aparece desde dentro */
+#splash.out{animation:siris .7s cubic-bezier(.6,0,.2,1) forwards;pointer-events:none}
+#splash.out .slogo{animation:sgo .7s ease-in forwards}
+@keyframes siris{to{clip-path:circle(0% at 50% 42%)}}
+@keyframes sgo{to{transform:scale(1.5);opacity:0}}
+body.entered #app{animation:appin .75s cubic-bezier(.2,.9,.3,1) both}
+@keyframes appin{from{transform:scale(.93);opacity:0;filter:blur(8px)}to{transform:none;opacity:1;filter:none}}
+:root[data-fx=off] #splash .slogo,:root[data-fx=off] #splash .rg,:root[data-fx=off] #splash .ar,:root[data-fx=off] #splash .sname span,:root[data-fx=off] #splash .stag{animation-duration:.01s!important;animation-delay:0s!important}
+.oblogo{width:84px;height:84px;margin:0 auto 4px;filter:drop-shadow(0 10px 24px rgba(43,127,224,.45));animation:slogo .7s cubic-bezier(.2,1.3,.4,1) both}
+.oblogo .lgo{width:100%;height:100%;display:block}
+
+/* ===================== GLASS OPTIMIZADO ===================== */
+/* Solo las capas fijas (barra inferior, hojas, diálogos) desenfocan; las tarjetas usan cristal "falso" (relleno + brillo), mucho más ligero al hacer scroll */
+html[data-style=glass]{--g-fill:rgba(14,18,46,.5);--g-fill2:rgba(18,22,52,.62)}
+html[data-style=glass][data-mode=light]{--g-fill:rgba(255,255,255,.62);--g-fill2:rgba(255,255,255,.78)}
+html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass] .exc,html[data-style=glass] .stat,html[data-style=glass] .badge,html[data-style=glass] .rcard,html[data-style=glass] .seg2,html[data-style=glass] .opt,html[data-style=glass] .hrow,html[data-style=glass] .sw2,html[data-style=glass] .counter,html[data-style=glass] .fb button,html[data-style=glass] .hab,html[data-style=glass] .exitem,html[data-style=glass] .vlist,html[data-style=glass] .hblist,html[data-style=glass] .hbr,html[data-style=glass] .hbx,html[data-style=glass] .chip,html[data-style=glass] .btn.sec,html[data-style=glass] input,html[data-style=glass] textarea{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-style=glass] .tabs{-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+html[data-style=glass] .sheet{-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);background:var(--g-fill2)}
+html[data-style=glass] .dlg{-webkit-backdrop-filter:blur(14px)!important;backdrop-filter:blur(14px)!important}
+html[data-style=glass] #sheet.on,html[data-style=glass] #modal.on{-webkit-backdrop-filter:none;backdrop-filter:none;background:rgba(4,6,18,.5)}
+html[data-style=glass] #overlay{-webkit-backdrop-filter:none;backdrop-filter:none;background:linear-gradient(160deg,rgba(8,11,27,.96),rgba(20,15,49,.96))}
+html[data-style=glass][data-mode=light] #overlay{background:linear-gradient(160deg,rgba(232,239,255,.97),rgba(244,233,255,.97))}
+/* fondo: degradados fijos (sin filtros) y movimiento solo por transform */
+#bgfx i{opacity:.5}
+html[data-style=glass] .card,html[data-style=glass] .mini{contain:layout paint}
+html[data-style=glass] .card::before{display:none}
+html[data-style=glass] .card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,0) 45%),var(--g-fill)}
+html[data-style=glass][data-mode=light] .card{background:linear-gradient(135deg,rgba(255,255,255,.7),rgba(255,255,255,0) 50%),var(--g-fill)}
+html[data-style=glass] .wcard,html[data-style=glass] .tip,html[data-style=glass] .apkb{background:linear-gradient(135deg,rgba(var(--acc-rgb),.28),var(--g-fill) 75%)}
+html[data-perf=low] #bgfx i{animation:none!important}
+html[data-perf=low][data-style=glass] .tabs,html[data-perf=low][data-style=glass] .sheet,html[data-perf=low][data-style=glass] .dlg{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
