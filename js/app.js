@@ -322,13 +322,14 @@
   function applyTheme() {
     var st = S.settings, root = document.documentElement, mode = st.mode;
     if (mode === 'auto') mode = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
-    root.setAttribute('data-mode', mode); root.setAttribute('data-theme', st.theme); root.setAttribute('data-style', st.style || 'classic'); root.setAttribute('data-fx', st.fx === false ? 'off' : 'on');
+    root.setAttribute('data-mode', mode); root.setAttribute('data-theme', st.theme); root.setAttribute('data-style', st.style || 'classic'); root.setAttribute('data-fx', st.fx === false ? 'off' : 'on'); root.setAttribute('data-black', st.black ? 'on' : 'off');
+    var weak = (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) || (navigator.deviceMemory && navigator.deviceMemory <= 3); root.setAttribute('data-perf', st.perf === 'low' || (st.perf !== 'high' && weak) ? 'low' : 'high');
     ensureBg();
     var cs = getComputedStyle(root), a = cs.getPropertyValue('--acc').trim(), b = cs.getPropertyValue('--acc2').trim();
     var light = mode === 'light';
     window.FigColors = { near: a, dark: b, far: light ? '#9aa4d0' : '#6f7bb5', ground: light ? '#b8c1e6' : '#39406b',
       wall: light ? '#c9d1f0' : '#2a3158', wallLine: light ? '#98a3d4' : '#5d68a8', shadow: light ? 'rgba(0,0,0,.12)' : 'rgba(0,0,0,.28)' };
-    try { if (AND() && AND().bars) AND().bars(light ? '#f1f4ff' : '#0e1120', light); } catch (e) { }
+    try { if (AND() && AND().bars) AND().bars(light ? '#f1f4ff' : (st.black ? '#000000' : '#0e1120'), light); } catch (e) { }
   }
   function accent() { return window.FigColors.near; }
   function say(t) { if (!S.settings.voice) return; try { if (AND() && AND().speak) AND().speak(t); } catch (e) { } }
@@ -725,7 +726,7 @@
   function sw(name) { return '<div class="sw' + (S.settings[name] ? ' on' : '') + '" data-a="tog" data-v="' + name + '"></div>'; }
   /* ---------- AJUSTES: menú con secciones ---------- */
   function setV() { return setSec ? setSection(setSec) : setMenu(); }
-  var THEMES = [['blue', '#4aa8ff', 'Azul'], ['cyan', '#22d3ee', 'Cian'], ['teal', '#2dd4bf', 'Turquesa'], ['green', '#2fcf8a', 'Verde'], ['lime', '#a3e635', 'Lima'], ['yellow', '#facc15', 'Amarillo'], ['gold', '#f5b942', 'Dorado'], ['orange', '#ffa23d', 'Naranja'], ['red', '#ff5d6c', 'Rojo'], ['pink', '#ff6fa8', 'Rosa'], ['magenta', '#e879f9', 'Magenta'], ['purple', '#a78bfa', 'Morado'], ['indigo', '#818cf8', 'Índigo'], ['mint', '#6ee7b7', 'Menta']],
+  var THEMES = [['black', '#2a2d36', 'Negro'], ['blue', '#4aa8ff', 'Azul'], ['cyan', '#22d3ee', 'Cian'], ['teal', '#2dd4bf', 'Turquesa'], ['green', '#2fcf8a', 'Verde'], ['lime', '#a3e635', 'Lima'], ['yellow', '#facc15', 'Amarillo'], ['gold', '#f5b942', 'Dorado'], ['orange', '#ffa23d', 'Naranja'], ['red', '#ff5d6c', 'Rojo'], ['pink', '#ff6fa8', 'Rosa'], ['magenta', '#e879f9', 'Magenta'], ['purple', '#a78bfa', 'Morado'], ['indigo', '#818cf8', 'Índigo'], ['mint', '#6ee7b7', 'Menta']],
     THEME_N = (function () { var o = {}; THEMES.forEach(function (t) { o[t[0]] = t[2]; }); return o; })(), MODE_N = { dark: 'Oscuro', light: 'Claro', auto: 'Automático' };
   function setMenu() {
     var s = S.settings, c = cloudCfg();
@@ -761,6 +762,8 @@
       h += '<div class="card"><b>Color de la app</b><div class="swg">' + THEMES.map(function (c) { return '<button class="sw2' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i><span>' + c[2] + '</span></button>'; }).join('') +
         '</div></div><div class="card"><b>Modo</b><div class="seg" style="margin-top:10px">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
         '<div class="card"><b>Estilo</b><div class="seg" style="margin-top:10px">' + [['classic', '🎴 Clásico'], ['glass', '🫧 Glass líquido']].map(function (m) { return '<button class="' + ((s.style || 'classic') === m[0] ? 'on' : '') + '" data-a="style" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div><p class="mut small" style="margin:10px 0 0">Glass líquido: fondo vivo, cristal translúcido y brillos.</p>' +
+        '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>⚫ Negro puro (OLED)</b><div class="mut small">Fondo negro total en modo oscuro: ahorra batería</div></div>' + sw('black') + '</div>' +
+        '<label>Rendimiento</label>' + seg('perf', [['auto', '🤖 Auto'], ['high', '🚀 Máximo'], ['low', '🔋 Ahorro']], s.perf || 'auto') +
         '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>✨ Animaciones</b><div class="mut small">Transiciones, brillos y efectos</div></div>' + sw('fx') + '</div></div>';
     } else if (k === 'sound') {
       h += '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
@@ -1301,7 +1304,7 @@
       case 'style': S.settings.style = v; save(); applyTheme(); render(); break;
       case 'mode': S.settings.mode = v; save(); applyTheme(); render(); break;
       case 'tog':
-        setBool(v); if (v === 'fx') applyTheme();
+        setBool(v); if (v === 'fx' || v === 'black') applyTheme();
         if (v === 'voice' && S.settings.voice) say('Voz activada');
         if (v === 'stats') { if (S.settings.stats) { statsPing(true); } else statsDelete(); }
         if (v === 'rem' || v === 'risk') { if ((S.settings.rem || S.settings.risk) && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
@@ -1319,7 +1322,7 @@
         catch (e) { toast('Texto no válido'); } break;
       case 'reset':
         dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { statsDelete(); try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
-      case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); render(); break;
+      case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); if (kv[0] === 'perf') applyTheme(); render(); break;
       case 'hab':
         var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); fx.hab = v; render(); fx.hab = null; break;
       case 'slp':

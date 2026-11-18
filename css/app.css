@@ -497,3 +497,64 @@ html[data-style=glass] #bgfx i{opacity:.5}
 html[data-style=glass][data-mode=light] #bgfx i{opacity:.5}
 html[data-style=glass] .sw2{color:var(--txt)}
 html[data-style=glass] .card::before{background:linear-gradient(120deg,rgba(255,255,255,.1),rgba(255,255,255,0) 40%)}
+
+/* ===================== NEGRO ===================== */
+:root[data-theme=black]{--acc:#e8eaf0;--acc2:#a9aebd;--acc-rgb:232,234,240;--on-acc:#0b0c10;--blue:#9ca3af}
+:root[data-theme=black][data-mode=light]{--acc:#20232d;--acc2:#0b0c10;--acc-rgb:32,35,45;--on-acc:#ffffff}
+:root[data-mode=dark][data-black=on]{--bg:#000;--bg2:#08080b;--card:#111116;--card2:#1b1b22;--line:#25252d;--bd:rgba(255,255,255,.07);--fb-a:#16161c;--fb-b:#0a0a0e}
+:root[data-mode=dark][data-black=on] .tabs{background:#000}
+:root[data-mode=dark][data-black=on] #splash{background:#000}
+.sw2 i[style*="#2a2d36"]{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35),inset 0 2px 3px rgba(255,255,255,.2),0 3px 10px rgba(0,0,0,.4)}
+
+/* ===================== MÁS REDONDEADO ===================== */
+:root{--r:28px}
+.btn{border-radius:26px;padding:17px}
+.card,.mini,.exc,.stat,.rcard,.opt,.hrow,.counter,.hab,.badge,.li,.exitem{border-radius:26px}
+.rcard .re{border-radius:18px}
+.mini{border-radius:24px}
+.exc .fig{border-radius:20px}
+.seg2{border-radius:30px;padding:6px}
+.seg2 button{border-radius:24px}
+.seg,.seg button,.fb button{border-radius:20px}
+.sw2{border-radius:22px}
+.swt{border-radius:20px}
+input,textarea,select{border-radius:20px}
+.tabs{border-radius:30px 30px 0 0}
+.tab{border-radius:22px}
+.sheet{border-radius:36px 36px 0 0}
+.dlg{border-radius:34px}
+.pbar,.bar,.xpbar,.fbt{border-radius:99px}
+.wcard,.tip,.apkb,.note,.note2{border-radius:26px}
+.fbt i,.bar i,.xpbar i,.pbar i{border-radius:99px}
+.chip{border-radius:99px}
+.sheet .grab{border-radius:99px}
+html[data-style=glass] .tabs{border-radius:34px}
+.sw{border-radius:99px}
+.cal .d,.pc,.wd .dot{border-radius:50%}
+.back{border-radius:99px}
+.lvl,.big{border-radius:50%}
+
+/* ===================== OPTIMIZACIÓN ===================== */
+/* el fondo del glass sin filtros pesados: degradados radiales */
+#bgfx i{filter:none!important;opacity:.55;will-change:transform;backface-visibility:hidden}
+#bgfx i:nth-child(1){background:radial-gradient(closest-side,var(--acc),transparent)}
+#bgfx i:nth-child(2){background:radial-gradient(closest-side,var(--blue),transparent)}
+#bgfx i:nth-child(3){background:radial-gradient(closest-side,var(--acc2),transparent)}
+/* brillo de botones con transform (sin recalcular layout) */
+.btn:not(.sec):not(.ghost):not(.warn)::after{left:0;width:40%;transform:translateX(-150%) skewX(-20deg);animation:sheen2 4.5s ease-in-out infinite}
+@keyframes sheen2{0%,60%{transform:translateX(-150%) skewX(-20deg)}100%{transform:translateX(420%) skewX(-20deg)}}
+/* sin animaciones infinitas de pintura */
+.fbt i,.bar i,.xpbar i{animation:none;background-size:100% 100%}
+/* listas largas: solo se pinta lo visible */
+.exc,.rcard,.frow,.li{content-visibility:auto;contain-intrinsic-size:auto 84px}
+.card,.mini{contain:layout paint}
+html[data-style=glass] .card,html[data-style=glass] .mini{contain:none}
+.view{will-change:scroll-position}
+/* dispositivos modestos: menos desenfoque y sin efectos continuos */
+html[data-perf=low] .card,html[data-perf=low] .mini,html[data-perf=low] .exc,html[data-perf=low] .stat,html[data-perf=low] .badge,html[data-perf=low] .rcard,html[data-perf=low] .seg2,html[data-perf=low] .dlg,html[data-perf=low] .opt,html[data-perf=low] .hrow,html[data-perf=low] .sw2,html[data-perf=low] .tabs,html[data-perf=low] .sheet,html[data-perf=low] .chip,html[data-perf=low] .btn.sec,html[data-perf=low] input,html[data-perf=low] textarea{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html[data-perf=low][data-style=glass]{--g-fill:rgba(18,22,52,.62);--g-fill2:rgba(20,24,56,.78)}
+html[data-perf=low][data-style=glass][data-mode=light]{--g-fill:rgba(255,255,255,.8);--g-fill2:rgba(255,255,255,.9)}
+html[data-perf=low] #bgfx i{animation:none}
+html[data-perf=low] .btn::after,html[data-perf=low] .lvl,html[data-perf=low] .trophy,html[data-perf=low] #splash .lg{animation:none!important}
+html[data-perf=low] .pnl>*,html[data-perf=low] .view.anim>*{animation-duration:.2s}
+html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass] .exc,html[data-style=glass] .stat,html[data-style=glass] .badge,html[data-style=glass] .rcard,html[data-style=glass] .seg2,html[data-style=glass] .dlg,html[data-style=glass] .opt,html[data-style=glass] .hrow,html[data-style=glass] .sw2,html[data-style=glass] .counter,html[data-style=glass] .fb button,html[data-style=glass] .hab,html[data-style=glass] .exitem,html[data-style=glass] .li{-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}

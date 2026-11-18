@@ -136,11 +136,12 @@
     function frame(now) {
       if (self.stop || !self.svg.isConnected) { return; }
       var a = self.poses[seg % n], b = self.poses[(seg + 1) % n];
-      var el = now - t0, p;
+      var el = now - t0, p, still = false;
       var d = dur((seg + 1) % n), h = hold((seg + 1) % n);
       if (el < d) p = mix(a, b, ease(el / d));
-      else { p = b; if (el > d + h) { seg = (seg + 1) % n; t0 = now; } }
-      self.render(p);
+      else { p = b; still = true; if (el > d + h) { seg = (seg + 1) % n; t0 = now; still = false; } }
+      // ahorro: ~40 fps al moverse y sin redibujar mientras la figura está quieta
+      if (!(still && self.held === seg) && now - (self.last || 0) >= 24) { self.render(p); self.last = now; self.held = still ? seg : -1; }
       self.raf = requestAnimationFrame(frame);
     }
     this.raf = requestAnimationFrame(frame);
