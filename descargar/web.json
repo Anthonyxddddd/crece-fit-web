@@ -1,1 +1,1 @@
-{"version": 32, "date": "18/11/2026", "notes": ["Arreglo: la animación de entrada ahora funciona también con las animaciones desactivadas", "La pantalla de entrada nunca se queda pegada si algo falla al arrancar"]}
+{"version": 33, "date": "18/11/2026", "notes": ["Arreglo definitivo: la animación de entrada se ve aunque tengas las animaciones desactivadas (en la app o en el teléfono)"]}
