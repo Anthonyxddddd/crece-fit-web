@@ -596,3 +596,30 @@ html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass]
 .pname{letter-spacing:-.3px}
 .badge:not(.lock){box-shadow:0 0 0 1px rgba(var(--acc-rgb),.35),0 6px 20px rgba(var(--acc-rgb),.18)}
 .badge:not(.lock) .e{animation:floaty 3s ease-in-out infinite}
+
+/* ===================== ÍCONOS PROPIOS ===================== */
+.ic{display:inline-block;width:1.15em;height:1.15em;vertical-align:-.2em;flex:none;line-height:1;font-style:normal}
+.ic svg{display:block;width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;overflow:visible}
+.ic-dotg svg,.ic-doty svg,.ic-dotr svg,.ic-dotk svg{stroke:none}
+.ic-dotg{color:#34d399}.ic-doty{color:#facc15}.ic-dotr{color:#f87171}.ic-dotk{color:#111}
+.ic-flame{color:#ff8a3d}.ic-flame svg{fill:rgba(255,138,61,.22)}
+.ic-star svg,.ic-trophy svg,.ic-medal svg{fill:rgba(251,191,36,.2)}
+.ic-star,.ic-trophy,.ic-medal,.ic-sun,.ic-bolt{color:#fbbf24}
+.ic-bolt svg{fill:rgba(250,204,21,.25)}
+.ic-heart{color:#ff5d73}.ic-heart svg{fill:rgba(255,93,115,.22)}
+.ic-drop{color:#38bdf8}.ic-snow{color:#7dd3fc}.ic-moon{color:#a5b4fc}
+.ic-sprout,.ic-leaf{color:#4ade80}
+.ic-checkc{color:var(--acc)}
+.ic-target,.ic-rocket,.ic-sparkle,.ic-bubbles,.ic-posture,.ic-dumbbell,.ic-timer{color:var(--acc)}
+.ic-fork,.ic-bowl,.ic-egg,.ic-cheese,.ic-cup,.ic-drumstick,.ic-fruit,.ic-bread,.ic-nut,.ic-avocado,.ic-cookie,.ic-fish{color:rgb(var(--cc,255,170,80))}
+/* tamaños grandes: trazo algo más fino y color de acento */
+.big .ic,.trophy .ic,.rbig .ic,.flame .ic,.re .ic,.e .ic,.lg .ic{stroke-width:1.5}
+.big,.rbig,.re,.lg{color:var(--acc)}
+.trophy .ic{color:#fbbf24}
+.hero .hs .ic,.chip .ic,.kind .ic{width:1.05em;height:1.05em}
+.btn .ic{width:1.1em;height:1.1em}
+.week .dot .ic{width:14px;height:14px;stroke-width:3}
+.wd.done .dot{color:var(--on-acc)}
+.wd.fz .dot .ic{color:#7dd3fc}
+.tabs .ic{width:22px;height:22px}
+.xbtn .ic{width:14px;height:14px}
