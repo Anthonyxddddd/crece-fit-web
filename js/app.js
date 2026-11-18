@@ -22,7 +22,7 @@
 
   /* ---------- estado ---------- */
   function fresh() {
-    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', rem: false, rh: 19, rm: 0,
+    return { setup: false, name: '', settings: { rest: 40, sound: true, vib: true, voice: true, theme: 'blue', mode: 'dark', style: 'classic', fx: true, rem: false, rh: 19, rm: 0,
       goal: 3, warm: 'cardio', cool: 'all', nojump: false, risk: false, hands: false, pace: 2.5 }, recs: {}, exv: {}, profile: null,
       days: {}, chains: {}, total: 0, rot: 0, meas: [], log: [], last: null,
       xp: 0, freeze: { m: '', used: 0 }, habits: {}, custom: [], plan: null, planDone: false, exh: {}, goalsHit: {} };
@@ -315,10 +315,15 @@
   }
 
   /* ---------- tema y voz ---------- */
+  function ensureBg() {
+    var b = document.getElementById('bgfx');
+    if (!b) { b = document.createElement('div'); b.id = 'bgfx'; b.innerHTML = '<i></i><i></i><i></i>'; document.body.insertBefore(b, document.body.firstChild); }
+  }
   function applyTheme() {
     var st = S.settings, root = document.documentElement, mode = st.mode;
     if (mode === 'auto') mode = (window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches) ? 'light' : 'dark';
-    root.setAttribute('data-mode', mode); root.setAttribute('data-theme', st.theme);
+    root.setAttribute('data-mode', mode); root.setAttribute('data-theme', st.theme); root.setAttribute('data-style', st.style || 'classic'); root.setAttribute('data-fx', st.fx === false ? 'off' : 'on');
+    ensureBg();
     var cs = getComputedStyle(root), a = cs.getPropertyValue('--acc').trim(), b = cs.getPropertyValue('--acc2').trim();
     var light = mode === 'light';
     window.FigColors = { near: a, dark: b, far: light ? '#9aa4d0' : '#6f7bb5', ground: light ? '#b8c1e6' : '#39406b',
@@ -720,7 +725,8 @@
   function sw(name) { return '<div class="sw' + (S.settings[name] ? ' on' : '') + '" data-a="tog" data-v="' + name + '"></div>'; }
   /* ---------- AJUSTES: menú con secciones ---------- */
   function setV() { return setSec ? setSection(setSec) : setMenu(); }
-  var THEME_N = { blue: 'Azul', green: 'Verde', purple: 'Morado', orange: 'Naranja', pink: 'Rosa' }, MODE_N = { dark: 'Oscuro', light: 'Claro', auto: 'Automático' };
+  var THEMES = [['blue', '#4aa8ff', 'Azul'], ['cyan', '#22d3ee', 'Cian'], ['teal', '#2dd4bf', 'Turquesa'], ['green', '#2fcf8a', 'Verde'], ['lime', '#a3e635', 'Lima'], ['yellow', '#facc15', 'Amarillo'], ['gold', '#f5b942', 'Dorado'], ['orange', '#ffa23d', 'Naranja'], ['red', '#ff5d6c', 'Rojo'], ['pink', '#ff6fa8', 'Rosa'], ['magenta', '#e879f9', 'Magenta'], ['purple', '#a78bfa', 'Morado'], ['indigo', '#818cf8', 'Índigo'], ['mint', '#6ee7b7', 'Menta']],
+    THEME_N = (function () { var o = {}; THEMES.forEach(function (t) { o[t[0]] = t[2]; }); return o; })(), MODE_N = { dark: 'Oscuro', light: 'Claro', auto: 'Automático' };
   function setMenu() {
     var s = S.settings, c = cloudCfg();
     var rows = [
@@ -752,9 +758,10 @@
         '<label>Velocidad al contar</label>' + seg('pace', [[2, '⚡ Rápido (2 s)'], [2.5, '👍 Normal (2,5 s)'], [3.5, '🐢 Lento (3,5 s)']], s.pace) +
         '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>🤫 Modo sin saltos</b><div class="mut small">Cambia saltos por ejercicios silenciosos</div></div>' + sw('nojump') + '</div></div>';
     } else if (k === 'look') {
-      h += '<div class="card"><b>Color de la app</b><div class="swrow">' +
-        [['blue', '#4aa8ff', 'Azul'], ['green', '#2fcf8a', 'Verde'], ['purple', '#a78bfa', 'Morado'], ['orange', '#ffa23d', 'Naranja'], ['pink', '#ff6fa8', 'Rosa']].map(function (c) { return '<button class="swt' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i>' + c[2] + '</button>'; }).join('') +
-        '</div></div><div class="card"><b>Modo</b><div class="seg" style="margin-top:10px">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>';
+      h += '<div class="card"><b>Color de la app</b><div class="swg">' + THEMES.map(function (c) { return '<button class="sw2' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i><span>' + c[2] + '</span></button>'; }).join('') +
+        '</div></div><div class="card"><b>Modo</b><div class="seg" style="margin-top:10px">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
+        '<div class="card"><b>Estilo</b><div class="seg" style="margin-top:10px">' + [['classic', '🎴 Clásico'], ['glass', '🫧 Glass líquido']].map(function (m) { return '<button class="' + ((s.style || 'classic') === m[0] ? 'on' : '') + '" data-a="style" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div><p class="mut small" style="margin:10px 0 0">Glass líquido: fondo vivo, cristal translúcido y brillos.</p>' +
+        '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>✨ Animaciones</b><div class="mut small">Transiciones, brillos y efectos</div></div>' + sw('fx') + '</div></div>';
     } else if (k === 'sound') {
       h += '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
         '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +
@@ -1259,6 +1266,13 @@
 
   /* ---------- acciones ---------- */
   function setBool(k) { S.settings[k] = !S.settings[k]; save(); }
+  document.addEventListener('pointerdown', function (ev) {
+    if (S && S.settings.fx === false) return;
+    var t = ev.target.closest && ev.target.closest('.btn,.tab,.mini,.rcard,.exc,.chip,.opt,.seg button,.seg2 button,.sw2'); if (!t) return;
+    var r = t.getBoundingClientRect(), d = Math.max(r.width, r.height) * 1.6, e = document.createElement('span');
+    e.className = 'rip'; e.style.cssText = 'width:' + d + 'px;height:' + d + 'px;left:' + (ev.clientX - r.left - d / 2) + 'px;top:' + (ev.clientY - r.top - d / 2) + 'px';
+    t.classList.add('rp'); t.appendChild(e); setTimeout(function () { if (e.parentNode) e.parentNode.removeChild(e); }, 650);
+  }, { passive: true });
   document.addEventListener('click', function (ev) {
     if (ev.target.id === 'sheet') { sheetClose(); return; }
     var t = ev.target.closest('[data-a]'); if (!t) return;
@@ -1284,9 +1298,10 @@
         if (h && (h < 80 || h > 250)) { toast('Revisa la estatura (cm)'); break; }
         S.meas.push({ d: today(), h: h || 0, w: w || 0 }); save(); toast('Medida guardada ✅'); render(); break;
       case 'theme': S.settings.theme = v; save(); applyTheme(); render(); break;
+      case 'style': S.settings.style = v; save(); applyTheme(); render(); break;
       case 'mode': S.settings.mode = v; save(); applyTheme(); render(); break;
       case 'tog':
-        setBool(v);
+        setBool(v); if (v === 'fx') applyTheme();
         if (v === 'voice' && S.settings.voice) say('Voz activada');
         if (v === 'stats') { if (S.settings.stats) { statsPing(true); } else statsDelete(); }
         if (v === 'rem' || v === 'risk') { if ((S.settings.rem || S.settings.risk) && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }

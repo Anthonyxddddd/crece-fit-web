@@ -405,3 +405,95 @@ ul.ing,ol.ing{margin:6px 0 12px;padding-left:20px;line-height:1.55;font-size:14p
 .chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
 .chips::-webkit-scrollbar{display:none}
 .chips button.chip{border:0;font-family:inherit}
+
+/* ===================== MÁS COLORES ===================== */
+:root[data-theme=red]{--acc:#ff5d6c;--acc2:#e0364a;--acc-rgb:255,93,108;--on-acc:#3d0610}
+:root[data-theme=cyan]{--acc:#22d3ee;--acc2:#0ea5c4;--acc-rgb:34,211,238;--on-acc:#02242b}
+:root[data-theme=teal]{--acc:#2dd4bf;--acc2:#14a896;--acc-rgb:45,212,191;--on-acc:#032b26}
+:root[data-theme=lime]{--acc:#a3e635;--acc2:#7cb518;--acc-rgb:163,230,53;--on-acc:#1c2b02}
+:root[data-theme=yellow]{--acc:#facc15;--acc2:#d4a30a;--acc-rgb:250,204,21;--on-acc:#332800}
+:root[data-theme=gold]{--acc:#f5b942;--acc2:#d9962a;--acc-rgb:245,185,66;--on-acc:#33200a}
+:root[data-theme=magenta]{--acc:#e879f9;--acc2:#c24fd6;--acc-rgb:232,121,249;--on-acc:#35073d}
+:root[data-theme=indigo]{--acc:#818cf8;--acc2:#5b63e0;--acc-rgb:129,140,248;--on-acc:#10123d}
+:root[data-theme=mint]{--acc:#6ee7b7;--acc2:#3fc795;--acc-rgb:110,231,183;--on-acc:#05301f}
+.swg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.sw2{display:flex;flex-direction:column;align-items:center;gap:6px;padding:10px 2px 8px;border-radius:14px;background:var(--card2);border:2px solid transparent;font-size:11px;font-weight:700;color:var(--mut);transition:transform .15s,border-color .2s}
+.sw2 i{width:30px;height:30px;border-radius:50%;display:block;box-shadow:inset 0 -3px 6px rgba(0,0,0,.2),inset 0 2px 3px rgba(255,255,255,.35),0 3px 10px rgba(0,0,0,.25)}
+.sw2.on{border-color:var(--acc);color:var(--txt);background:rgba(var(--acc-rgb),.14)}
+.sw2.on i{animation:pop .4s ease-out}
+.sw2:active{transform:scale(.93)}
+
+/* ===================== ANIMACIONES Y PULIDO ===================== */
+.btn,.tab,.mini,.rcard,.exc,.chip,.opt,.seg button,.seg2 button,.hrow,.mslot{transition:transform .15s cubic-bezier(.3,.9,.4,1.2),box-shadow .2s,background .2s,border-color .2s,color .2s}
+.btn:active,.mini:active,.rcard:active,.exc:active,.opt:active,.hrow:active{transform:scale(.97)}
+.tab:active{transform:scale(.9)}
+.rp{position:relative;overflow:hidden}
+.rip{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.55),rgba(255,255,255,0) 70%);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+@keyframes rip{to{transform:scale(1);opacity:0}}
+:root[data-mode=light] .rip{background:radial-gradient(circle,rgba(var(--acc-rgb),.35),rgba(var(--acc-rgb),0) 70%)}
+.btn:not(.sec):not(.ghost):not(.warn){position:relative;overflow:hidden}
+.btn:not(.sec):not(.ghost):not(.warn)::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.35),transparent);transform:skewX(-20deg);animation:sheen 4.5s ease-in-out infinite}
+@keyframes sheen{0%,60%{left:-60%}100%{left:130%}}
+.tab.on .i{display:inline-block;animation:bob .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes bob{0%{transform:translateY(6px) scale(.8)}60%{transform:translateY(-4px) scale(1.2)}100%{transform:none}}
+.pnl>*{animation:fu .38s ease-out both}
+.pnl>*:nth-child(2){animation-delay:.04s}.pnl>*:nth-child(3){animation-delay:.08s}.pnl>*:nth-child(4){animation-delay:.12s}.pnl>*:nth-child(5){animation-delay:.16s}.pnl>*:nth-child(n+6){animation-delay:.2s}
+.lvl{animation:glowp 3s ease-in-out infinite}
+@keyframes glowp{0%,100%{box-shadow:0 0 0 0 rgba(var(--acc-rgb),.45)}50%{box-shadow:0 0 0 10px rgba(var(--acc-rgb),0)}}
+.trophy{animation:trophy 2s ease-in-out infinite}
+@keyframes trophy{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-8px) rotate(4deg)}}
+#splash .lg{animation:floaty 2.2s ease-in-out infinite}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.fbt i,.bar i,.xpbar i{background-size:200% 100%;animation:flow 3s linear infinite}
+@keyframes flow{to{background-position:-200% 0}}
+.sw.on{box-shadow:0 0 12px rgba(var(--acc-rgb),.55)}
+.seg2 button.on,.chip.on{animation:pop .35s ease-out}
+:root[data-fx=off] *,:root[data-fx=off] *::before,:root[data-fx=off] *::after{animation:none!important;transition:none!important}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+
+/* ===================== GLASS LÍQUIDO ===================== */
+#bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;display:none;overflow:hidden}
+#bgfx i{position:absolute;border-radius:50%;filter:blur(60px);opacity:.75;will-change:transform}
+#bgfx i:nth-child(1){width:70vmax;height:70vmax;left:-25vmax;top:-20vmax;background:var(--acc);animation:drift1 22s ease-in-out infinite alternate}
+#bgfx i:nth-child(2){width:60vmax;height:60vmax;right:-25vmax;top:25%;background:var(--blue);animation:drift2 26s ease-in-out infinite alternate}
+#bgfx i:nth-child(3){width:65vmax;height:65vmax;left:-10vmax;bottom:-30vmax;background:var(--acc2);animation:drift3 24s ease-in-out infinite alternate}
+@keyframes drift1{to{transform:translate(25vmax,18vmax) scale(1.15)}}
+@keyframes drift2{to{transform:translate(-22vmax,-12vmax) scale(.9)}}
+@keyframes drift3{to{transform:translate(30vmax,-16vmax) scale(1.2)}}
+:root[data-style=glass] #bgfx{display:block}
+:root[data-style=glass] #app{z-index:1}
+:root[data-style=glass]{--g-fill:rgba(255,255,255,.075);--g-fill2:rgba(255,255,255,.12);--g-line:rgba(255,255,255,.18);--g-hi:rgba(255,255,255,.34);--g-sh:0 12px 34px rgba(0,0,0,.28)}
+:root[data-style=glass][data-mode=light]{--g-fill:rgba(255,255,255,.52);--g-fill2:rgba(255,255,255,.7);--g-line:rgba(255,255,255,.85);--g-hi:rgba(255,255,255,.95);--g-sh:0 10px 30px rgba(40,60,130,.16)}
+html[data-style=glass],html[data-style=glass] body{background:linear-gradient(160deg,#080b1b,#140f31 55%,#081a2c)}
+html[data-style=glass][data-mode=light],html[data-style=glass][data-mode=light] body{background:linear-gradient(160deg,#e8efff,#f4e9ff 55%,#e3f6ff)}
+html[data-style=glass][data-mode=light] #bgfx i{opacity:.5}
+html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass] .exc,html[data-style=glass] .stat,html[data-style=glass] .badge,html[data-style=glass] .rcard,html[data-style=glass] .seg2,html[data-style=glass] .dlg,html[data-style=glass] .opt,html[data-style=glass] .hrow,html[data-style=glass] .sw2,html[data-style=glass] .counter,html[data-style=glass] .fb button,html[data-style=glass] .hab,html[data-style=glass] .exitem,html[data-style=glass] .li{
+  background:var(--g-fill);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);
+  border:1px solid var(--g-line);box-shadow:inset 0 1px 0 var(--g-hi),inset 0 -1px 0 rgba(255,255,255,.04),var(--g-sh)}
+html[data-style=glass] .wcard,html[data-style=glass] .tip,html[data-style=glass] .apkb{background:linear-gradient(135deg,rgba(var(--acc-rgb),.28),var(--g-fill) 75%)}
+html[data-style=glass] .opt.on,html[data-style=glass] .hab.on,html[data-style=glass] .sw2.on,html[data-style=glass] .hrow.on,html[data-style=glass] .fb button.on{background:linear-gradient(135deg,rgba(var(--acc-rgb),.35),var(--g-fill));border-color:rgba(var(--acc-rgb),.7)}
+html[data-style=glass] .tabs{margin:0 12px calc(10px + var(--safe-b));padding:6px;border-radius:28px;border:1px solid var(--g-line);background:var(--g-fill2);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:inset 0 1px 0 var(--g-hi),0 14px 40px rgba(0,0,0,.35)}
+html[data-style=glass] .tab.on{background:rgba(var(--acc-rgb),.2);box-shadow:inset 0 1px 0 var(--g-hi)}
+html[data-style=glass] .sheet{background:var(--g-fill2);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);border:1px solid var(--g-line);border-bottom:0;box-shadow:inset 0 1px 0 var(--g-hi),0 -14px 50px rgba(0,0,0,.4)}
+html[data-style=glass][data-mode=light] .sheet{background:rgba(255,255,255,.75)}
+html[data-style=glass] #sheet.on,html[data-style=glass] #modal.on{background:rgba(5,8,20,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html[data-style=glass] #overlay{background:linear-gradient(160deg,rgba(8,11,27,.82),rgba(20,15,49,.82));-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+html[data-style=glass][data-mode=light] #overlay{background:linear-gradient(160deg,rgba(232,239,255,.85),rgba(244,233,255,.85))}
+html[data-style=glass] .btn:not(.sec):not(.ghost):not(.warn){background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0) 55%),linear-gradient(180deg,var(--acc),var(--acc2));box-shadow:inset 0 1px 0 rgba(255,255,255,.65),inset 0 -2px 6px rgba(0,0,0,.15),0 8px 24px rgba(var(--acc-rgb),.4)}
+html[data-style=glass] .btn.sec{background:var(--g-fill2);border:1px solid var(--g-line);box-shadow:inset 0 1px 0 var(--g-hi);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+html[data-style=glass] .seg2 button.on,html[data-style=glass] .chip.on{background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,0) 60%),linear-gradient(180deg,var(--acc),var(--acc2));box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 4px 14px rgba(var(--acc-rgb),.4)}
+html[data-style=glass] .chip{background:var(--g-fill);border:1px solid var(--g-line)}
+html[data-style=glass] input,html[data-style=glass] textarea{background:var(--g-fill);border:1px solid var(--g-line);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+html[data-style=glass] .exc .fig,html[data-style=glass] .rcard .re{background:rgba(255,255,255,.06)}
+html[data-style=glass] .card,html[data-style=glass] .mini{position:relative}
+html[data-style=glass] .card::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(120deg,rgba(255,255,255,.14),rgba(255,255,255,0) 40%)}
+html[data-style=glass][data-mode=light] .card::before{background:linear-gradient(120deg,rgba(255,255,255,.7),rgba(255,255,255,0) 45%)}
+html[data-style=glass] .fbt,html[data-style=glass] .bar,html[data-style=glass] .xpbar{background:rgba(255,255,255,.1)}
+html[data-style=glass] .swt.on,html[data-style=glass] .seg button.on{background:linear-gradient(135deg,rgba(var(--acc-rgb),.35),var(--g-fill))}
+/* ajuste de contraste del glass (oscuro) */
+html[data-style=glass]{--g-fill:rgba(12,16,40,.36);--g-fill2:rgba(16,20,48,.5);--mut:#c3cbee}
+html[data-style=glass][data-mode=light]{--g-fill:rgba(255,255,255,.52);--g-fill2:rgba(255,255,255,.7);--mut:#4a557f}
+html[data-style=glass] #bgfx i{opacity:.5}
+html[data-style=glass][data-mode=light] #bgfx i{opacity:.5}
+html[data-style=glass] .sw2{color:var(--txt)}
+html[data-style=glass] .card::before{background:linear-gradient(120deg,rgba(255,255,255,.1),rgba(255,255,255,0) 40%)}
