@@ -558,3 +558,41 @@ html[data-perf=low] #bgfx i{animation:none}
 html[data-perf=low] .btn::after,html[data-perf=low] .lvl,html[data-perf=low] .trophy,html[data-perf=low] #splash .lg{animation:none!important}
 html[data-perf=low] .pnl>*,html[data-perf=low] .view.anim>*{animation-duration:.2s}
 html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass] .exc,html[data-style=glass] .stat,html[data-style=glass] .badge,html[data-style=glass] .rcard,html[data-style=glass] .seg2,html[data-style=glass] .dlg,html[data-style=glass] .opt,html[data-style=glass] .hrow,html[data-style=glass] .sw2,html[data-style=glass] .counter,html[data-style=glass] .fb button,html[data-style=glass] .hab,html[data-style=glass] .exitem,html[data-style=glass] .li{-webkit-backdrop-filter:blur(14px) saturate(160%);backdrop-filter:blur(14px) saturate(160%)}
+
+/* ===================== MÁS BONITO ===================== */
+.tab{position:relative}
+.tab .i{width:44px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:99px;transition:background .25s,transform .25s}
+.tab .i svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;transition:transform .25s}
+.tab.on .i{background:rgba(var(--acc-rgb),.2);box-shadow:0 0 18px rgba(var(--acc-rgb),.35)}
+.tab.on .i svg{stroke-width:2.2;transform:scale(1.08)}
+.tab{font-size:11px;letter-spacing:.2px}
+.hero{display:flex;align-items:center;gap:14px;justify-content:space-between;margin-bottom:6px}
+.hero .hs{font-size:13px;font-weight:700;color:var(--mut)}
+.hero .title{font-size:28px}
+.hring{position:relative;width:78px;height:78px;flex:none}
+.hring svg{width:100%;height:100%;transform:rotate(-90deg);filter:drop-shadow(0 0 8px rgba(var(--acc-rgb),.45))}
+.hring circle{fill:none;stroke-width:6;stroke-linecap:round}
+.hring .t{stroke:var(--card2)}
+.hring .p{stroke:var(--acc);transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1);animation:ringin 1.2s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ringin{from{stroke-dashoffset:164}}
+.hring .tx{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.hring .tx b{font-size:17px;font-weight:900;line-height:1}
+.hring .tx span{font-size:10px;color:var(--mut);font-weight:700;margin-top:2px}
+.exc{position:relative;overflow:hidden}
+.exc .fig{background:radial-gradient(circle at 50% 30%,rgba(var(--cc,74,168,255),.28),rgba(var(--cc,74,168,255),.06) 70%),var(--bg2)}
+.exc::after{content:"";position:absolute;left:14px;right:14px;top:0;height:3px;border-radius:0 0 6px 6px;background:rgb(var(--cc,74,168,255));opacity:.9}
+.rcard .re{background:radial-gradient(circle,rgba(var(--cc,74,168,255),.3),rgba(var(--cc,74,168,255),.08));box-shadow:0 0 0 1px rgba(var(--cc,74,168,255),.25)}
+.h2{display:flex;align-items:center;gap:8px}
+.h2::before{content:"";width:4px;height:16px;border-radius:4px;background:linear-gradient(180deg,var(--acc),var(--acc2))}
+.title{letter-spacing:-.4px}
+.card{box-shadow:0 8px 24px rgba(0,0,0,.16)}
+:root[data-mode=light] .card{box-shadow:0 8px 24px rgba(30,45,110,.08)}
+.wcard,.streak{position:relative;overflow:hidden}
+.wcard::after,.streak::after{content:"";position:absolute;width:180px;height:180px;right:-60px;top:-70px;border-radius:50%;background:radial-gradient(circle,rgba(var(--acc-rgb),.35),transparent 70%);pointer-events:none}
+#overlay.on::before{content:"";position:absolute;left:50%;top:18%;width:130vw;height:130vw;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(var(--cc,74,168,255),.2),transparent 62%);pointer-events:none;transition:background .5s}
+#overlay.on>*{position:relative}
+.figbox{background:radial-gradient(circle at 50% 35%,rgba(var(--cc,74,168,255),.18),transparent 70%)}
+.ringwrap svg circle:nth-child(2){filter:drop-shadow(0 0 8px rgba(var(--acc-rgb),.5))}
+.pname{letter-spacing:-.3px}
+.badge:not(.lock){box-shadow:0 0 0 1px rgba(var(--acc-rgb),.35),0 6px 20px rgba(var(--acc-rgb),.18)}
+.badge:not(.lock) .e{animation:floaty 3s ease-in-out infinite}

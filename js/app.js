@@ -473,10 +473,17 @@
   }
 
   /* ---------- pantallas principales ---------- */
+  var TICON = {
+    home: '<svg viewBox="0 0 24 24"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10.5V20h13v-9.5"/><path d="M10 20v-5h4v5"/></svg>',
+    ex: '<svg viewBox="0 0 24 24"><path d="M6.5 6.5v11M17.5 6.5v11M3.5 9v6M20.5 9v6M6.5 12h11"/></svg>',
+    food: '<svg viewBox="0 0 24 24"><path d="M7 3v8a2 2 0 0 0 2 2v8M11 3v8a2 2 0 0 1-2 2M9 3v6"/><path d="M17 21V3c-2.5 1.5-3.5 4.5-3.5 8H17"/></svg>',
+    prog: '<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></svg>',
+    set: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/></svg>'
+  };
   function tabsHTML() {
     var T = [['home', '🏠', 'Inicio'], ['ex', '🏋️', 'Ejercicios'], ['food', '🍽', 'Comida'], ['prog', '📈', 'Progreso'], ['set', '⚙️', 'Ajustes']];
     return '<div class="tabs">' + T.map(function (t) {
-      return '<button class="tab' + (tab === t[0] ? ' on' + (fx.tab ? ' pop' : '') : '') + '" data-a="tab" data-v="' + t[0] + '"><span class="i">' + t[1] + '</span>' + t[2] + '</button>';
+      return '<button class="tab' + (tab === t[0] ? ' on' + (fx.tab ? ' pop' : '') : '') + '" data-a="tab" data-v="' + t[0] + '"><span class="i">' + (TICON[t[0]] || t[1]) + '</span>' + t[2] + '</button>';
     }).join('') + '</div>';
   }
 
@@ -538,7 +545,11 @@
       h += '<div class="card apkb"><div class="row"><div style="font-size:32px">📲</div><div class="sp"><b>' + (apkReq ? 'Necesitas instalar la nueva versión' : 'Nueva versión del APK: v' + esc(apkInfo.version)) + '</b><div class="mut small">' + esc(apkInfo.notes && apkInfo.notes[0] ? apkInfo.notes[0] : 'Descárgala desde la página y instálala encima. No pierdes tu progreso.') + '</div></div></div>' +
         '<div class="row" style="margin-top:12px">' + (apkReq ? '' : '<button class="btn ghost sm sp" data-a="apkno">Después</button>') + '<button class="btn sm sp" data-a="gosite">🌐 Ir a descargar</button></div></div>';
     }
-    h += '<div class="title">¡Hola' + name + '!</div>';
+    var hr = new Date().getHours(), gr = hr < 6 ? ['Buenas noches', '🌙'] : hr < 12 ? ['Buenos días', '☀️'] : hr < 19 ? ['Buenas tardes', '🌤'] : ['Buenas noches', '🌙'];
+    var wc = weekCount(), wg = S.settings.goal, wp = Math.min(1, wc / wg), C = 2 * Math.PI * 26, lv = levelOf(S.xp || 0);
+    h += '<div class="hero"><div class="hg"><div class="hs">' + gr[1] + ' ' + gr[0] + '</div><div class="title" style="margin-top:2px">¡Hola' + name + '!</div>' +
+      '<div class="chips" style="margin-top:8px"><span class="chip on">⭐ Nivel ' + lv + '</span>' + (S.profile ? '<span class="chip">' + GOALS[S.profile.goal].e + ' ' + GOALS[S.profile.goal].n + '</span>' : '') + '</div></div>' +
+      '<div class="hring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" class="t"/><circle cx="32" cy="32" r="26" class="p" style="stroke-dasharray:' + C.toFixed(1) + ';stroke-dashoffset:' + (C * (1 - wp)).toFixed(1) + '"/></svg><div class="tx"><b>' + wc + '/' + wg + '</b><span>semana</span></div></div></div>';
     h += '<div class="card streak sm' + (st.cur ? '' : ' off') + '" style="margin-top:12px"><div class="row"><div class="flame">🔥</div><div class="num">' + st.cur + '</div>' +
       '<div class="sp"><b>' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</b><div class="small" style="color:var(--st-t);font-weight:700">' + msg + '</div></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor</div><b style="font-size:20px">' + st.best + '</b></div></div>' + weekStrip() + '</div>';
@@ -604,9 +615,11 @@
       '<input type="search" id="exq" data-set="exq" placeholder="🔍 Buscar ejercicio…" value="' + esc(exQ) + '" autocomplete="off">' +
       segTabs('ex', PKEYS.ex.map(function (c) { return [c, c]; })) + '<div class="pnl" id="pnl" data-g="ex">' + exPanel(pst.ex) + '</div>';
   }
+  var CATC = { 'Piernas': '74,168,255', 'Pecho y brazos': '255,111,168', 'Core': '255,162,61', 'Espalda': '47,207,138', 'Cardio': '255,93,108', 'Crecer': '163,230,53', 'Movilidad': '167,139,250' };
+  var FTC = { des: '255,190,80', alm: '255,120,90', cen: '140,120,255', snk: '120,220,150', bat: '90,200,255' };
   function exCard(k) {
     var e = EX[k];
-    return '<button class="exc" data-a="ex" data-v="' + k + '"><div class="fig"><svg data-fig="' + k + '"></svg></div><b>' + e.n + '</b><small>' + (e.type === 'time' ? '⏱ Tiempo' : '🔁 Reps') + ' · ' + (LVL_T[e.lv] || '') + (e.grow ? ' · 🌱' : '') + '</small></button>';
+    return '<button class="exc" style="--cc:' + (CATC[e.cat] || '74,168,255') + '" data-a="ex" data-v="' + k + '"><div class="fig"><svg data-fig="' + k + '"></svg></div><b>' + e.n + '</b><small>' + (e.type === 'time' ? '⏱ Tiempo' : '🔁 Reps') + ' · ' + (LVL_T[e.lv] || '') + (e.grow ? ' · 🌱' : '') + '</small></button>';
   }
   function exPanel(cat) {
     var h = '', n = 0, q = norm(exQ.trim());
@@ -821,7 +834,7 @@
   function fTags(t) { return (t.indexOf('E') >= 0 ? '<span class="chip">💰 Económica</span>' : '') + (t.indexOf('R') >= 0 ? '<span class="chip">⚡ Rápida</span>' : '') + (t.indexOf('V') >= 0 ? '<span class="chip">🌿 Vegetariana</span>' : '') + (t.indexOf('S') >= 0 ? '<span class="chip">🧊 Sin cocinar</span>' : ''); }
   function rCard(id) {
     var r = RECIPES[id];
-    return '<button class="rcard" data-a="fview" data-v="' + id + '"><span class="re">' + r[0] + '</span><span class="rt"><b>' + r[1] + '</b><span>' + r[3] + ' kcal · ' + r[4] + ' g prot · ' + r[5] + ' min' + (S.food.fav[id] ? ' · ❤️' : '') + '</span></span><i class="chev">›</i></button>';
+    return '<button class="rcard" style="--cc:' + (FTC[r[2]] || '74,168,255') + '" data-a="fview" data-v="' + id + '"><span class="re">' + r[0] + '</span><span class="rt"><b>' + r[1] + '</b><span>' + r[3] + ' kcal · ' + r[4] + ' g prot · ' + r[5] + ' min' + (S.food.fav[id] ? ' · ❤️' : '') + '</span></span><i class="chev">›</i></button>';
   }
   function foodPanel(k) {
     var f = S.food, h = '';
@@ -1049,6 +1062,7 @@
     if (!st) return finish();
     P.paused = false; P.count = 0; P.beepTick = false; P.sayTick = false;
     if (st.k === 'rest') return showRest(st);
+    try { $('#overlay').style.setProperty('--cc', CATC[EX[st.ex].cat] || '74,168,255'); } catch (e) { }
     var e = EX[st.ex], isTime = st.type === 'time';
     var kind = st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (st.label || 'Estiramiento') : 'Serie ' + st.set + ' de ' + st.sets;
     var html = header() + '<div class="pbody"><div class="kind">' + kind + '</div><div class="pname">' + e.n + '</div>' +
