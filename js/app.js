@@ -43,7 +43,7 @@
     Object.keys(CHAINS).forEach(function (k) { if (!S.chains[k]) S.chains[k] = { i: 0, v: CHAINS[k][0].s }; });
     var f0 = fresh(); ['recs', 'habits', 'exh', 'goalsHit'].forEach(function (k) { if (!S[k]) S[k] = {}; });
     if (!S.cloud) S.cloud = { code: '', auto: true, last: 0 };
-    if (!S.food) S.food = { sex: 'm', age: '', w: '', h: '', act: 2, goal: 'gain', log: {}, fav: {}, done: false }; if (!S.custom) S.custom = []; if (!S.exv) S.exv = {}; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
+    if (!S.chalDone) S.chalDone = []; if (!S.food) S.food = { sex: 'm', age: '', w: '', h: '', act: 2, goal: 'gain', log: {}, fav: {}, done: false }; if (!S.custom) S.custom = []; if (!S.exv) S.exv = {}; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
   }
   function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
@@ -404,6 +404,7 @@
   function warmSet() { var w = S.settings.warm; if (S.settings.nojump && w === 'cardio') w = 'suave'; return WARM_SETS[w] || []; }
   function coolSet() { return COOL_SETS[S.settings.cool] || COOL_SETS.all; }
   function rdef(id) {
+    var cd = chalDef(id); if (cd) return cd;
     if (WORKOUTS[id]) return WORKOUTS[id];
     if (QUICK[id]) return QUICK[id];
     if (id === 'S') return STRETCH_ROUTINE;
@@ -509,7 +510,7 @@
 
   /* ---------- secciones con pestañas (se cambian tocando o deslizando) ---------- */
   var pst = { home: 'hoy', prog: 'resumen', ex: 'Piernas', food: 'plan' }, setSec = null;
-  var PKEYS = { home: ['hoy', 'avance', 'habitos', 'rutinas'], prog: ['resumen', 'calendario', 'medidas', 'nivel', 'logros'], ex: ['Piernas', 'Pecho y brazos', 'Core', 'Espalda', 'Cardio', 'Boxeo', 'Cara', 'Crecer', 'Movilidad'], food: ['plan', 'menu', 'rec', 'ali', 'tip'] };
+  var PKEYS = { home: ['hoy', 'retos', 'avance', 'habitos', 'rutinas'], prog: ['resumen', 'calendario', 'medidas', 'nivel', 'logros'], ex: ['Piernas', 'Pecho y brazos', 'Core', 'Espalda', 'Cardio', 'Boxeo', 'Cara', 'Crecer', 'Movilidad'], food: ['plan', 'menu', 'rec', 'ali', 'tip'] };
   function segTabs(g, items) {
     return '<div class="seg2" data-g="' + g + '">' + items.map(function (it) {
       return '<button class="' + (pst[g] === it[0] ? 'on' : '') + '" data-a="pn" data-v="' + g + ':' + it[0] + '">' + it[1] + '</button>';
@@ -560,7 +561,7 @@
     h += '<div class="card streak sm' + (st.cur ? '' : ' off') + '" style="margin-top:12px"><div class="row"><div class="flame">🔥</div><div class="num">' + st.cur + '</div>' +
       '<div class="sp"><b>' + (st.cur === 1 ? 'día seguido' : 'días seguidos') + '</b><div class="small" style="color:var(--st-t);font-weight:700">' + msg + '</div></div>' +
       '<div style="text-align:right"><div class="mut small">Mejor</div><b style="font-size:20px">' + st.best + '</b></div></div>' + weekStrip() + '</div>';
-    h += segTabs('home', [['hoy', '⚡ Hoy'], ['avance', '⭐ Avance'], ['habitos', '✅ Hábitos'], ['rutinas', '🏋️ Rutinas']]);
+    h += segTabs('home', [['hoy', '⚡ Hoy'], ['retos', '🏆 Retos'], ['avance', '⭐ Avance'], ['habitos', '✅ Hábitos'], ['rutinas', '🏋️ Rutinas']]);
     return h + '<div class="pnl" id="pnl" data-g="home">' + homePanel(pst.home) + '</div>';
   }
   function homePanel(k) {
@@ -583,6 +584,8 @@
           '<div style="margin-top:14px"><button class="btn" data-a="start" data-v="' + id + '">▶ Empezar</button></div>' +
           '<div class="set" style="border:0;padding:12px 0 0"><div class="sp"><b>🙌 Modo manos libres</b><div class="mut small">La voz cuenta y avanza sola</div></div>' + sw('hands') + '</div></div>';
       }
+    } else if (k === 'retos') {
+      h += chalPanel();
     } else if (k === 'avance') {
       var lv = st.lvl, a = xpAt(lv), b = xpAt(lv + 1), wc = weekCount(), g = S.settings.goal;
       h += '<div class="card"><div class="row"><div class="lvl">⭐ ' + lv + '</div><div class="sp"><b>' + lvlName(lv) + '</b><div class="mut small">' + S.xp + ' / ' + b + ' XP</div></div></div>' +
@@ -619,6 +622,47 @@
   var exQ = '';
   function norm(t) { return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   var LVL_T = { 1: '🟢 Fácil', 2: '🟡 Medio', 3: '🔴 Difícil' };
+  /* ---------- retos de 30 días ---------- */
+  var CHAL_ORDER = ['plank', 'push', 'squat', 'abs', 'box', 'face', 'grow'];
+  window.CHAL_N = function () { return S && S.chalDone ? S.chalDone.length : 0; };
+  function chalNext() { var c = S.chal; for (var d = 1; d <= 30; d++) if (!c.done[d]) return d; return 31; }
+  function chalCount() { var n = 0; for (var d = 1; d <= 30; d++) if (S.chal.done[d]) n++; return n; }
+  function chalFinish(id) {
+    var m = /^CH:([a-z]+):(\d+)$/.exec(id), c = S.chal; if (!m || !c || c.id !== m[1]) return { xp: 0, msg: '' };
+    var d = +m[2], first = !c.done[d], xp = 0, msg = '';
+    if (first) { c.done[d] = today(); c.last = today(); xp = 25; msg = 'Reto · Día ' + d + ' de 30 completado (' + chalCount() + '/30)'; }
+    else msg = 'Día ' + d + ' repetido';
+    if (chalCount() >= 30 || (d === 30 && chalCount() >= 28)) {
+      S.chalDone.push({ id: c.id, date: today() }); xp += 150; msg = '¡Reto de 30 días completado! ' + CHALLENGES[c.id].n + ' · +150 XP'; S.chal = null;
+    }
+    return { xp: xp, msg: msg };
+  }
+  function chalPanel() {
+    var h = '', c = S.chal;
+    if (!c) {
+      h += '<p class="mut small" style="margin:0 2px 12px;line-height:1.5">Un reto, un objetivo: 30 días con una rutina corta cada día. Cada séptimo día es de descanso activo y el último día es la prueba final.</p>';
+      h += CHAL_ORDER.map(function (k) {
+        var C = CHALLENGES[k], won = S.chalDone.filter(function (x) { return x.id === k; }).length;
+        return '<div class="card chc" style="--cc:' + C.c + '"><div class="row"><div class="chi">' + C.e + '</div><div class="sp"><b>' + C.n + '</b>' + (won ? ' <span class="tag">×' + won + ' ✓</span>' : '') + '<div class="mut small" style="margin-top:2px">' + C.d + '</div></div></div>' +
+          '<div class="row" style="margin-top:10px"><span class="chip">🎯 ' + C.meta + '</span></div><button class="btn sm" style="margin-top:12px" data-a="chalstart" data-v="' + k + '">Empezar reto</button></div>';
+      }).join('');
+      return h;
+    }
+    var C = CHALLENGES[c.id], n = chalCount(), nx = chalNext(), id = 'CH:' + c.id + ':' + Math.min(nx, 30), def = chalDef(id), today1 = c.last === today();
+    h += '<div class="card wcard chc" style="--cc:' + C.c + '"><div class="row"><div class="chi">' + C.e + '</div><div class="sp"><div class="mut small" style="font-weight:800">RETO DE 30 DÍAS</div><div style="font-size:20px;font-weight:900">' + C.n + '</div></div><div style="text-align:right"><b style="font-size:24px">' + n + '</b><span class="mut small">/30</span></div></div>' +
+      '<div class="xpbar" style="margin-top:12px"><i style="width:' + Math.round(n / 30 * 100) + '%"></i></div></div>';
+    h += '<div class="card"><div class="mut small" style="font-weight:800">' + (today1 ? 'HOY YA HICISTE TU DÍA · MAÑANA TOCA' : 'TOCA HOY') + '</div><div style="font-size:19px;font-weight:900;margin:2px 0 4px">' + def.name + '</div><div class="mut small" style="margin-bottom:12px">' + def.desc + '</div>' +
+      '<div class="exl">' + mainList(id).slice(0, 6).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + (def.rounds.length > 6 ? '<div class="li"><b class="mut">+' + (def.rounds.length - 6) + ' más</b><span></span></div>' : '') + '</div>' +
+      '<button class="btn" style="margin-top:14px" data-a="start" data-v="' + id + '">' + (today1 ? 'Adelantar el día ' + nx : 'Empezar día ' + nx) + '</button>' + (today1 ? '<p class="mut small" style="margin:8px 0 0;text-align:center">Mañana te toca el día ' + nx + '</p>' : '') + '</div>';
+    var cells = '';
+    for (var d = 1; d <= 30; d++) {
+      var dn = !!c.done[d], rest = d % 7 === 0 && d < 30, cur = d === nx;
+      cells += '<button class="chd' + (dn ? ' done' : '') + (cur ? ' cur' : '') + (rest ? ' rest' : '') + '" ' + (dn || cur ? 'data-a="prev" data-v="CH:' + c.id + ':' + d + '"' : 'disabled') + '>' + (dn ? '<i class="ic ic-check"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></i>' : d === 30 ? '<i class="ic ic-trophy"><svg viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0zM12 13v4M8.5 20.5h7"/></svg></i>' : d) + '</button>';
+    }
+    h += '<div class="h2">Tu calendario</div><div class="chgrid">' + cells + '</div><p class="mut small" style="margin:8px 2px 0">Los días rayados son de descanso activo. Si fallas un día, no pasa nada: sigues donde quedaste.</p>';
+    h += '<button class="btn ghost" style="margin-top:16px" data-a="chalquit">Abandonar este reto</button>';
+    return h;
+  }
   function faceBanner() {
     return '<div class="card tipc"><div class="tipe">🧖</div><div><b>Ejercicios de cara y cuello</b><p class="mut small" style="margin:4px 0 8px;line-height:1.45">Dan tono a mejillas, mandíbula y cuello. Ojo: no se puede quemar grasa solo de la cara.</p><div class="row"><button class="btn sm sp" data-a="facerout">Rutinas de cara</button><button class="btn sec sm sp" data-a="faceguide">Guía y mitos</button></div></div></div>';
   }
@@ -844,6 +888,7 @@
     var a = $('#fa'), w = $('#fw'), h = $('#fh');
     if (a) S.food.age = parseFloat(a.value) || ''; if (w) S.food.w = parseFloat(w.value) || ''; if (h) S.food.h = parseFloat(h.value) || '';
   }
+  function switchPanelRefresh2() { var pn = $('#pnl'); if (pn) { destroyFigs(); pn.innerHTML = homePanel(pst.home); } }
   function switchPanelRefresh() { var pn = $('#pnl'); if (pn) { destroyFigs(); pn.innerHTML = foodPanel(pst.food); } }
   function foodV() {
     return '<div class="title">Comida</div><p class="mut small" style="margin:2px 0 10px">Come bien para crecer, ganar peso o mantenerte.</p>' +
@@ -1171,7 +1216,7 @@
 
   function finish() {
     clearTimer(); destroyFigs(); keepAwake(false);
-    var secs = Math.round((Date.now() - P.t0) / 1000), d = today(), id = P.id, light = isLight(id), isQuick = !!QUICK[id];
+    var secs = Math.round((Date.now() - P.t0) / 1000), d = today(), id = P.id, light = isLight(id), isQuick = !!QUICK[id] || /^CH:/.test(id);
     var day = S.days[d] || (S.days[d] = { w: 0, sec: 0, sets: 0 });
     day.w++; day.sec += secs; day.sets += P.sets; delete day.freeze;
     var reps = 0, best = {};
@@ -1201,13 +1246,14 @@
     } else S.last = null;
     // XP, meta semanal y plan
     var gain = light ? 15 : 20 + P.sets * 6 + (isQuick ? 0 : 20), wk = weekKey(), tp = todayPlan();
-    P.goalHit = false; P.planDay = false;
+    P.goalHit = false; P.planDay = false; P.chalMsg = '';
+    if (/^CH:/.test(id)) { var cm = chalFinish(id); gain += cm.xp; P.chalMsg = cm.msg; }
     if (weekCount() >= S.settings.goal && !S.goalsHit[wk]) { S.goalsHit[wk] = 1; gain += 50; P.goalHit = true; }
     if (tp && tp.t !== 'R') { gain += 10; P.planDay = true; }
     if (tp && tp.i >= 27) S.planDone = true;
     var up = addXP(gain); P.xp = { gain: gain, up: up };
     save(); syncReminder(); cloudAuto();
-    statEvent('workout', { r: /^U\d+/.test(id) ? 'U' : id, s: secs, n: P.sets }); statsPing(true);
+    statEvent('workout', { r: /^U\d+/.test(id) ? 'U' : /^CH:/.test(id) ? 'CH' : id, s: secs, n: P.sets }); statsPing(true);
     beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
     summary(secs, light);
   }
@@ -1228,6 +1274,7 @@
       '<p style="text-align:center;margin:8px 0 0;color:var(--mut);line-height:1.4">' + cheer(st.cur) + '</p>' +
       '<div class="card streak" style="margin-top:16px;text-align:center"><div class="flame" style="font-size:44px">🔥</div><div class="num">' + st.cur + '</div><div style="font-weight:800">' + (st.cur === 1 ? 'día de racha' : 'días de racha') + '</div></div>' +
       '<div class="row" style="justify-content:center;flex-wrap:wrap;margin-bottom:6px"><span class="chip on">+' + x.gain + ' XP</span>' + (P.goalHit ? '<span class="chip">🎯 ¡Meta semanal cumplida! +50</span>' : '') + (P.planDay ? '<span class="chip">📅 Día del plan ✓</span>' : '') + '</div>' +
+      (P.chalMsg ? '<div class="note shine" style="text-align:center;font-weight:800">' + P.chalMsg + '</div>' : '') +
       (x.up ? '<div class="note shine" style="text-align:center;font-weight:800">⭐ ¡Subiste al nivel ' + x.up + ': ' + lvlName(x.up) + '!</div>' : '') +
       '<div class="sumgrid"><div><b>' + mmss(secs) + '</b><span>Tiempo</span></div><div><b>' + P.sets + '</b><span>Series</span></div><div><b>' + P.exs + '</b><span>Ejercicios</span></div></div>';
     if (!light && S.last && (S.last.done.length || (S.last.donex || []).length)) {
@@ -1417,6 +1464,8 @@
       case 'obgoal': obGoal = v; Array.prototype.forEach.call(document.querySelectorAll('.gopt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'profopen': profileSheet(); break;
       case 'boxclasses': sheetClasses(); break;
+      case 'chalstart': S.chal = { id: v, start: today(), done: {}, last: '' }; save(); toast('Reto iniciado: ' + CHALLENGES[v].n); switchPanelRefresh2(); break;
+      case 'chalquit': dialog('¿Abandonar el reto?', 'Perderás el progreso de este reto. Tu racha y demás datos no se tocan.', 'Abandonar', function () { S.chal = null; save(); switchPanelRefresh2(); }, true); break;
       case 'facerout': sheetFaceRoutines(); break;
       case 'faceguide': sheetFaceGuide(); break;
       case 'fset': foodRead(); var kv = v.split(':'); S.food[kv[0]] = kv[0] === 'act' ? +kv[1] : kv[1]; save(); S.food.done = false; var pn1 = $('#pnl'); if (pn1) pn1.innerHTML = foodPanel('plan'); break;

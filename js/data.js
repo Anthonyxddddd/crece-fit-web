@@ -812,3 +812,64 @@ var FACE_FACTS = [
   ['camera', 'Ángulo, luz y gestos', 'La cámara cercana, la luz desde arriba y la cabeza agachada engordan la cara. Cámara a la altura de los ojos, luz suave de frente y barbilla ligeramente al frente ayudan.'],
   ['warn', 'Cuidado', 'Evita dietas extremas, pastillas "quemagrasa" y masticar chicle en exceso (puede cansar la mandíbula). Si tienes dolor de mandíbula, chasquidos fuertes o hinchazón repentina de un lado, consulta a un médico o dentista. Si eres menor de edad, evita restringir comida.']
 ];
+
+/* ======================= RETOS DE 30 DÍAS ======================= */
+var CH_COOL = [{ ex: 'child', val: 20 }, { ex: 'reach', val: 15 }];
+var CHALLENGES = {
+  plank: { n: 'Reto de plancha', e: '🧍', c: '255,162,61', d: 'Pasa de 20 segundos a más de 2 minutos de plancha.', meta: 'Plancha de 2+ minutos',
+    gen: function (d) {
+      var v = Math.min(140, 20 + (d - 1) * 4), n = d < 10 ? 2 : 3, r = RR([['plank', v, n]]);
+      if (d >= 15) r.push({ ex: 'sideplank', val: Math.round(v / 3) }, { ex: 'sideplank', val: Math.round(v / 3) });
+      return { desc: n + ' × plancha de ' + v + ' s' + (d >= 15 ? ' + laterales' : ''), rounds: r, rest: 25, warm: false, cool: CH_COOL };
+    } },
+  push: { n: 'Reto de flexiones', e: '💪', c: '255,111,168', d: 'De flexiones de rodillas a hacer series completas.', meta: 'Series de 15–20 flexiones',
+    gen: function (d) {
+      var ex, v;
+      if (d <= 10) { ex = 'kneepush'; v = 5 + d; } else if (d <= 20) { ex = 'pushup'; v = 3 + (d - 10); } else { ex = 'pushup'; v = 8 + Math.round((d - 20) * 1.2); }
+      var r = RR([[ex, v, 3]]); if (d >= 21) r.push({ ex: 'slowpush', val: Math.max(4, v - 4) });
+      return { desc: '3 × ' + v + ' ' + EX[ex].n.toLowerCase(), rounds: r, rest: 40, warm: false, cool: CH_COOL };
+    } },
+  squat: { n: 'Reto de sentadillas', e: '🦵', c: '74,168,255', d: 'Piernas y glúteos más fuertes en 30 días.', meta: '3 × 40 sentadillas',
+    gen: function (d) {
+      var v = 10 + Math.round((d - 1) * 1), r = RR([['squat', v, 3]]);
+      if (d >= 12) r.push({ ex: 'splitsquat', val: Math.round(v / 2) }, { ex: 'splitsquat', val: Math.round(v / 2) });
+      if (d >= 24) r.push({ ex: 'jumpsquat', val: 8 });
+      return { desc: '3 × ' + v + ' sentadillas' + (d >= 12 ? ' + zancadas' : ''), rounds: r, rest: 35, warm: false, cool: CH_COOL };
+    } },
+  abs: { n: 'Reto de abdomen', e: '🛡', c: '255,190,80', d: 'Un poco cada día para un core firme.', meta: 'Core fuerte y estable',
+    gen: function (d) {
+      var L = [['crunch', 12], ['legraise', 8], ['bicycle', 14], ['reversecrunch', 10], ['russian', 14], ['situp', 10]], a = L[d % L.length], b = L[(d + 3) % L.length], k = Math.floor(d / 5);
+      var r = RR([[a[0], a[1] + k * 2, 3], [b[0], b[1] + k * 2, 2]]); r.push({ ex: 'plank', val: 20 + d, });
+      return { desc: EX[a[0]].n + ' + ' + EX[b[0]].n + ' + plancha', rounds: r, rest: 25, warm: false, cool: CH_COOL };
+    } },
+  face: { n: 'Reto de cara y cuello', e: '🧖', c: '255,190,120', d: 'Un poco cada día frente al espejo, con constancia.', meta: 'Hábito diario de cara',
+    gen: function (d) {
+      var key = ['F1', 'F2', 'F3'][d % 3], q = QUICK[key];
+      return { desc: q.name.replace('Cara · ', ''), rounds: q.rounds, rest: q.rest, warm: false, cool: [] };
+    } },
+  box: { n: 'Reto de boxeo', e: '🥊', c: '255,93,108', d: 'Cuatro semanas: fundamentos, combos, cardio y experto.', meta: 'Combos completos con ritmo',
+    gen: function (d) {
+      var key = d <= 7 ? 'CL1' : d <= 14 ? 'CL2' : d <= 21 ? 'CL3' : (d % 2 ? 'CL4' : 'CL5'), q = QUICK[key];
+      return { desc: q.name.replace('Clase ', 'Clase '), rounds: q.rounds, rest: q.rest, warm: q.warm, cool: q.cool };
+    } },
+  grow: { n: 'Reto de postura y estatura', e: '🌱', c: '163,230,53', d: 'Estiramientos, columna y postura cada día.', meta: 'Postura y flexibilidad',
+    gen: function (d) {
+      var A = [['reach', 25], ['cobra', 30], ['catcow', 30], ['child', 30], ['wallangel', 10], ['sidebend', 25]], B = [['hamstringstand', 25], ['seatedfold', 30], ['quadstretch', 25], ['hipflexor', 25], ['butterfly', 30], ['backrock', 25]], o = [];
+      for (var i = 0; i < 4; i++) { var s = (i % 2 ? B : A)[(d + i * 2) % 6]; o.push({ ex: s[0], val: s[1] + Math.floor(d / 6) * 3 }); }
+      o.push({ ex: 'superman', val: 8 + Math.floor(d / 4) }, { ex: 'birddog', val: 8 });
+      return { desc: 'Estiramientos, postura y fuerza suave', rounds: o, rest: 10, warm: false, cool: [] };
+    } }
+};
+function chalDef(id) {
+  var m = /^CH:([a-z]+):(\d+)$/.exec(id); if (!m || !CHALLENGES[m[1]]) return null;
+  var C = CHALLENGES[m[1]], d = +m[2], base;
+  if (d % 7 === 0 && d < 30) base = { desc: 'Estira y recupera: también cuenta para el reto.', rounds: RR([['child', 30], ['cobra', 30], ['catcow', 30], ['reach', 20]]), rest: 8, warm: false, cool: [], rl: 'Estiramiento' };
+  else base = C.gen(d);
+  base.name = 'Día ' + d + ' de 30 · ' + C.n.replace('Reto de ', '');
+  base.emoji = d % 7 === 0 && d < 30 ? '🛌' : d === 30 ? '🏆' : C.e;
+  base.level = d % 7 === 0 && d < 30 ? 'Descanso' : d === 30 ? 'Día final' : '';
+  if (d === 30) base.desc = '¡Último día! ' + base.desc;
+  base.chal = m[1]; base.day = d;
+  return base;
+}
+BADGES.push({ id: 'chal1', e: '🏆', n: 'Reto de 30 días', f: function () { return (window.CHAL_N ? window.CHAL_N() : 0) >= 1; } });

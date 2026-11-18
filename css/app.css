@@ -623,3 +623,14 @@ html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass]
 .wd.fz .dot .ic{color:#7dd3fc}
 .tabs .ic{width:22px;height:22px}
 .xbtn .ic{width:14px;height:14px}
+
+/* ===================== RETOS ===================== */
+.chc{border-color:rgba(var(--cc,74,168,255),.35)}
+.chc .chi{width:48px;height:48px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;flex:none;background:radial-gradient(circle,rgba(var(--cc,74,168,255),.32),rgba(var(--cc,74,168,255),.08));color:rgb(var(--cc,74,168,255))}
+.chgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+.chd{aspect-ratio:1;border-radius:16px;background:var(--card2);color:var(--mut);font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;border:2px solid transparent}
+.chd:disabled{opacity:.45}
+.chd.rest{background:repeating-linear-gradient(135deg,var(--card2),var(--card2) 6px,transparent 6px,transparent 12px)}
+.chd.done{background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on-acc);box-shadow:0 4px 12px rgba(var(--acc-rgb),.3)}
+.chd.cur{border-color:var(--acc);color:var(--txt);animation:todayp 2s ease-in-out infinite}
+.chd .ic{width:16px;height:16px;stroke-width:3}
