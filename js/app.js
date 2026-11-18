@@ -43,10 +43,14 @@
     Object.keys(CHAINS).forEach(function (k) { if (!S.chains[k]) S.chains[k] = { i: 0, v: CHAINS[k][0].s }; });
     var f0 = fresh(); ['recs', 'habits', 'exh', 'goalsHit'].forEach(function (k) { if (!S[k]) S[k] = {}; });
     if (!S.cloud) S.cloud = { code: '', auto: true, last: 0 };
-    if (!S.chalDone) S.chalDone = []; if (!S.food) S.food = { sex: 'm', age: '', w: '', h: '', act: 2, goal: 'gain', log: {}, fav: {}, done: false }; if (!S.custom) S.custom = []; if (!S.exv) S.exv = {}; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
+    if (!S.chalDone) S.chalDone = []; hbInit(); if (!S.food) S.food = { sex: 'm', age: '', w: '', h: '', act: 2, goal: 'gain', log: {}, fav: {}, done: false }; if (!S.custom) S.custom = []; if (!S.exv) S.exv = {}; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+  var saveT = 0;
+  function saveNow() { saveT = 0; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+  function save() { if (!saveT) saveT = setTimeout(saveNow, 160); }
+  window.addEventListener('pagehide', function () { if (saveT) { clearTimeout(saveT); saveNow(); } });
+  document.addEventListener('visibilitychange', function () { if (document.hidden && saveT) { clearTimeout(saveT); saveNow(); } });
 
   function levelOf(xp) { return Math.floor(Math.sqrt(xp / 60)) + 1; }
   function xpAt(l) { return 60 * (l - 1) * (l - 1); }
@@ -518,10 +522,14 @@
   }
   function panelHTML(g) { return g === 'food' ? foodPanel(pst.food) : g === 'home' ? homePanel(pst.home) : g === 'prog' ? progPanel(pst.prog) : exPanel(pst.ex); }
   function mountThumbs() {
-    Array.prototype.forEach.call(document.querySelectorAll('svg[data-fig]'), function (el) {
+    var list = Array.prototype.slice.call(document.querySelectorAll('svg[data-fig]')), i = 0;
+    function one(el) {
+      if (!el.isConnected || el.firstChild) return;
       var a = ANIMS[EX[el.getAttribute('data-fig')].anim];
       new Fig(el, Object.assign({}, a, { poses: [a.poses[a.poses.length > 1 ? 1 : 0]] }), { still: true });
-    });
+    }
+    list.slice(0, 8).forEach(one); i = 8;
+    (function chunk() { var n = 0; while (i < list.length && n < 4) { one(list[i++]); n++; } if (i < list.length) requestAnimationFrame(chunk); })();
   }
   function switchPanel(g, key) {
     var ks = PKEYS[g], from = ks.indexOf(pst[g]), to = ks.indexOf(key), el = $('#pnl');
@@ -537,6 +545,7 @@
     el.classList.remove('sl', 'sr'); el.innerHTML = panelHTML(g); void el.offsetWidth; el.classList.add(to >= from ? 'sl' : 'sr');
     $('#view').scrollTop = 0;
     mountThumbs();
+    Array.prototype.forEach.call(document.querySelectorAll('.sumgrid b'), function (b) { if (/^\d+$/.test(b.textContent)) countUp(b, +b.textContent); });
   }
 
   /* ---------- INICIO ---------- */
@@ -597,13 +606,7 @@
       h += '<button class="mini" data-a="planopen" style="width:100%;margin-bottom:12px"><span class="e">📅</span><span class="mt"><b>Plan de 4 semanas</b><span>' + (tp ? 'Día ' + (tp.i + 1) + ' de 28' : 'Calendario listo para empezar') + '</span></span><i class="chev">›</i></button>';
       h += '<div class="card tip"><div class="mut small" style="font-weight:800;color:var(--acc)">💡 CONSEJO DEL DÍA</div><p style="margin-top:6px;line-height:1.45">' + TIPS[dnum(today()) % TIPS.length] + '</p></div>';
     } else if (k === 'habitos') {
-      var hb = S.habits[today()] || { w: 0, p: 0, s: 0, sl: 0 }, hc = habCount(hb);
-      h += '<div class="card"><div class="row"><b>✅ Hábitos para crecer</b><div class="sp"></div><span class="mut small">' + hc + '/4 hoy</span></div>' +
-        [['w', '💧', 'Agua (8 vasos)'], ['p', '🥩', 'Proteína'], ['s', '☀️', 'Sol 10 min']].map(function (x) {
-          return '<button class="hrow' + (hb[x[0]] ? ' on' : '') + (fx.hab === x[0] ? ' bn' : '') + '" data-a="hab" data-v="' + x[0] + '"><span class="e">' + x[1] + '</span><b>' + x[2] + '</b><i class="ck">✓</i></button>';
-        }).join('') +
-        '<div class="hrow' + (hb.sl >= 8 ? ' on' : '') + '" style="cursor:default"><span class="e">😴</span><b>Sueño</b><span class="sp"></span><button class="stp" data-a="slp" data-v="-1">−</button><b style="min-width:46px;text-align:center">' + (hb.sl ? hb.sl + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div></div>' +
-        '<p class="mut small" style="padding:0 4px;line-height:1.5">Completar los 4 hábitos del día da +15 XP. Dormir 8–10 horas ayuda a crecer. 😴</p>';
+      h += hbPanel();
     } else {
       h += '<div class="grid2">';
       ORDER.forEach(function (r) { h += mini(r, WORKOUTS[r].emoji, WORKOUTS[r].name, 'Rutina ' + r); });
@@ -622,6 +625,128 @@
   var exQ = '';
   function norm(t) { return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   var LVL_T = { 1: '🟢 Fácil', 2: '🟡 Medio', 3: '🔴 Difícil' };
+
+  /* ---------- HÁBITOS ---------- */
+  var hbView = 'hoy', hbCat = 'Cuerpo';
+  function hbInit() {
+    if (S.hb) return;
+    var hb = { act: ['water', 'protein', 'sun', 'sleep'], custom: [], log: {} };
+    Object.keys(S.habits || {}).forEach(function (d) {
+      var o = S.habits[d], l = {}; if (o.w) l.water = 1; if (o.p) l.protein = 1; if (o.s) l.sun = 1; hb.log[d] = l;
+    });
+    S.hb = hb;
+  }
+  function hbInfo(id) {
+    if (HABITS[id]) { var h = HABITS[id]; return { id: id, e: h[0], n: h[1], cat: h[2], why: h[3], how: h[4], sleep: h[5] === 's' }; }
+    for (var i = 0; i < S.hb.custom.length; i++) if (S.hb.custom[i].id === id) { var c = S.hb.custom[i]; return { id: id, e: c.e, n: c.n, cat: c.cat || 'Disciplina', why: 'Un hábito creado por ti.', how: 'Hazlo siempre a la misma hora y en el mismo lugar.', custom: true }; }
+    return null;
+  }
+  function hbDone(d, id) {
+    if (id === 'sleep') return !!(S.habits[d] && S.habits[d].sl >= 8);
+    return !!(S.hb.log[d] && S.hb.log[d][id]);
+  }
+  function hbActive() { return S.hb.act.filter(function (id) { return hbInfo(id); }); }
+  function hbStreak(id) {
+    var n = 0, k = dnum(today()); if (!hbDone(today(), id)) k--;
+    while (hbDone(nstr(k), id) && n < 1000) { n++; k--; }
+    return n;
+  }
+  function hbBest(id) {
+    var best = 0, cur = 0, now = dnum(today()), i;
+    for (i = 120; i >= 0; i--) { if (hbDone(nstr(now - i), id)) { cur++; if (cur > best) best = cur; } else cur = 0; }
+    return best;
+  }
+  function hbRate(id, days) { var n = 0, i, now = dnum(today()); for (i = 0; i < days; i++) if (hbDone(nstr(now - i), id)) n++; return Math.round(n / days * 100); }
+  function hbDayPct(d) { var a = hbActive(); if (!a.length) return 0; var n = 0; a.forEach(function (id) { if (hbDone(d, id)) n++; }); return n / a.length; }
+  function hbTodayDone() { var a = hbActive(), n = 0; a.forEach(function (id) { if (hbDone(today(), id)) n++; }); return n; }
+  function hbXP() {
+    var a = hbActive(), h = hab();
+    if (a.length >= 3 && hbTodayDone() === a.length && !h.xp) { h.xp = 1; var up = addXP(15); toast('✅ ¡Hábitos del día completos! +15 XP' + (up ? ' · ⭐ nivel ' + up : '')); }
+  }
+  function hbPerfect() { var n = 0, i, now = dnum(today()); for (i = 0; i < 28; i++) { var k = nstr(now - i), a = hbActive(); if (a.length && hbDayPct(k) === 1) n++; } return n; }
+  function hbRecommended() {
+    var g = S.profile ? S.profile.goal : 'forma', out = HPACKS.filter(function (p) { return p.goals.indexOf(g) >= 0; });
+    return out.length ? out : [HPACKS[0]];
+  }
+  function hbRow(id) {
+    var i = hbInfo(id), d = today(), done = hbDone(d, id), st = hbStreak(id);
+    if (i.sleep) {
+      var hs = (S.habits[d] && S.habits[d].sl) || 0;
+      return '<div class="hbr' + (done ? ' on' : '') + '"><button class="hbi" data-a="hbi" data-v="' + id + '"><span class="e">' + i.e + '</span><span class="hbt"><b>' + i.n + '</b><span>' + (st ? '<i class="ic ic-flame"><svg viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4.2.2 1.200.9 2 1.700 2.200C10.200 8.500 10.500 5.500 12 3z"/></svg></i> ' + st + ' días · ' : '') + 'Mínimo 8 h</span></span></button>' +
+        '<button class="stp" data-a="slp" data-v="-1">−</button><b class="hbh">' + (hs ? hs + ' h' : '— h') + '</b><button class="stp" data-a="slp" data-v="1">+</button></div>';
+    }
+    return '<div class="hbr' + (done ? ' on' : '') + (fx.hab === id ? ' bn' : '') + '"><button class="hbi" data-a="hbi" data-v="' + id + '"><span class="e">' + i.e + '</span><span class="hbt"><b>' + i.n + '</b><span>' + (st ? '🔥 ' + st + (st === 1 ? ' día' : ' días') : i.cat) + '</span></span></button>' +
+      '<button class="hbc" data-a="hbt" data-v="' + id + '" aria-label="Marcar"><i class="ck">✓</i></button></div>';
+  }
+  function hbPanel() {
+    var h = '', V = [['hoy', 'Hoy'], ['exp', 'Explorar'], ['disc', 'Disciplina'], ['stat', 'Estadísticas']];
+    h += '<div class="chips" style="margin-bottom:12px">' + V.map(function (v) { return '<button class="chip' + (hbView === v[0] ? ' on' : '') + '" data-a="hbv" data-v="' + v[0] + '">' + v[1] + '</button>'; }).join('') + '</div>';
+    if (hbView === 'hoy') {
+      var a = hbActive(), n = hbTodayDone(), pc = a.length ? n / a.length : 0, C = 2 * Math.PI * 26;
+      if (!a.length) {
+        h += '<div class="card"><b>Aún no tienes hábitos</b><p class="mut small" style="margin:4px 0 12px;line-height:1.5">Elige una de estas colecciones o explora la lista completa. Empieza con 2 o 3: menos es más.</p>' + hbPackCards(hbRecommended()) + '<button class="btn ghost sm" style="margin-top:8px" data-a="hbv" data-v="exp">Ver todos los hábitos</button></div>';
+        return h;
+      }
+      h += '<div class="card wcard"><div class="row"><div class="hring"><svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" class="t"/><circle cx="32" cy="32" r="26" class="p" style="stroke-dasharray:' + C.toFixed(1) + ';stroke-dashoffset:' + (C * (1 - pc)).toFixed(1) + '"/></svg><div class="tx"><b>' + n + '/' + a.length + '</b><span>hoy</span></div></div>' +
+        '<div class="sp"><b style="font-size:18px">' + (pc === 1 ? '¡Día perfecto!' : pc >= 0.5 ? 'Vas muy bien' : n ? 'Buen comienzo' : 'Empieza con uno pequeño') + '</b><div class="mut small" style="margin-top:3px;line-height:1.4">' + (pc === 1 ? 'Cumpliste todos tus hábitos de hoy. +15 XP' : 'Completa tus hábitos para ganar +15 XP.') + '</div></div></div></div>';
+      h += '<div class="hblist">' + a.map(hbRow).join('') + '</div>';
+      h += '<div class="row" style="margin-top:12px"><button class="btn sec sm sp" data-a="hbv" data-v="exp">Añadir hábitos</button><button class="btn ghost sm sp" data-a="hbnew">Crear el mío</button></div>';
+      var hid = a[dnum(today()) % a.length], inf = hbInfo(hid);
+      h += '<div class="card tip" style="margin-top:14px"><div class="mut small" style="font-weight:800;color:var(--acc)">💡 CÓMO LOGRARLO · ' + inf.n.toUpperCase() + '</div><p style="margin-top:6px;line-height:1.45">' + inf.how + '</p></div>';
+      h += '<div class="card tip"><div class="mut small" style="font-weight:800;color:var(--acc)">🎯 RETO DE DISCIPLINA DE LA SEMANA</div><p style="margin-top:6px;line-height:1.45">' + DISC_WEEK[Math.floor(dnum(today()) / 7) % DISC_WEEK.length] + '</p></div>';
+    } else if (hbView === 'exp') {
+      var rec = hbRecommended();
+      h += '<div class="h2">Recomendado para ti</div>' + hbPackCards(rec);
+      h += '<div class="h2">Todas las colecciones</div>' + hbPackCards(HPACKS.filter(function (p) { return rec.indexOf(p) < 0; }));
+      h += '<div class="h2">Biblioteca de hábitos</div><div class="chips" style="margin-bottom:10px">' + HCATS.map(function (c) { return '<button class="chip' + (hbCat === c ? ' on' : '') + '" data-a="hbcat" data-v="' + c + '">' + c + '</button>'; }).join('') + '</div>';
+      h += Object.keys(HABITS).filter(function (id) { return HABITS[id][2] === hbCat; }).map(function (id) {
+        var i = hbInfo(id), on = S.hb.act.indexOf(id) >= 0;
+        return '<div class="hbx"><button class="hbi" data-a="hbi" data-v="' + id + '"><span class="e">' + i.e + '</span><span class="hbt"><b>' + i.n + '</b><span>' + i.why + '</span></span></button><button class="hba' + (on ? ' on' : '') + '" data-a="' + (on ? 'hbrm' : 'hbadd') + '" data-v="' + id + '" aria-label="' + (on ? 'Quitar' : 'Añadir') + '">' + (on ? '✓' : '+') + '</button></div>';
+      }).join('');
+      h += '<button class="btn ghost" style="margin-top:12px" data-a="hbnew">Crear un hábito propio</button>';
+    } else if (hbView === 'disc') {
+      h += '<div class="card wcard"><div class="mut small" style="font-weight:800">RETO DE LA SEMANA</div><div style="font-size:18px;font-weight:900;line-height:1.3;margin-top:6px">' + DISC_WEEK[Math.floor(dnum(today()) / 7) % DISC_WEEK.length] + '</div></div>';
+      h += '<p class="mut small" style="margin:0 2px 10px;line-height:1.5">La disciplina se entrena como un músculo. Estas ideas funcionan de verdad:</p>';
+      h += DISC.map(function (d) { return '<div class="card tipc" style="margin-bottom:10px"><div class="tipe">' + d[0] + '</div><div><b>' + d[1] + '</b><p class="mut small" style="margin:4px 0 8px;line-height:1.45">' + d[2] + '</p><div class="chip">Hazlo hoy: ' + d[3] + '</div></div></div>'; }).join('');
+    } else {
+      var a2 = hbActive(), now = dnum(today()), cells = '', i;
+      if (!a2.length) return h + '<p class="mut">Añade hábitos para ver tus estadísticas.</p>';
+      for (i = 27; i >= 0; i--) { var k = nstr(now - i), p = hbDayPct(k); cells += '<div class="hmc l' + (p === 0 ? 0 : p < 0.5 ? 1 : p < 1 ? 2 : 3) + (i === 0 ? ' td' : '') + '" title="' + k + '"></div>'; }
+      var r7 = 0, r28 = 0; for (i = 0; i < 7; i++) r7 += hbDayPct(nstr(now - i)); for (i = 0; i < 28; i++) r28 += hbDayPct(nstr(now - i));
+      h += '<div class="sumgrid"><div><b>' + hbPerfect() + '</b><span>Días perfectos (28 d)</span></div><div><b>' + Math.round(r7 / 7 * 100) + '%</b><span>Últimos 7 días</span></div><div><b>' + Math.round(r28 / 28 * 100) + '%</b><span>Últimos 28 días</span></div></div>';
+      h += '<div class="h2">Últimos 28 días</div><div class="card"><div class="hmap">' + cells + '</div><div class="mut small" style="margin-top:10px">Más intenso = más hábitos cumplidos ese día.</div></div>';
+      h += '<div class="h2">Por hábito</div><div class="card">' + a2.map(function (id) { var inf = hbInfo(id); return '<div class="li"><b>' + inf.e + ' ' + inf.n + '</b><span>racha ' + hbStreak(id) + ' · mejor ' + hbBest(id) + ' · ' + hbRate(id, 28) + '%</span></div>'; }).join('') + '</div>';
+      var worst = a2.slice().sort(function (x, y) { return hbRate(x, 14) - hbRate(y, 14); })[0], wi = hbInfo(worst);
+      h += '<div class="card tip"><div class="mut small" style="font-weight:800;color:var(--acc)">💡 RECOMENDACIÓN</div><p style="margin-top:6px;line-height:1.45">Tu hábito más difícil últimamente es <b>' + wi.n + '</b>. Hazlo más pequeño y ligado a algo que ya haces: ' + wi.how + '</p></div>';
+    }
+    return h;
+  }
+  function hbPackCards(list) {
+    return list.map(function (p) {
+      var have = p.ids.filter(function (id) { return S.hb.act.indexOf(id) >= 0; }).length, all = have === p.ids.length;
+      return '<div class="card chc" style="--cc:74,168,255"><div class="row"><div class="chi">' + p.e + '</div><div class="sp"><b>' + p.n + '</b><div class="mut small" style="margin-top:2px">' + p.d + '</div></div></div><div class="chips" style="margin-top:10px">' + p.ids.map(function (id) { var i = HABITS[id]; return '<span class="chip">' + i[0] + ' ' + i[1] + '</span>'; }).join('') + '</div>' +
+        '<button class="btn sm' + (all ? ' sec' : '') + '" style="margin-top:12px" data-a="hbpack" data-v="' + p.id + '">' + (all ? '✓ Ya los tienes' : 'Añadir colección') + '</button></div>';
+    }).join('');
+  }
+  function hbSheet(id) {
+    var i = hbInfo(id); if (!i) return;
+    var on = S.hb.act.indexOf(id) >= 0, now = dnum(today()), dots = '', k;
+    for (k = 13; k >= 0; k--) dots += '<span class="hbd' + (hbDone(nstr(now - k), id) ? ' on' : '') + '"></span>';
+    sheet('<div class="rhead"><div class="rbig">' + i.e + '</div><div><div class="title" style="font-size:21px">' + i.n + '</div><div class="mut small">' + i.cat + '</div></div></div>' +
+      '<div class="sumgrid" style="margin:12px 0"><div><b>' + hbStreak(id) + '</b><span>Racha</span></div><div><b>' + hbBest(id) + '</b><span>Mejor</span></div><div><b>' + hbRate(id, 28) + '%</b><span>Últimos 28 d</span></div></div>' +
+      '<div class="hbdots">' + dots + '</div><div class="mut small" style="margin:4px 0 10px">Últimos 14 días</div>' +
+      '<div class="h2">Por qué importa</div><p style="line-height:1.5;margin:0 0 10px">' + i.why + '</p><div class="h2">Cómo empezar</div><p style="line-height:1.5;margin:0 0 14px">' + i.how + '</p>' +
+      '<div class="note">Truco: ' + (i.cat === 'Disciplina' ? 'cúmplelo aunque sea en versión mínima.' : 'ponle una hora y un lugar fijos.') + '</div>' +
+      (on ? '<button class="btn ghost" style="margin-top:12px" data-a="hbrm" data-v="' + id + '">Quitar de mis hábitos</button>' : '<button class="btn" style="margin-top:12px" data-a="hbadd" data-v="' + id + '">Añadir a mis hábitos</button>'));
+  }
+  var HB_ICONS = ['🎯', '💪', '📖', '🧠', '💧', '🥩', '🧘', '🌱', '⚡', '🔥'];
+  function hbNewSheet() {
+    sheet('<div class="title">Crear hábito</div><label>Nombre</label><input type="text" id="hbn" maxlength="34" placeholder="Ej. Practicar guitarra 15 min"><label>Ícono</label><div class="chips" id="hbico" style="flex-wrap:wrap">' +
+      HB_ICONS.map(function (e, i) { return '<button class="chip hic' + (i === 0 ? ' on' : '') + '" data-a="hbico" data-v="' + i + '">' + e + '</button>'; }).join('') + '</div><label>Categoría</label><div class="chips" style="flex-wrap:wrap">' +
+      HCATS.map(function (c, i) { return '<button class="chip hcc' + (i === 3 ? ' on' : '') + '" data-a="hbcc" data-v="' + c + '">' + c + '</button>'; }).join('') + '</div><button class="btn" style="margin-top:16px" data-a="hbsave">Guardar</button>');
+    hbNewSheet.ico = 0; hbNewSheet.cat = 'Disciplina';
+  }
+
   /* ---------- retos de 30 días ---------- */
   var CHAL_ORDER = ['plank', 'push', 'squat', 'abs', 'box', 'face', 'grow'];
   window.CHAL_N = function () { return S && S.chalDone ? S.chalDone.length : 0; };
@@ -870,11 +995,20 @@
     return h;
   }
 
+  function vt(fn) {
+    try { if (document.startViewTransition && !(S && S.settings.fx === false) && document.documentElement.getAttribute('data-perf') !== 'low' && !document.hidden) { document.startViewTransition(fn); return; } } catch (e) { }
+    fn();
+  }
   function render(anim) {
     var old = $('#view'), top = old ? old.scrollTop : 0;
     destroyFigs();
     var v = tab === 'home' ? homeV() : tab === 'ex' ? exV() : tab === 'food' ? foodV() : tab === 'prog' ? progV() : setV();
-    $('#app').innerHTML = '<div class="view' + (anim ? ' anim' : '') + '" id="view">' + v + '</div>' + tabsHTML();
+    var bar = document.querySelector('.tabs');
+    if (bar) {
+      var vw = old; if (!vw) { vw = document.createElement('div'); vw.id = 'view'; $('#app').insertBefore(vw, bar); }
+      vw.className = 'view' + (anim ? ' anim' : ''); vw.innerHTML = v;
+      Array.prototype.forEach.call(bar.querySelectorAll('.tab'), function (b) { var on = b.getAttribute('data-v') === tab; if (on !== b.classList.contains('on')) { b.classList.toggle('on', on); if (on && fx.tab) { var ic = b.querySelector('.i'); if (ic) { ic.style.animation = 'none'; void ic.offsetWidth; ic.style.animation = ''; } } } });
+    } else $('#app').innerHTML = '<div class="view' + (anim ? ' anim' : '') + '" id="view">' + v + '</div>' + tabsHTML();
     $('#view').scrollTop = anim ? 0 : top;
     if (anim && tab === 'home') { var sn = document.querySelector('.streak .num'); if (sn) countUp(sn, +sn.textContent); }
     mountThumbs();
@@ -996,8 +1130,13 @@
   }
 
   /* ---------- hojas y diálogos ---------- */
-  function sheet(html) { var s = $('#sheet'); s.innerHTML = '<div class="sheet"><div class="grab"></div>' + html + '</div>'; s.className = 'on'; s.scrollTop = 0; }
-  function sheetClose() { destroySheetFig(); $('#sheet').className = ''; $('#sheet').innerHTML = ''; }
+  function sheet(html) { var s = $('#sheet'); clearTimeout(shT); s.innerHTML = '<div class="sheet"><div class="grab"></div>' + html + '</div>'; s.className = 'on'; s.scrollTop = 0; }
+  var shT = 0;
+  function sheetClose() {
+    destroySheetFig(); var el = $('#sheet'); if (el.className !== 'on') return;
+    if (S && S.settings.fx === false) { el.className = ''; el.innerHTML = ''; return; }
+    el.className = 'on out'; clearTimeout(shT); shT = setTimeout(function () { if (el.className === 'on out') { el.className = ''; el.innerHTML = ''; } }, 200);
+  }
   var sheetFig = null;
   function destroySheetFig() { if (sheetFig) { sheetFig.destroy(); sheetFig = null; } }
   function dialog(title, text, okLabel, fn, danger) {
@@ -1350,9 +1489,7 @@
   }
 
   /* hábitos completos = +15 XP (una vez por día) */
-  function habDone(h) {
-    if (habCount(h) === 4 && !h.xp) { h.xp = 1; var up = addXP(15); toast('✅ ¡Hábitos completos! +15 XP' + (up ? ' · ⭐ nivel ' + up : '')); }
-  }
+
 
   /* ---------- acciones ---------- */
   function setBool(k) { S.settings[k] = !S.settings[k]; save(); }
@@ -1368,7 +1505,8 @@
     var t = ev.target.closest('[data-a]'); if (!t) return;
     var a = t.getAttribute('data-a'), v = t.getAttribute('data-v');
     switch (a) {
-      case 'tab': if (v === 'set' && tab !== 'set') setSec = null; tab = v; fx.tab = true; render(true); fx.tab = false; break;
+      case 'tab': if (v === tab) break; if (v === 'set' && tab !== 'set') setSec = null; tab = v; fx.tab = true; vib(6);
+        vt(function () { render(true); }); fx.tab = false; break;
       case 'tutnext': if (tutI < TUT.length - 1) { tutI++; tutDraw(); } else tutClose(); break;
       case 'tutskip': tutClose(); break;
       case 'tutopen': showTutorial(); break;
@@ -1410,10 +1548,21 @@
       case 'reset':
         dialog('¿Borrar todo?', 'Se eliminarán tu racha, historial y progreso. No se puede deshacer.', 'Borrar', function () { statsDelete(); try { localStorage.removeItem(KEY); } catch (e) { } S = null; load(); save(); applyTheme(); onboarding(); render(true); syncReminder(); }, true); break;
       case 'opt': var kv = v.split(':'); S.settings[kv[0]] = isNaN(kv[1]) ? kv[1] : +kv[1]; save(); if (kv[0] === 'perf') applyTheme(); render(); break;
-      case 'hab':
-        var hh2 = hab(); hh2[v] = hh2[v] ? 0 : 1; habDone(hh2); save(); fx.hab = v; render(); fx.hab = null; break;
+      case 'hbv': hbView = v; switchPanelRefresh2(); break;
+      case 'hbcat': hbCat = v; switchPanelRefresh2(); break;
+      case 'hbt': var dd0 = today(); S.hb.log[dd0] = S.hb.log[dd0] || {}; S.hb.log[dd0][v] = S.hb.log[dd0][v] ? 0 : 1; fx.hab = v; save(); hbXP(); switchPanelRefresh2(); fx.hab = null; break;
+      case 'hbi': hbSheet(v); break;
+      case 'hbadd': if (S.hb.act.indexOf(v) < 0) S.hb.act.push(v); save(); toast('Hábito añadido'); sheetClose(); switchPanelRefresh2(); break;
+      case 'hbrm': S.hb.act = S.hb.act.filter(function (x) { return x !== v; }); save(); sheetClose(); switchPanelRefresh2(); break;
+      case 'hbpack': HPACKS.forEach(function (p) { if (p.id === v) p.ids.forEach(function (id) { if (S.hb.act.indexOf(id) < 0) S.hb.act.push(id); }); }); save(); toast('Colección añadida'); hbView = 'hoy'; switchPanelRefresh2(); break;
+      case 'hbnew': hbNewSheet(); break;
+      case 'hbico': hbNewSheet.ico = +v; Array.prototype.forEach.call(document.querySelectorAll('.hic'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
+      case 'hbcc': hbNewSheet.cat = v; Array.prototype.forEach.call(document.querySelectorAll('.hcc'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
+      case 'hbsave':
+        var hn = ($('#hbn').value || '').trim(); if (!hn) { toast('Escribe un nombre'); break; }
+        var hid2 = 'c_' + Date.now(); S.hb.custom.push({ id: hid2, n: hn, e: HB_ICONS[hbNewSheet.ico || 0], cat: hbNewSheet.cat || 'Disciplina' }); S.hb.act.push(hid2); save(); sheetClose(); hbView = 'hoy'; switchPanelRefresh2(); toast('Hábito creado'); break;
       case 'slp':
-        var hs = hab(); hs.sl = Math.max(3, Math.min(12, (hs.sl || 7.5) + 0.5 * (+v))); habDone(hs); save(); render(); break;
+        var hs = hab(); hs.sl = Math.max(3, Math.min(12, (hs.sl || 7.5) + 0.5 * (+v))); save(); hbXP(); if (tab === 'home') switchPanelRefresh2(); else render(); break;
       case 'evx': progEx = v; render(); break;
       case 'planopen': openPlan(); break;
       case 'planstart': S.plan = { start: today() }; S.planDone = false; save(); sheetClose(); toast('📅 ¡Plan iniciado! Hoy es el día 1'); render(); break;

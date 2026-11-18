@@ -3,7 +3,7 @@
    función especial del WebView. */
 (function () {
   var A = window.Android, over = false;
-  var FILES = ['css/app.css', 'js/version.js', 'js/figure.js', 'js/data.js', 'js/food.js', 'js/icons.js', 'js/config.js', 'js/app.js'];
+  var FILES = ['css/app.css', 'js/version.js', 'js/figure.js', 'js/data.js', 'js/food.js', 'js/icons.js', 'js/habits.js', 'js/config.js', 'js/app.js'];
   try { over = !!(A && A.hasOverride && A.hasOverride()); } catch (e) { }
   try { if (over) { var o = JSON.parse(A.readFile('version.json')); if (o.load && o.load.length) FILES = o.load; } } catch (e) { }
   window.__src = over ? 'ota' : 'apk';

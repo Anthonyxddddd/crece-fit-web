@@ -634,3 +634,64 @@ html[data-style=glass] .card,html[data-style=glass] .mini,html[data-style=glass]
 .chd.done{background:linear-gradient(180deg,var(--acc),var(--acc2));color:var(--on-acc);box-shadow:0 4px 12px rgba(var(--acc-rgb),.3)}
 .chd.cur{border-color:var(--acc);color:var(--txt);animation:todayp 2s ease-in-out infinite}
 .chd .ic{width:16px;height:16px;stroke-width:3}
+
+/* ===================== HÁBITOS ===================== */
+.hblist{display:flex;flex-direction:column;gap:10px}
+.hbr,.hbx{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-radius:24px;padding:10px 12px;transition:background .25s,border-color .25s,transform .2s}
+.hbr.on{background:linear-gradient(135deg,rgba(var(--acc-rgb),.22),var(--card));border-color:rgba(var(--acc-rgb),.5)}
+.hbi{display:flex;align-items:center;gap:12px;flex:1;min-width:0;text-align:left}
+.hbi .e{font-size:24px;width:44px;height:44px;border-radius:16px;background:var(--bg2);display:flex;align-items:center;justify-content:center;flex:none;color:var(--acc)}
+.hbt{min-width:0;display:flex;flex-direction:column}
+.hbt b{font-size:15px;line-height:1.25}
+.hbt span{font-size:12px;color:var(--mut);line-height:1.3;display:flex;align-items:center;gap:4px}
+.hbx .hbt span{display:block}
+.hbc,.hba{width:42px;height:42px;border-radius:50%;border:2px solid var(--line);display:flex;align-items:center;justify-content:center;flex:none;color:transparent;font-weight:900;font-size:20px;transition:all .25s cubic-bezier(.3,1.5,.5,1)}
+.hba{color:var(--mut);font-size:24px}
+.hbr.on .hbc,.hba.on{background:var(--acc);border-color:var(--acc);color:var(--on-acc);transform:scale(1.08);box-shadow:0 0 16px rgba(var(--acc-rgb),.45)}
+.hbc .ck{font-style:normal}
+.hbr.bn .hbc{animation:pop .45s ease-out}
+.hbh{min-width:46px;text-align:center}
+.hbx{margin-bottom:8px}
+.hmap{display:grid;grid-template-columns:repeat(7,1fr);gap:7px}
+.hmc{aspect-ratio:1;border-radius:10px;background:var(--card2)}
+.hmc.l1{background:rgba(var(--acc-rgb),.3)}.hmc.l2{background:rgba(var(--acc-rgb),.6)}.hmc.l3{background:var(--acc);box-shadow:0 0 8px rgba(var(--acc-rgb),.5)}
+.hmc.td{outline:2px solid var(--txt);outline-offset:1px}
+.hbdots{display:flex;gap:5px}
+.hbd{flex:1;height:22px;border-radius:7px;background:var(--card2)}
+.hbd.on{background:var(--acc)}
+
+/* ===================== FLUIDEZ Y MOVIMIENTO ===================== */
+html{touch-action:manipulation}
+button,.tab,.mini,.rcard,.exc,.chip{touch-action:manipulation}
+.view{scroll-behavior:smooth;overscroll-behavior-y:contain;contain:layout style}
+/* transición entre pestañas (View Transitions) */
+::view-transition-old(root){animation:vtout .16s ease-in both}
+::view-transition-new(root){animation:vtin .3s cubic-bezier(.2,.9,.3,1) both}
+@keyframes vtout{to{opacity:0;transform:scale(.985)}}
+@keyframes vtin{from{opacity:0;transform:translateY(14px) scale(.985)}}
+/* hojas: entran con rebote suave y salen deslizando */
+.sheet{animation:sheetin .34s cubic-bezier(.2,.95,.3,1.08)}
+@keyframes sheetin{from{transform:translateY(60%);opacity:.4}to{transform:none;opacity:1}}
+#sheet.on{animation:fadein .2s ease-out}
+@keyframes fadein{from{background-color:transparent}}
+#sheet.out{pointer-events:none;animation:fadeout .2s ease-in forwards}
+#sheet.out .sheet{animation:sheetout .2s ease-in forwards}
+@keyframes sheetout{to{transform:translateY(70%);opacity:.3}}
+@keyframes fadeout{to{opacity:0}}
+/* entradas con resorte */
+.pnl>*,.view.anim>*{animation-timing-function:cubic-bezier(.2,.9,.3,1.15)}
+@keyframes fu{from{opacity:0;transform:translateY(18px) scale(.985)}to{opacity:1;transform:none}}
+/* al hacer scroll, las filas aparecen suavemente (solo si el WebView lo soporta) */
+@supports (animation-timeline: view()){
+  .exc,.rcard,.hbr,.hbx,.mini,.chd,.frow{animation:reveal linear both;animation-timeline:view();animation-range:entry 0% entry 45%}
+  @keyframes reveal{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+}
+/* movimiento sutil continuo en las tarjetas destacadas */
+.wcard::after,.streak::after{animation:orb 9s ease-in-out infinite alternate}
+@keyframes orb{to{transform:translate(-26px,22px) scale(1.2)}}
+.tab.on::before{content:"";position:absolute;top:-6px;left:50%;width:18px;height:3px;margin-left:-9px;border-radius:3px;background:var(--acc);box-shadow:0 0 10px var(--acc);animation:tabbar .35s cubic-bezier(.3,1.4,.5,1) both}
+@keyframes tabbar{from{transform:scaleX(0)}to{transform:none}}
+.btn:active,.mini:active,.rcard:active,.exc:active,.opt:active,.hrow:active,.hbr:active{transform:scale(.965);transition-duration:.08s}
+.hring .p,.fbt i,.bar i,.xpbar i,.pbar i{will-change:stroke-dashoffset,width}
+:root[data-perf=low] .view{scroll-behavior:auto}
+:root[data-perf=low] ::view-transition-old(root),:root[data-perf=low] ::view-transition-new(root){animation:none}
