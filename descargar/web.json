@@ -1,1 +1,1 @@
-{"version": 31, "date": "18/11/2026", "notes": ["La entrada de la app ahora toma el color que elegiste", "Entrada más limpia y sin lag: la pantalla se desvanece y el inicio aparece en escalera"]}
+{"version": 32, "date": "18/11/2026", "notes": ["Arreglo: la animación de entrada ahora funciona también con las animaciones desactivadas", "La pantalla de entrada nunca se queda pegada si algo falla al arrancar"]}

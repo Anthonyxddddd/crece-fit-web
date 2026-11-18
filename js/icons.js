@@ -37,3 +37,8 @@
   }
   if (document.body) start(); else document.addEventListener('DOMContentLoaded', start);
 })();
+/* red de seguridad: si algo falla al arrancar, la pantalla de entrada nunca se queda pegada */
+setTimeout(function () {
+  var e = document.getElementById('splash');
+  if (e && !e.classList.contains('out')) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); }, 480); }
+}, 6500);
