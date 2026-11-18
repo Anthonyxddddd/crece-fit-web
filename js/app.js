@@ -49,7 +49,7 @@
     S.settings.style = 'classic'; S.settings.fx = true;
   }
   var saveT = 0;
-  function saveNow() { saveT = 0; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
+  function saveNow() { saveT = 0; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } try { syncWidget(); } catch (e) { } }
   function save() { if (!saveT) saveT = setTimeout(saveNow, 160); }
   window.addEventListener('pagehide', function () { if (saveT) { clearTimeout(saveT); saveNow(); } });
   document.addEventListener('visibilitychange', function () { if (document.hidden && saveT) { clearTimeout(saveT); saveNow(); } });
@@ -135,6 +135,12 @@
       var a = AND(); if (!a) return;
       var st = stats(), k = lastKeys();
       if (a.updateWidget) a.updateWidget(st.cur, k.any, k.w, rdef(todayRoutineId()).name);
+      if (a.updateWidget2) {
+        var ks = Object.keys(S.days).sort().slice(-28), dates = [], fz = [], lv = levelOf(S.xp || 0), x0 = xpAt(lv), x1 = xpAt(lv + 1), acc = '#4aa8ff';
+        ks.forEach(function (d) { if (S.days[d].w > 0) dates.push(d); else if (S.days[d].freeze) fz.push(d); });
+        try { var cs = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim(); if (/^#[0-9a-f]{6}$/i.test(cs)) acc = cs; } catch (e) { }
+        a.updateWidget2(JSON.stringify({ dates: dates, fz: fz, goal: S.settings.goal, wc: weekCount(), lvl: lv, xp: Math.round((S.xp - x0) / (x1 - x0) * 100), best: st.best, hbd: S.hb ? hbTodayDone() : 0, hbt: S.hb ? hbActive().length : 0, acc: acc }));
+      }
       if (a.setReminderPlus) a.setReminderPlus(!!S.settings.risk, JSON.stringify(NOTIF_MSGS));
     } catch (e) { }
   }
@@ -930,8 +936,10 @@
     return '<div class="card"><div class="set" style="border:0;padding:0"><div class="sp"><b>📊 Estadísticas anónimas</b><div class="mut small" style="line-height:1.45;margin-top:4px">Ayudan a mejorar la app. Se envía un código aleatorio, la versión, tu nivel, racha y nº de entrenamientos. Nunca tu nombre, medidas ni notas. Al apagarlo se borra lo enviado.</div></div>' + sw('stats') + '</div></div>';
   }
   function widgetCard() {
-    return '<div class="card"><b>🧩 Widget de racha</b><p class="mut small" style="margin:6px 0 12px;line-height:1.5">Mira tu racha 🔥 en la pantalla de inicio del teléfono y entra con un toque.</p>' +
-      (nativeOk('pinWidget') ? '<button class="btn sec sm" data-a="pinw">➕ Añadir a la pantalla de inicio</button>' : '<p class="mut small" style="margin:0">Necesita la última versión del APK.</p>') + '</div>';
+    var ok = nativeOk('pinWidget2');
+    var W = [['streak', '🔥', 'Racha', 'Tu racha en grande, cuadrado'], ['week', '📅', 'Mi semana', 'Los 7 días y tu meta semanal'], ['today', '🏋️', 'Entrenar hoy', 'Tu rutina y un botón para empezar']];
+    return '<div class="card"><b>🧩 Widgets</b><p class="mut small" style="margin:6px 0 4px;line-height:1.5">Ponlos en la pantalla de inicio o búscalos en el apartado de widgets de tu teléfono: mantén pulsado un espacio vacío → Widgets → Crece Fit.</p>' +
+      (ok ? W.map(function (w) { return '<div class="set"><div class="sp"><b>' + w[1] + ' ' + w[2] + '</b><div class="mut small">' + w[3] + '</div></div><button class="btn sec sm" style="width:auto;padding:10px 14px" data-a="pinw" data-v="' + w[0] + '">Añadir</button></div>'; }).join('') : '<p class="mut small" style="margin:8px 0 0">Necesitan la última versión del APK.</p>') + '</div>';
   }
   function sw(name) { return '<div class="sw' + (S.settings[name] ? ' on' : '') + '" data-a="tog" data-v="' + name + '"></div>'; }
   /* ---------- AJUSTES: menú con secciones ---------- */
@@ -1585,7 +1593,7 @@
       case 'statsyes': S.settings.stats = true; save(); dialogClose(); statsPing(true); statEvent('consent', { v: 1 }); toast('¡Gracias! 💙'); break;
       case 'statsno': S.settings.stats = false; save(); dialogClose(); break;
       case 'pinw':
-        try { if (AND().pinWidget()) toast('Elige dónde poner el widget 👆'); else toast('Mantén pulsado un espacio vacío de tu pantalla → Widgets → Crece Fit'); } catch (e) { }
+        try { if ((AND().pinWidget2 ? AND().pinWidget2(v || 'streak') : AND().pinWidget())) toast('Elige dónde poner el widget 👆'); else toast('Mantén pulsado un espacio vacío de tu pantalla → Widgets → Crece Fit'); } catch (e) { }
         break;
       case 'cloudon': cloudOn(); break;
       case 'cloudsave': cloudSave(false).then(function () { render(); }); break;
