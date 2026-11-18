@@ -46,6 +46,7 @@
     if (!S.cloud) S.cloud = { code: '', auto: true, last: 0 };
     if (!S.chalDone) S.chalDone = []; hbInit(); if (!S.food) S.food = { sex: 'm', age: '', w: '', h: '', act: 2, goal: 'gain', log: {}, fav: {}, done: false }; if (!S.custom) S.custom = []; if (!S.exv) S.exv = {}; if (!S.freeze) S.freeze = f0.freeze; if (!S.xp) S.xp = 0;
     var f = fresh(); Object.keys(f.settings).forEach(function (k) { if (S.settings[k] == null) S.settings[k] = f.settings[k]; });
+    S.settings.style = 'classic'; S.settings.fx = true;
   }
   var saveT = 0;
   function saveNow() { saveT = 0; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { } }
@@ -970,10 +971,9 @@
     } else if (k === 'look') {
       h += '<div class="card"><b>Color de la app</b><div class="swg">' + THEMES.map(function (c) { return '<button class="sw2' + (s.theme === c[0] ? ' on' : '') + '" data-a="theme" data-v="' + c[0] + '"><i style="background:' + c[1] + '"></i><span>' + c[2] + '</span></button>'; }).join('') +
         '</div></div><div class="card"><b>Modo</b><div class="seg" style="margin-top:10px">' + [['dark', '🌙 Oscuro'], ['light', '☀️ Claro'], ['auto', '📱 Auto']].map(function (m) { return '<button class="' + (s.mode === m[0] ? 'on' : '') + '" data-a="mode" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div></div>' +
-        '<div class="card"><b>Estilo</b><div class="seg" style="margin-top:10px">' + [['classic', '🎴 Clásico'], ['glass', '🫧 Glass líquido']].map(function (m) { return '<button class="' + ((s.style || 'classic') === m[0] ? 'on' : '') + '" data-a="style" data-v="' + m[0] + '">' + m[1] + '</button>'; }).join('') + '</div><p class="mut small" style="margin:10px 0 0">Glass líquido: fondo vivo, cristal translúcido y brillos.</p>' +
-        '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>⚫ Negro puro (OLED)</b><div class="mut small">Fondo negro total en modo oscuro: ahorra batería</div></div>' + sw('black') + '</div>' +
-        '<label>Rendimiento</label>' + seg('perf', [['auto', '🤖 Auto'], ['high', '🚀 Máximo'], ['low', '🔋 Ahorro']], s.perf || 'auto') +
-        '<div class="set" style="border:0;margin-top:8px"><div class="sp"><b>✨ Animaciones</b><div class="mut small">Transiciones, brillos y efectos</div></div>' + sw('fx') + '</div></div>';
+        '<div class="card">' +
+        '<div class="set" style="border:0;margin-top:0"><div class="sp"><b>⚫ Negro puro (OLED)</b><div class="mut small">Fondo negro total en modo oscuro: ahorra batería</div></div>' + sw('black') + '</div>' +
+        '<label>Rendimiento</label>' + seg('perf', [['auto', '🤖 Auto'], ['high', '🚀 Máximo'], ['low', '🔋 Ahorro']], s.perf || 'auto') + '</div>';
     } else if (k === 'sound') {
       h += '<div class="card"><div class="set"><div class="sp"><b>🔊 Sonidos</b><div class="mut small">Pitidos al terminar</div></div>' + sw('sound') + '</div>' +
         '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +

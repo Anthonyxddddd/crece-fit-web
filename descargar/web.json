@@ -1,1 +1,1 @@
-{"version": 33, "date": "18/11/2026", "notes": ["Arreglo definitivo: la animación de entrada se ve aunque tengas las animaciones desactivadas (en la app o en el teléfono)"]}
+{"version": 34, "date": "18/11/2026", "notes": ["Se quitó la opción Glass líquido y el interruptor de animaciones: ahora la app siempre usa el estilo clásico con animaciones"]}
