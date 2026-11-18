@@ -1831,11 +1831,13 @@
   setTimeout(askStats, 9000);
   if (!S.setup) onboarding();
   (function () {
-    var sp = $('#splash');
-    if (sp && !sp.querySelector('.slogo')) { var t = document.createElement('div'); t.innerHTML = SPLASH_HTML; sp.parentNode.replaceChild(t.firstChild, sp); }
+    var sp = $('#splash'), swapped = false;
+    if (sp && !sp.querySelector('.slogo')) { var t = document.createElement('div'); t.innerHTML = SPLASH_HTML; sp.parentNode.replaceChild(t.firstChild, sp); swapped = true; }
+    // la animación dura ~1,9 s desde que se ve el logo: no se corta aunque la app cargue rápido
+    var begin = swapped ? performance.now() : Math.min(performance.now(), 250), wait = Math.max(500, begin + 2000 - performance.now());
     setTimeout(function () {
       var e = $('#splash'); document.body.classList.add('entered');
-      if (e) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); document.body.classList.remove('entered'); }, 800); }
-    }, 1750);
+      if (e) { e.classList.add('out'); setTimeout(function () { if (e.parentNode) e.remove(); document.body.classList.remove('entered'); }, 850); }
+    }, wait);
   })();
 })();

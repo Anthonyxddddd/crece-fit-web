@@ -441,7 +441,7 @@ ul.ing,ol.ing{margin:6px 0 12px;padding-left:20px;line-height:1.55;font-size:14p
 .sw.on{box-shadow:0 0 12px rgba(var(--acc-rgb),.55)}
 .seg2 button.on,.chip.on{animation:pop .35s ease-out}
 :root[data-fx=off] *,:root[data-fx=off] *::before,:root[data-fx=off] *::after{animation:none!important;transition:none!important}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+@media (prefers-reduced-motion:reduce){*:not(#splash):not(#splash *),*:not(#splash):not(#splash *)::before,*:not(#splash):not(#splash *)::after{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 
 /* ===================== GLASS LÍQUIDO ===================== */
 #bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;display:none;overflow:hidden}
