@@ -115,16 +115,79 @@
     return s;
   }
 
+
+  /* ---------- Cara (ejercicios faciales) ---------- */
+  var FDEF = { mo: 0, sm: 0, pk: 0, cl: 0, cr: 0, su: 0, ey: 1, br: 0, tl: 0, jx: 0, cu: 0, tg: 0, hx: 0 };
+  function FP(o) { var r = {}, k; for (k in FDEF) r[k] = FDEF[k]; for (k in o) r[k] = o[k]; return r; }
+  function f1(n) { return n.toFixed(1); }
+  function drawFace(anim, p) {
+    var C = g.FigColors, skin = '#ffd9b3', edge = '#e8b987', ink = '#4a3526', hair = '#3b2a20';
+    var s = '', tl = p.tl;
+    s += '<ellipse cx="120" cy="182" rx="62" ry="4" fill="' + C.shadow + '"/>';
+    if (anim.view === 'side') {
+      // perfil: cuello fijo, la cabeza se mueve hacia delante/atrás
+      var hx = p.hx, cx = 120 + hx, cy = 62;
+      s += '<path d="M100,175 C100,150 104,128 108,112 L136,112 C142,130 146,152 150,175 Z" fill="' + C.dark + '" opacity=".9"/>';
+      s += '<g transform="rotate(' + f1(tl) + ' 122 112)">';
+      s += '<circle cx="' + f1(cx) + '" cy="' + cy + '" r="40" fill="' + skin + '" stroke="' + edge + '" stroke-width="2.5"/>';
+      s += '<path d="M' + f1(cx + 38) + ',' + (cy - 2) + ' q10,8 0,14 q4,2 2,6" fill="' + skin + '" stroke="' + edge + '" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+      s += '<path d="M' + f1(cx - 40) + ',' + (cy - 6) + ' A40,40 0 0 1 ' + f1(cx + 24) + ',' + (cy - 36) + ' L' + f1(cx - 10) + ',' + (cy - 8) + ' Z" fill="' + hair + '"/>';
+      s += '<circle cx="' + f1(cx + 18) + '" cy="' + (cy - 4) + '" r="2.6" fill="' + ink + '"/>';
+      s += '<path d="M' + f1(cx + 12) + ',' + (cy + 22) + ' h' + f1(14 - p.pk * 6) + '" stroke="' + ink + '" stroke-width="2.5" stroke-linecap="round"/>';
+      s += '<ellipse cx="' + f1(cx - 14) + '" cy="' + (cy + 4) + '" rx="5" ry="8" fill="' + edge + '" opacity=".6"/>';
+      s += '</g>';
+      s += '<path d="M60,176 Q120,150 180,176" fill="none" stroke="' + C.dark + '" stroke-width="12" stroke-linecap="round"/>';
+      return s;
+    }
+    var by = p.cu * -9, sx = p.jx;
+    // cuello y hombros
+    s += '<path d="M96,118 L92,168 M144,118 L148,168" stroke="' + edge + '" stroke-width="3" stroke-linecap="round" fill="none"/>';
+    s += '<path d="M40,182 Q120,150 200,182" fill="none" stroke="' + C.dark + '" stroke-width="16" stroke-linecap="round"/>';
+    s += '<g transform="rotate(' + f1(tl) + ' 120 150)">';
+    var jaw = 100 + p.mo * 10, jw = 31 - p.su * 5;
+    s += '<ellipse cx="120" cy="64" rx="47" ry="56" fill="none" stroke="' + edge + '" stroke-width="3"/>';
+    s += '<ellipse cx="' + f1(120 + sx * 0.6) + '" cy="' + f1(jaw - 4) + '" rx="' + f1(jw) + '" ry="20" fill="none" stroke="' + edge + '" stroke-width="3"/>';
+    s += '<ellipse cx="120" cy="64" rx="47" ry="56" fill="' + skin + '"/>';
+    s += '<ellipse cx="' + f1(120 + sx * 0.6) + '" cy="' + f1(jaw - 4) + '" rx="' + f1(jw) + '" ry="20" fill="' + skin + '"/>';
+    s += '<path d="M73,52 A47,50 0 0 1 167,52 Q150,28 120,30 Q90,28 73,52 Z" fill="' + hair + '"/>';
+    s += '<g transform="translate(' + f1(sx * 0.8) + ',' + f1(by) + ')">';
+    // mejillas
+    var pl = p.cl, pr = p.cr;
+    if (pl > 0.02) s += '<circle cx="' + f1(94 - pl * 3) + '" cy="82" r="' + f1(9 + pl * 14) + '" fill="' + skin + '" stroke="' + edge + '" stroke-width="2.5"/><circle cx="' + f1(94 - pl * 3) + '" cy="82" r="' + f1(8 + pl * 13) + '" fill="' + skin + '"/>';
+    if (pr > 0.02) s += '<circle cx="' + f1(146 + pr * 3) + '" cy="82" r="' + f1(9 + pr * 14) + '" fill="' + skin + '" stroke="' + edge + '" stroke-width="2.5"/><circle cx="' + f1(146 + pr * 3) + '" cy="82" r="' + f1(8 + pr * 13) + '" fill="' + skin + '"/>';
+    if (p.su > 0.02) s += '<ellipse cx="93" cy="84" rx="' + f1(4 + p.su * 6) + '" ry="' + f1(8 + p.su * 8) + '" fill="#000" opacity="' + f1(p.su * 0.16) + '"/><ellipse cx="147" cy="84" rx="' + f1(4 + p.su * 6) + '" ry="' + f1(8 + p.su * 8) + '" fill="#000" opacity="' + f1(p.su * 0.16) + '"/>';
+    // cejas y ojos
+    var bz = 44 - p.br * 7, ey = 5 * p.ey;
+    s += '<path d="M91,' + f1(bz + 1) + ' Q103,' + f1(bz - 3) + ' 114,' + f1(bz + 1) + ' M126,' + f1(bz + 1) + ' Q137,' + f1(bz - 3) + ' 149,' + f1(bz + 1) + '" stroke="' + ink + '" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    if (ey < 0.8) s += '<path d="M97,58 q6,-3 12,0 M131,58 q6,-3 12,0" stroke="' + ink + '" stroke-width="3" fill="none" stroke-linecap="round"/>';
+    else s += '<ellipse cx="103" cy="58" rx="5.5" ry="' + f1(ey) + '" fill="#fff" stroke="' + ink + '" stroke-width="1.5"/><ellipse cx="137" cy="58" rx="5.5" ry="' + f1(ey) + '" fill="#fff" stroke="' + ink + '" stroke-width="1.5"/><circle cx="103" cy="58" r="2.6" fill="' + ink + '"/><circle cx="137" cy="58" r="2.6" fill="' + ink + '"/>';
+    s += '<path d="M120,62 q-5,14 0,17 q4,1 6,-1" stroke="' + edge + '" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+    // boca
+    var my = 98 - p.sm * 2, mw = 17 + p.sm * 9 - p.pk * 11 - p.su * 5, op = p.mo * 15;
+    if (p.pk > 0.4 && op < 2) {
+      s += '<ellipse cx="120" cy="' + f1(my) + '" rx="' + f1(4 + p.pk * 2) + '" ry="' + f1(3 + p.pk * 3) + '" fill="#d6736f" stroke="' + ink + '" stroke-width="1.5"/>';
+    } else if (op > 1.5) {
+      s += '<ellipse cx="120" cy="' + f1(my + op / 2 - 2) + '" rx="' + f1(mw * 0.8) + '" ry="' + f1(op / 2 + 1) + '" fill="#6b2a2e" stroke="' + ink + '" stroke-width="2"/>';
+      if (p.tg > 0.1) s += '<ellipse cx="120" cy="' + f1(my + op - 1 + p.tg * 6) + '" rx="' + f1(7 + p.tg * 3) + '" ry="' + f1(4 + p.tg * 9) + '" fill="#f08a95" stroke="' + ink + '" stroke-width="1.5"/>';
+    } else {
+      s += '<path d="M' + f1(120 - mw) + ',' + f1(my) + ' Q120,' + f1(my + 4 + p.sm * 9) + ' ' + f1(120 + mw) + ',' + f1(my) + '" fill="none" stroke="' + ink + '" stroke-width="3" stroke-linecap="round"/>';
+      if (p.sm > 0.6) s += '<path d="M' + f1(120 - mw - 2) + ',' + f1(my - 2) + ' q-4,-3 -7,-1 M' + f1(120 + mw + 2) + ',' + f1(my - 2) + ' q4,-3 7,-1" stroke="' + edge + '" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+    }
+    s += '</g></g>';
+    return s;
+  }
+
   function Fig(svg, anim, opt) {
     opt = opt || {};
     this.svg = svg; this.anim = anim; this.i = 0; this.stop = false; this.speed = opt.speed || 1;
-    this.poses = anim.poses.map(function (x) { return P(x); });
+    var mk = anim.face ? FP : P; this.poses = anim.poses.map(function (x) { return mk(x); });
     this.t0 = 0; this.phase = 0;
     svg.setAttribute('viewBox', '0 -34 240 206');
     this.render(this.poses[0]);
     if (!opt.still) this.start();
   }
   Fig.prototype.render = function (p) {
+    if (this.anim.face) { this.svg.innerHTML = drawFace(this.anim, p); return; }
     var J = place(this.anim, p);
     this.svg.innerHTML = draw(this.anim, p, J);
   };

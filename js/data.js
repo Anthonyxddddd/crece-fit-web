@@ -692,3 +692,123 @@ var BADGES = [
   { id: 'plan', e: '📅', n: 'Plan de 4 semanas', f: function (s) { return s.planDone; } },
   { id: 'push', e: '🦾', n: 'Llegaste a flexión normal', f: function (s) { return s.chains.push && s.chains.push.i >= 2; } }
 ];
+
+/* ======================= BOXEO ======================= */
+var BX_L = { t: -84, hd: -88, l1: [60, 105], l2: [120, 78], ft1: 0, ft2: 22 };
+var BX_G = { t: -84, hd: -88, a1: [62, -72], a2: [80, -52], l1: [60, 105], l2: [120, 78], ft1: 0, ft2: 22 };
+function BX(o, d, h) { return X(Object.assign({}, BX_G, o), d, h); }
+ANIMS.boxstance = { view: 'side', fix: 'p', fixX: 118, poses: [BX({}, 520, 120), BX({ t: -82, hd: -86, l1: [56, 108], l2: [124, 74], lift: 0 }, 520, 120)] };
+ANIMS.boxjab = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 200, 50), BX({ a1: [-6, -6], t: -80, hd: -84, l1: [56, 108] }, 110, 60), BX({}, 160, 160)] };
+ANIMS.boxcross = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 200, 50), BX({ a2: [-6, -6], t: -76, hd: -82, l1: [54, 108], l2: [130, 70], ft2: 68 }, 120, 60), BX({}, 160, 160)] };
+ANIMS.box12 = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 180, 40),
+  BX({ a1: [-6, -6], t: -80, hd: -84 }, 100, 40), BX({}, 110, 20),
+  BX({ a2: [-6, -6], t: -76, hd: -82, l2: [130, 70], ft2: 68 }, 110, 50), BX({}, 160, 200)] };
+ANIMS.boxhook = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 200, 50), BX({ a1: [-12, -108], t: -78, hd: -84 }, 130, 70), BX({}, 170, 150)] };
+ANIMS.boxupper = { view: 'side', fix: 'p', fixX: 112, poses: [BX({ a2: [96, 30], t: -80, l1: [52, 110], l2: [126, 74] }, 260, 60),
+  BX({ a2: [44, -72], t: -86, l1: [62, 104], l2: [116, 82] }, 130, 70), BX({}, 170, 120)] };
+ANIMS.box123 = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 160, 30),
+  BX({ a1: [-6, -6], t: -80, hd: -84 }, 90, 30), BX({}, 90, 10),
+  BX({ a2: [-6, -6], t: -76, hd: -82, l2: [130, 70], ft2: 68 }, 100, 30), BX({}, 90, 10),
+  BX({ a1: [-12, -108], t: -78, hd: -84 }, 110, 60), BX({}, 160, 220)] };
+ANIMS.boxslip = { view: 'side', fix: 'p', fixX: 114, poses: [BX({}, 220, 80), BX({ t: -102, hd: -108, l1: [66, 102], l2: [124, 76] }, 200, 160), BX({}, 220, 120)] };
+ANIMS.boxbob = { view: 'side', fix: 'p', fixX: 114, poses: [BX({}, 220, 60), BX({ t: -62, hd: -72, l1: [42, 112], l2: [136, 66], a1: [40, -62], a2: [56, -44] }, 300, 160), BX({}, 260, 80)] };
+ANIMS.boxfoot = { view: 'side', fix: 'f2', fixX: 106, poses: [BX({}, 260, 60), BX({ l1: [38, 100], l2: [116, 80], t: -82 }, 240, 50), BX({}, 240, 80), BX({ l1: [74, 96], l2: [138, 66], t: -86 }, 240, 50)] };
+ANIMS.boxbody = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 200, 50), BX({ t: -56, hd: -68, a1: [22, 4], l1: [42, 112], l2: [136, 66] }, 190, 90), BX({}, 190, 110)] };
+ANIMS.boxspeed = { view: 'side', fix: 'p', fixX: 112, poses: [BX({ a1: [-6, -6] }, 110, 10), BX({}, 80, 0), BX({ a2: [-6, -6], t: -78, l2: [128, 72] }, 110, 10), BX({}, 80, 0)] };
+ANIMS.boxcombo = { view: 'side', fix: 'p', fixX: 112, poses: [BX({}, 150, 20),
+  BX({ a1: [-6, -6], t: -80 }, 90, 10), BX({ a2: [-6, -6], t: -76, l2: [130, 70], ft2: 68 }, 100, 10),
+  BX({ t: -102, hd: -108 }, 170, 20), BX({ a2: [-6, -6], t: -76, l2: [130, 70], ft2: 68 }, 100, 40), BX({}, 180, 200)] };
+
+/* ======================= CARA ======================= */
+function FC(o, d, h) { return Object.assign({ d: d, h: h }, o); }
+ANIMS.facefish = { face: true, poses: [FC({}, 500, 100), FC({ su: 1, pk: 0.9 }, 600, 900)] };
+ANIMS.cheekpuff = { face: true, poses: [FC({ cl: 1, cr: 1, pk: 0.4 }, 500, 700), FC({}, 400, 150)] };
+ANIMS.cheekshift = { face: true, poses: [FC({ cl: 1, pk: 0.5 }, 450, 350), FC({ cr: 1, pk: 0.5 }, 450, 350)] };
+ANIMS.bigsmile = { face: true, poses: [FC({}, 500, 100), FC({ sm: 1, ey: 0.7 }, 600, 900)] };
+ANIMS.jawdrop = { face: true, poses: [FC({}, 600, 150), FC({ mo: 1, br: 0.4 }, 900, 400)] };
+ANIMS.chinlift = { face: true, poses: [FC({}, 500, 150), FC({ cu: 1, pk: 1, tl: 0 }, 800, 1000)] };
+ANIMS.tonguepress = { face: true, poses: [FC({ sm: 0.1 }, 500, 150), FC({ mo: 0.35, tg: 0.5, sm: 0.2 }, 600, 900)] };
+ANIMS.chintuck = { face: true, view: 'side', poses: [FC({ hx: 14 }, 600, 150), FC({ hx: -6 }, 900, 900)] };
+ANIMS.jawjut = { face: true, view: 'side', poses: [FC({ hx: -4 }, 600, 150), FC({ hx: 14, pk: 0 }, 800, 900)] };
+ANIMS.neckside = { face: true, poses: [FC({ tl: 0 }, 600, 150), FC({ tl: 26 }, 1000, 1500), FC({ tl: 0 }, 600, 150), FC({ tl: -26 }, 1000, 1500)] };
+ANIMS.neckturn = { face: true, poses: [FC({ jx: -14 }, 800, 600), FC({ jx: 14 }, 1100, 600)] };
+ANIMS.browlift = { face: true, poses: [FC({}, 400, 100), FC({ br: 1, ey: 1.3 }, 500, 800)] };
+ANIMS.lionface = { face: true, poses: [FC({}, 400, 100), FC({ mo: 1, tg: 1, ey: 1.4, br: 1 }, 500, 1100)] };
+ANIMS.jawcircle = { face: true, poses: [FC({ mo: 0.4, jx: -12 }, 500, 100), FC({ mo: 0.7 }, 500, 100), FC({ mo: 0.4, jx: 12 }, 500, 100), FC({ mo: 0.1 }, 500, 100)] };
+ANIMS.smilekiss = { face: true, poses: [FC({ sm: 1 }, 450, 400), FC({ pk: 1 }, 450, 400)] };
+ANIMS.vowels = { face: true, poses: [FC({ mo: 1 }, 400, 450), FC({ sm: 1, mo: 0.2 }, 400, 450), FC({ sm: 0.7, mo: 0.1 }, 400, 450), FC({ pk: 1, mo: 0.5 }, 400, 450), FC({ pk: 1 }, 400, 450)] };
+ANIMS.cheeklift = { face: true, poses: [FC({}, 400, 100), FC({ sm: 1, ey: 0.5, br: -0.2 }, 600, 1400)] };
+ANIMS.eyeopen = { face: true, poses: [FC({ ey: 0.3 }, 350, 100), FC({ ey: 1.5, br: 1 }, 350, 600)] };
+ANIMS.necklong = { face: true, poses: [FC({}, 700, 200), FC({ cu: 1 }, 1100, 1200)] };
+
+var NEWEX2 = {
+  boxstance: { n: 'Guardia de boxeo', cat: 'Boxeo', type: 'time', anim: 'boxstance', m: 'Postura, piernas y hombros', steps: ['Pies separados al ancho de los hombros, el pie débil adelante.', 'Rodillas flexionadas y peso en las puntas de los pies.', 'Puños junto a la barbilla, codos pegados al cuerpo.'], tip: 'Mantén la barbilla baja y rebota suave.', lv: 1, g: 'MFS' },
+  boxjab: { n: 'Jab (golpe directo)', cat: 'Boxeo', type: 'time', anim: 'boxjab', m: 'Hombros, tríceps y core', steps: ['Desde la guardia, estira el brazo adelantado en línea recta.', 'Gira un poco el puño al llegar y vuelve rápido.', 'La otra mano siempre protege la cara.'], tip: 'Rápido de ida y más rápido de vuelta.', lv: 1, g: 'MF' },
+  boxcross: { n: 'Cruzado (cross)', cat: 'Boxeo', type: 'time', anim: 'boxcross', m: 'Piernas, cadera y hombro', steps: ['Empuja con el pie de atrás y gira la cadera.', 'Lanza el puño de atrás recto al frente.', 'Regresa a la guardia sin bajar la mano contraria.'], tip: 'La fuerza sale de la cadera, no del brazo.', lv: 1, g: 'MF' },
+  box12: { n: 'Combinación 1-2 (jab + cruzado)', cat: 'Boxeo', type: 'time', anim: 'box12', m: 'Cardio, hombros y core', steps: ['Lanza el jab y enseguida el cruzado.', 'Gira la cadera en el cruzado.', 'Vuelve a la guardia y repite con ritmo.'], tip: 'Cuenta en voz alta: uno, dos.', lv: 1, g: 'MF' },
+  boxhook: { n: 'Gancho (hook)', cat: 'Boxeo', type: 'time', anim: 'boxhook', m: 'Oblicuos y hombros', steps: ['Codo a la altura del hombro y brazo doblado.', 'Gira el cuerpo y el pie como si abrieras una puerta.', 'Regresa a la guardia.'], tip: 'El brazo no se estira: gira el tronco.', lv: 2, g: 'MF' },
+  boxupper: { n: 'Uppercut (gancho al mentón)', cat: 'Boxeo', type: 'time', anim: 'boxupper', m: 'Piernas, core y brazos', steps: ['Dobla un poco más las rodillas.', 'Al subir, lanza el puño hacia arriba con la palma hacia ti.', 'Regresa a la guardia.'], tip: 'Sube desde las piernas.', lv: 2, g: 'MF' },
+  box123: { n: 'Combinación 1-2-3 (jab, cruzado, gancho)', cat: 'Boxeo', type: 'time', anim: 'box123', m: 'Cardio y cuerpo completo', steps: ['Jab, cruzado y gancho sin pausa.', 'Gira bien la cadera en cada golpe.', 'Respira al golpear.'], tip: 'Primero lento y limpio, luego rápido.', lv: 2, g: 'MF' },
+  boxslip: { n: 'Esquiva (defensa)', cat: 'Boxeo', type: 'time', anim: 'boxslip', m: 'Core, cuello y reflejos', steps: ['Desde la guardia, mueve la cabeza fuera de la línea.', 'Mantén los puños altos.', 'Vuelve al centro.'], tip: 'Mueve el tronco, no solo el cuello.', lv: 2, g: 'MFS' },
+  boxbob: { n: 'Agacharse y cubrirse (bob & weave)', cat: 'Boxeo', type: 'time', anim: 'boxbob', m: 'Piernas y core', steps: ['Dobla las rodillas y baja el cuerpo bajo un golpe imaginario.', 'Mantén la espalda recta y la mirada al frente.', 'Sube con control.'], tip: 'Baja con las piernas, no con la espalda.', lv: 2, g: 'MF' },
+  boxfoot: { n: 'Juego de pies', cat: 'Boxeo', type: 'time', anim: 'boxfoot', m: 'Piernas y coordinación', steps: ['Da un paso adelante con el pie delantero y sigue con el trasero.', 'Retrocede igual, sin cruzar los pies.', 'Mantén siempre la guardia.'], tip: 'Pasos cortos, nunca cruces los pies.', lv: 1, g: 'MF' },
+  boxbody: { n: 'Golpes al cuerpo', cat: 'Boxeo', type: 'time', anim: 'boxbody', m: 'Piernas, core y oblicuos', steps: ['Baja el cuerpo doblando las rodillas.', 'Lanza el golpe a la altura del abdomen.', 'Sube a la guardia.'], tip: 'Baja con las piernas.', lv: 2, g: 'MF' },
+  boxspeed: { n: 'Golpes rápidos', cat: 'Boxeo', type: 'time', anim: 'boxspeed', m: 'Cardio y hombros', steps: ['Lanza golpes rectos alternando brazos muy rápido.', 'Mantén la guardia.', 'Respira y no dejes de moverte.'], tip: 'Rápido pero con la espalda recta.', lv: 3, g: 'MF' },
+  boxcombo: { n: 'Combo completo con esquiva', cat: 'Boxeo', type: 'time', anim: 'boxcombo', m: 'Cardio y reflejos', steps: ['Jab, cruzado, esquiva y cruzado otra vez.', 'Mantén ritmo constante.', 'Vuelve a la guardia.'], tip: 'La esquiva te prepara para el siguiente golpe.', lv: 3, g: 'MF' },
+
+  facefish: { n: 'Cara de pez (mejillas hundidas)', cat: 'Cara', type: 'time', anim: 'facefish', m: 'Mejillas y labios', steps: ['Succiona las mejillas hacia adentro como un pez.', 'Mantén sonriendo suavemente.', 'Relaja y repite.'], tip: 'Es un ejercicio suave: no te lastimes.', lv: 1, g: 'FS' },
+  cheekpuff: { n: 'Inflar mejillas', cat: 'Cara', type: 'reps', anim: 'cheekpuff', m: 'Mejillas', steps: ['Llena la boca de aire.', 'Mantén unos segundos sin dejar escapar aire.', 'Suelta lento.'], tip: 'Respira por la nariz.', lv: 1, g: 'FS' },
+  cheekshift: { n: 'Pasar el aire de lado a lado', cat: 'Cara', type: 'reps', anim: 'cheekshift', m: 'Mejillas', steps: ['Infla las mejillas con aire.', 'Pasa el aire de una mejilla a la otra.', 'Cuenta una repetición por cada lado.'], tip: 'Hazlo despacio.', lv: 1, g: 'FS' },
+  bigsmile: { n: 'Sonrisa amplia (labios cerrados)', cat: 'Cara', type: 'reps', anim: 'bigsmile', m: 'Mejillas y pómulos', steps: ['Sonríe lo más que puedas sin abrir los labios.', 'Mantén unos segundos.', 'Relaja.'], tip: 'Siente que los pómulos suben.', lv: 1, g: 'FS' },
+  jawdrop: { n: 'Abrir y cerrar la boca lento', cat: 'Cara', type: 'reps', anim: 'jawdrop', m: 'Mandíbula', steps: ['Abre la boca despacio, sin forzar.', 'Mantén un momento.', 'Cierra con control.'], tip: 'Si te duele o truena la mandíbula, para.', lv: 1, g: 'FS' },
+  chinlift: { n: 'Beso al cielo', cat: 'Cara', type: 'reps', anim: 'chinlift', m: 'Papada y cuello', steps: ['Mira al techo con la cabeza hacia atrás.', 'Junta los labios como dando un beso al techo.', 'Mantén 3 segundos y relaja.'], tip: 'Estira desde el cuello, sin dolor.', lv: 1, g: 'FS' },
+  tonguepress: { n: 'Lengua al paladar', cat: 'Cara', type: 'time', anim: 'tonguepress', m: 'Papada y postura de la lengua', steps: ['Pega toda la lengua al paladar.', 'Dientes ligeramente juntos y labios cerrados.', 'Respira por la nariz.'], tip: 'Sin apretar los dientes.', lv: 1, g: 'FS' },
+  chintuck: { n: 'Retracción de mentón', cat: 'Cara', type: 'reps', anim: 'chintuck', m: 'Cuello y papada', steps: ['De pie, mira al frente.', 'Lleva el mentón hacia atrás haciendo papada.', 'Mantén 3 segundos y suelta.'], tip: 'Mueve la cabeza recta, no la inclines.', lv: 1, g: 'FSC' },
+  jawjut: { n: 'Mandíbula adelante', cat: 'Cara', type: 'reps', anim: 'jawjut', m: 'Mandíbula y cuello', steps: ['Mira al frente con la cabeza recta.', 'Empuja la mandíbula inferior hacia adelante.', 'Mantén 3 segundos y regresa.'], tip: 'Suave y sin dolor.', lv: 1, g: 'FS' },
+  neckside: { n: 'Inclinación lateral del cuello', cat: 'Cara', type: 'time', anim: 'neckside', m: 'Cuello y trapecio', steps: ['Inclina la oreja hacia el hombro.', 'Mantén sin subir el hombro.', 'Cambia de lado.'], tip: 'Respira lento.', lv: 1, g: 'FSC' },
+  neckturn: { n: 'Girar la cabeza', cat: 'Cara', type: 'reps', anim: 'neckturn', m: 'Cuello', steps: ['Gira la cabeza hacia un lado hasta sentir estiramiento.', 'Vuelve al centro.', 'Repite al otro lado.'], tip: 'Hombros relajados.', lv: 1, g: 'FSC' },
+  browlift: { n: 'Cejas arriba', cat: 'Cara', type: 'reps', anim: 'browlift', m: 'Frente y ojos', steps: ['Sube las cejas y abre bien los ojos.', 'Mantén 2 segundos.', 'Relaja.'], tip: 'No arrugues demasiado la frente.', lv: 1, g: 'FS' },
+  lionface: { n: 'Cara de león', cat: 'Cara', type: 'reps', anim: 'lionface', m: 'Toda la cara', steps: ['Abre muy grande los ojos y la boca.', 'Saca la lengua hacia la barbilla.', 'Relaja.'], tip: 'Exagera el gesto para activar todos los músculos.', lv: 1, g: 'FS' },
+  jawcircle: { n: 'Círculos con la mandíbula', cat: 'Cara', type: 'reps', anim: 'jawcircle', m: 'Mandíbula', steps: ['Abre un poco la boca.', 'Mueve la mandíbula en círculos lentos.', 'Cambia de sentido.'], tip: 'Pequeños movimientos. Si truena o duele, para.', lv: 1, g: 'FS' },
+  smilekiss: { n: 'Sonrisa y beso', cat: 'Cara', type: 'reps', anim: 'smilekiss', m: 'Labios y mejillas', steps: ['Sonríe ancho.', 'Junta los labios como un beso exagerado.', 'Alterna.'], tip: 'Gestos grandes.', lv: 1, g: 'FS' },
+  vowels: { n: 'Vocales exageradas (A-E-I-O-U)', cat: 'Cara', type: 'reps', anim: 'vowels', m: 'Toda la cara', steps: ['Pronuncia A, E, I, O, U exagerando cada gesto.', 'Aprieta los músculos de la cara.', 'Repite lento.'], tip: 'Mueve toda la cara, no solo la boca.', lv: 1, g: 'FS' },
+  cheeklift: { n: 'Elevar mejillas (sonrisa con ojos)', cat: 'Cara', type: 'time', anim: 'cheeklift', m: 'Pómulos y mejillas', steps: ['Sonríe y sube las mejillas hacia los ojos.', 'Mantén sin arrugar la frente.', 'Relaja y repite.'], tip: 'Siente el trabajo en los pómulos.', lv: 1, g: 'FS' },
+  eyeopen: { n: 'Abrir y cerrar los ojos fuerte', cat: 'Cara', type: 'reps', anim: 'eyeopen', m: 'Ojos y párpados', steps: ['Cierra los ojos con fuerza.', 'Abre muy grande.', 'Parpadea suave al terminar.'], tip: 'Descansa la vista después.', lv: 1, g: 'FS' },
+  necklong: { n: 'Cuello largo', cat: 'Cara', type: 'time', anim: 'necklong', m: 'Cuello y postura', steps: ['Estírate hacia arriba sin subir los hombros.', 'Mantén el cuello largo.', 'Respira lento.'], tip: 'Imagina que un hilo te jala desde la cabeza.', lv: 1, g: 'FSC' }
+};
+Object.keys(NEWEX2).forEach(function (k) { EX[k] = NEWEX2[k]; });
+
+/* ======================= CLASES Y RUTINAS ======================= */
+function RD(arr, val) { return arr.map(function (k) { return { ex: k, val: EX[k].type === 'time' ? val : Math.round(val / 3) }; }); }
+function RR(spec) { var o = []; spec.forEach(function (s) { for (var i = 0; i < (s[2] || 1); i++) o.push({ ex: s[0], val: s[1] }); }); return o; }
+var BOX_WARM = [{ ex: 'jacks', val: 30 }, { ex: 'armcircles', val: 20 }, { ex: 'neckroll', val: 20 }];
+var BOX_COOL = [{ ex: 'armhug', val: 25 }, { ex: 'shouldercross', val: 25 }, { ex: 'quadstretch', val: 25 }, { ex: 'child', val: 25 }];
+QUICK.CL1 = { name: 'Clase 1 · Fundamentos', emoji: '🥊', desc: 'Guardia, jab, cruzado y juego de pies. Ideal para empezar.', level: 'Principiante',
+  rounds: RR([['boxstance', 40], ['boxjab', 40, 1], ['boxcross', 40], ['box12', 40], ['boxfoot', 40], ['box12', 40]]), rest: 20, warm: BOX_WARM, cool: BOX_COOL };
+QUICK.CL2 = { name: 'Clase 2 · Combos y defensa', emoji: '🥊', desc: 'Añade el gancho y las esquivas. Más intensidad.', level: 'Intermedio',
+  rounds: RR([['box12', 45], ['boxhook', 45], ['boxslip', 45], ['box123', 45], ['boxbob', 45], ['box123', 45], ['boxupper', 45]]), rest: 20, warm: BOX_WARM, cool: BOX_COOL };
+QUICK.CL3 = { name: 'Clase 3 · Cardio de boxeo', emoji: '🥊', desc: 'Rounds de 45 s con golpes rápidos para quemar calorías.', level: 'Intermedio',
+  rounds: RR([['boxjab', 45], ['boxspeed', 45], ['boxfoot', 45], ['box123', 45], ['boxbody', 45], ['boxspeed', 45], ['boxcombo', 45], ['jacks', 30]]), rest: 15, warm: BOX_WARM, cool: BOX_COOL };
+QUICK.CL4 = { name: 'Clase 4 · Experto', emoji: '🥊', desc: 'Rounds largos, combos completos y pocas pausas.', level: 'Experto',
+  rounds: RR([['box123', 60], ['boxcombo', 60], ['boxbody', 60], ['boxspeed', 60], ['boxupper', 60], ['boxcombo', 60], ['burpee', 30], ['boxspeed', 60]]), rest: 15, warm: BOX_WARM, cool: BOX_COOL };
+QUICK.CL5 = { name: 'Clase 5 · Boxeo + abdomen', emoji: '🥊', desc: 'Golpes alternados con core para marcar el abdomen.', level: 'Intermedio',
+  rounds: RR([['box12', 45], ['plank', 30], ['boxhook', 45], ['russian', 30], ['boxbody', 45], ['flutter', 30], ['boxcombo', 45]]), rest: 15, warm: BOX_WARM, cool: BOX_COOL };
+
+QUICK.F1 = { name: 'Cara · Rutina diaria', emoji: '🧖', desc: 'Mejillas, mandíbula y cuello. Hazla frente al espejo.', level: 'Todos',
+  rounds: RR([['bigsmile', 10], ['cheekpuff', 10], ['cheekshift', 10], ['facefish', 20], ['smilekiss', 12], ['chinlift', 10], ['jawdrop', 10]]), rest: 8, warm: false, cool: [] };
+QUICK.F2 = { name: 'Cara · Mandíbula y papada', emoji: '🧖', desc: 'Define el contorno: papada, mandíbula y cuello.', level: 'Todos',
+  rounds: RR([['chintuck', 10], ['jawjut', 10], ['tonguepress', 30], ['chinlift', 12], ['jawcircle', 8], ['neckturn', 8], ['neckside', 40]]), rest: 8, warm: false, cool: [] };
+QUICK.F3 = { name: 'Cara · Antihinchazón de mañana', emoji: '🧖', desc: 'Activa la circulación para amanecer con la cara más despejada.', level: 'Todos',
+  rounds: RR([['browlift', 10], ['eyeopen', 8], ['cheeklift', 25], ['lionface', 6], ['necklong', 25], ['vowels', 8]]), rest: 6, warm: false, cool: [] };
+
+var FACE_FACTS = [
+  ['target', 'No se puede adelgazar solo la cara', 'El cuerpo baja grasa de todo el cuerpo a la vez; no puedes elegir de dónde. La grasa de la cara baja cuando baja tu grasa total, con déficit de calorías, fuerza y cardio. El boxeo ayuda mucho porque quema muchas calorías.'],
+  ['face', 'Los ejercicios faciales sirven, pero con límites', 'Fortalecen y dan tono a los músculos de la cara, el cuello y la mandíbula. No queman grasa de la cara, pero pueden mejorar la definición y la postura. Los resultados son modestos y tardan semanas.'],
+  ['drop', 'A veces no es grasa, es retención de líquidos', 'Mucha sal, alcohol, poco sueño y poca agua hinchan la cara. Por eso amanece más hinchada. Esto sí puedes mejorarlo en pocos días.'],
+  ['moon', 'Duerme 7–9 horas', 'Dormir poco sube la hinchazón y el hambre. Duerme con la cabeza ligeramente elevada para amanecer con menos hinchazón.'],
+  ['cup', 'Hidratación y menos sal', 'Bebe agua durante el día y reduce embutidos, snacks salados y comida ultraprocesada. Ayuda a reducir la retención.'],
+  ['posture', 'Postura y cuello', 'Cabeza adelantada y encorvada hace ver la papada más marcada. Los ejercicios de retracción de mentón y de espalda mejoran el aspecto de cuello y mandíbula.'],
+  ['dumbbell', 'Músculo y cardio', 'Entrenar fuerza y cardio (como las clases de boxeo) baja la grasa total y mejora cómo se ve el rostro. Combínalo con proteína suficiente.'],
+  ['camera', 'Ángulo, luz y gestos', 'La cámara cercana, la luz desde arriba y la cabeza agachada engordan la cara. Cámara a la altura de los ojos, luz suave de frente y barbilla ligeramente al frente ayudan.'],
+  ['warn', 'Cuidado', 'Evita dietas extremas, pastillas "quemagrasa" y masticar chicle en exceso (puede cansar la mandíbula). Si tienes dolor de mandíbula, chasquidos fuertes o hinchazón repentina de un lado, consulta a un médico o dentista. Si eres menor de edad, evita restringir comida.']
+];

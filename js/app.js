@@ -421,10 +421,16 @@
   function build(id) {
     var steps = [], d = rdef(id), rest = d.rest || S.settings.rest;
     if (d.items) { d.items.forEach(function (it) { steps.push(stepOf(it, 'cool', d.label || 'Estiramiento')); }); return steps; }
-    var warm = d.warm === false ? [] : warmSet(), cool = d.cool || coolSet();
+    var warm = d.warm === false ? [] : (d.warm || warmSet()), cool = d.cool || coolSet();
     warm.forEach(function (it) { steps.push(stepOf(it, 'warm')); });
     if (warm.length) steps.push({ k: 'rest', secs: 15, title: 'Prepárate' });
-    d.slots.forEach(function (sl, si) {
+    if (d.rounds) {
+      d.rounds.forEach(function (r, i) {
+        steps.push({ k: 'ex', ex: r.ex, val: r.val, type: EX[r.ex].type, kind: 'main', set: i + 1, sets: d.rounds.length, label: (d.rl || 'Round') + ' ' + (i + 1) + ' de ' + d.rounds.length });
+        if (i < d.rounds.length - 1) steps.push({ k: 'rest', secs: d.rest || 20 });
+      });
+    }
+    (d.slots || []).forEach(function (sl, si) {
       var cv = curVar(sl[0]), q = quietSub(cv.ex, cv.val), type = EX[q.ex].type;
       for (var n = 1; n <= sl[1]; n++) {
         steps.push({ k: 'ex', ex: q.ex, val: q.val, type: type, chain: CHAINS[sl[0]] ? sl[0] : null, key: sl[0], set: n, sets: sl[1], kind: 'main' });
@@ -447,6 +453,7 @@
   function mainList(id) {
     var d = rdef(id);
     if (d.items) return d.items.map(function (it) { var q = quietSub(it.ex, it.val); return { n: EX[q.ex].n, t: targetTxt(q.ex, q.val, (q.ex === it.ex && it.type) || null) }; });
+    if (d.rounds) return d.rounds.map(function (r, i) { return { n: EX[r.ex].n, t: targetTxt(r.ex, r.val, EX[r.ex].type) }; });
     return d.slots.map(function (sl) { var cv = curVar(sl[0]), q = quietSub(cv.ex, cv.val); return { n: EX[q.ex].n, t: sl[1] + ' × ' + targetTxt(q.ex, q.val, EX[q.ex].type) }; });
   }
   /* plan de 4 semanas */
@@ -502,7 +509,7 @@
 
   /* ---------- secciones con pestañas (se cambian tocando o deslizando) ---------- */
   var pst = { home: 'hoy', prog: 'resumen', ex: 'Piernas', food: 'plan' }, setSec = null;
-  var PKEYS = { home: ['hoy', 'avance', 'habitos', 'rutinas'], prog: ['resumen', 'calendario', 'medidas', 'nivel', 'logros'], ex: ['Piernas', 'Pecho y brazos', 'Core', 'Espalda', 'Cardio', 'Crecer', 'Movilidad'], food: ['plan', 'menu', 'rec', 'ali', 'tip'] };
+  var PKEYS = { home: ['hoy', 'avance', 'habitos', 'rutinas'], prog: ['resumen', 'calendario', 'medidas', 'nivel', 'logros'], ex: ['Piernas', 'Pecho y brazos', 'Core', 'Espalda', 'Cardio', 'Boxeo', 'Cara', 'Crecer', 'Movilidad'], food: ['plan', 'menu', 'rec', 'ali', 'tip'] };
   function segTabs(g, items) {
     return '<div class="seg2" data-g="' + g + '">' + items.map(function (it) {
       return '<button class="' + (pst[g] === it[0] ? 'on' : '') + '" data-a="pn" data-v="' + g + ':' + it[0] + '">' + it[1] + '</button>';
@@ -569,7 +576,7 @@
           '<p class="mut small" style="margin:10px 0 12px">Hoy toca descansar los músculos. Haz un chequeo de postura de 2 minutos y mantienes tu racha.</p>' +
           '<div class="col"><button class="btn" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec" data-a="start" data-v="S">🌱 Estirar</button></div></div>';
       } else {
-        var w = rdef(id), steps = build(id), cnt = w.items ? w.items.length : w.slots.length;
+        var w = rdef(id), steps = build(id), cnt = w.items ? w.items.length : w.rounds ? w.rounds.length : w.slots.length;
         h += '<div class="card wcard"><div class="row"><div class="big">' + w.emoji + '</div><div><div class="mut small" style="font-weight:800">RUTINA DE HOY</div><div style="font-size:21px;font-weight:900">' + w.name + '</div></div></div>' +
           '<div class="row" style="margin:12px 0 4px;flex-wrap:wrap"><span class="chip">⏱ ~' + estMin(steps) + ' min</span><span class="chip">📋 ' + cnt + ' ejercicios</span>' + planTag + (S.settings.nojump ? '<span class="chip">🤫 Sin saltos</span>' : '') + '</div>' +
           '<div class="exl">' + mainList(id).map(function (x) { return '<div class="li"><b>' + x.n + '</b><span>' + x.t + '</span></div>'; }).join('') + '</div>' +
@@ -599,6 +606,8 @@
       ORDER.forEach(function (r) { h += mini(r, WORKOUTS[r].emoji, WORKOUTS[r].name, 'Rutina ' + r); });
       h += mini('Q5', '⏱', 'Rápida · 5 min', 'Poco tiempo') + mini('Q10', '⏲', 'Rápida · 10 min', 'Cardio + fuerza') +
         mini('P', '🧍', 'Postura', '2 min · racha') + mini('S', '🌱', 'Estiramientos', '6 min · racha') + '</div>';
+      h += '<div class="h2">Clases de boxeo</div><div class="vlist">' + ['CL1', 'CL2', 'CL3', 'CL4', 'CL5'].map(qrow).join('') + '</div>';
+      h += '<div class="h2">Cara y cuello</div><div class="vlist">' + ['F1', 'F2', 'F3'].map(qrow).join('') + '</div><button class="btn ghost" style="margin-top:10px" data-a="faceguide">Guía: qué sí funciona y qué no</button>';
       h += '<div class="h2">Mis rutinas</div><div class="grid2">' +
         S.custom.map(function (r) { return mini(r.id, '🛠', esc(r.name), r.slots.length + ' ejercicios'); }).join('') +
         miniRow('data-a="crnew"', '➕', 'Crear rutina', 'Elige ejercicios') + '</div>';
@@ -610,12 +619,26 @@
   var exQ = '';
   function norm(t) { return String(t).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
   var LVL_T = { 1: '🟢 Fácil', 2: '🟡 Medio', 3: '🔴 Difícil' };
+  function faceBanner() {
+    return '<div class="card tipc"><div class="tipe">🧖</div><div><b>Ejercicios de cara y cuello</b><p class="mut small" style="margin:4px 0 8px;line-height:1.45">Dan tono a mejillas, mandíbula y cuello. Ojo: no se puede quemar grasa solo de la cara.</p><div class="row"><button class="btn sm sp" data-a="facerout">Rutinas de cara</button><button class="btn sec sm sp" data-a="faceguide">Guía y mitos</button></div></div></div>';
+  }
+  function qrow(id) {
+    var d = QUICK[id], st = build(id);
+    return miniRow('data-a="prev" data-v="' + id + '"', d.emoji, d.name, (d.level ? d.level + ' · ' : '') + '≈' + estMin(st) + ' min · ' + d.rounds.length + ' rounds');
+  }
+  function sheetClasses() { sheet('<div class="title">🥊 Clases de boxeo</div><p class="mut small" style="margin:4px 0 12px">Rounds guiados con calentamiento y estiramiento. No necesitas costal ni guantes.</p><div class="vlist">' + ['CL1', 'CL2', 'CL3', 'CL4', 'CL5'].map(qrow).join('') + '</div><div class="note">Calienta siempre y mantén la guardia alta. Si tienes lesión de muñeca, hombro o cuello, consulta antes a un médico.</div>'); }
+  function sheetFaceRoutines() { sheet('<div class="title">🧖 Rutinas de cara</div><p class="mut small" style="margin:4px 0 12px">Hazlas frente al espejo, con la cara limpia y sin forzar. Con constancia: 5–6 días por semana.</p><div class="vlist">' + ['F1', 'F2', 'F3'].map(qrow).join('') + '</div><button class="btn ghost" style="margin-top:12px" data-a="faceguide">Guía: qué sí funciona y qué no</button>'); }
+  function sheetFaceGuide() {
+    sheet('<div class="title">🧖 Guía de la cara</div><p class="mut small" style="margin:4px 0 12px">Lo que sí funciona para verte con la cara más definida, sin mitos.</p>' +
+      FACE_FACTS.map(function (f) { return '<div class="card tipc" style="margin-bottom:10px"><div class="tipe">' + (window.icon ? window.icon(f[0]) : '') + '</div><div><b>' + f[1] + '</b><p class="mut small" style="margin:4px 0 0;line-height:1.45">' + f[2] + '</p></div></div>'; }).join('') +
+      '<button class="btn" data-a="facerout">Ver rutinas de cara</button>');
+  }
   function exV() {
     return '<div class="title">Ejercicios</div><p class="mut small" style="margin:4px 0 10px">' + Object.keys(EX).length + ' ejercicios con tutorial animado. Desliza para cambiar de categoría.</p>' +
       '<input type="search" id="exq" data-set="exq" placeholder="🔍 Buscar ejercicio…" value="' + esc(exQ) + '" autocomplete="off">' +
       segTabs('ex', PKEYS.ex.map(function (c) { return [c, c]; })) + '<div class="pnl" id="pnl" data-g="ex">' + exPanel(pst.ex) + '</div>';
   }
-  var CATC = { 'Piernas': '74,168,255', 'Pecho y brazos': '255,111,168', 'Core': '255,162,61', 'Espalda': '47,207,138', 'Cardio': '255,93,108', 'Crecer': '163,230,53', 'Movilidad': '167,139,250' };
+  var CATC = { 'Piernas': '74,168,255', 'Pecho y brazos': '255,111,168', 'Core': '255,162,61', 'Espalda': '47,207,138', 'Cardio': '255,93,108', 'Crecer': '163,230,53', 'Movilidad': '167,139,250', 'Boxeo': '255,93,108', 'Cara': '255,190,120' };
   var FTC = { des: '255,190,80', alm: '255,120,90', cen: '140,120,255', snk: '120,220,150', bat: '90,200,255' };
   function exCard(k) {
     var e = EX[k];
@@ -628,9 +651,12 @@
       Object.keys(EX).forEach(function (k) { var e = EX[k]; if (norm(e.n).indexOf(q) >= 0 || norm(e.m).indexOf(q) >= 0 || norm(e.cat).indexOf(q) >= 0) { h += exCard(k); n++; } });
       return n ? h + '</div>' : '<p class="mut" style="text-align:center;margin-top:30px">No encontré ejercicios con “' + esc(exQ) + '”.</p>';
     }
+    var intro = '';
+    if (cat === 'Cara') intro = faceBanner();
+    if (cat === 'Boxeo') intro = '<div class="card tipc"><div class="tipe">🥊</div><div><b>Clases de boxeo</b><p class="mut small" style="margin:4px 0 8px;line-height:1.45">Aprende cada golpe aquí y practica en clases guiadas por rounds.</p><button class="btn sm" data-a="boxclasses">Ver las clases</button></div></div>';
     h = '<div class="exg">';
     Object.keys(EX).forEach(function (k) { if (EX[k].cat === cat) { h += exCard(k); n++; } });
-    return '<div class="mut small" style="margin:0 2px 10px">' + n + ' ejercicios en esta categoría</div>' + h + '</div>';
+    return intro + '<div class="mut small" style="margin:0 2px 10px">' + n + ' ejercicios en esta categoría</div>' + h + '</div>';
   }
 
   function calHTML() {
@@ -1064,7 +1090,7 @@
     if (st.k === 'rest') return showRest(st);
     try { $('#overlay').style.setProperty('--cc', CATC[EX[st.ex].cat] || '74,168,255'); } catch (e) { }
     var e = EX[st.ex], isTime = st.type === 'time';
-    var kind = st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (st.label || 'Estiramiento') : 'Serie ' + st.set + ' de ' + st.sets;
+    var kind = st.kind === 'main' && st.label ? st.label : st.kind === 'warm' ? 'Calentamiento' : st.kind === 'cool' ? (st.label || 'Estiramiento') : 'Serie ' + st.set + ' de ' + st.sets;
     var html = header() + '<div class="pbody"><div class="kind">' + kind + '</div><div class="pname">' + e.n + '</div>' +
       '<div class="figbox"><svg id="pfig"></svg></div>';
     if (isTime) {
@@ -1390,6 +1416,9 @@
       case 'oblvl': obLvl = +v; Array.prototype.forEach.call(document.querySelectorAll('.lopt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'obgoal': obGoal = v; Array.prototype.forEach.call(document.querySelectorAll('.gopt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'profopen': profileSheet(); break;
+      case 'boxclasses': sheetClasses(); break;
+      case 'facerout': sheetFaceRoutines(); break;
+      case 'faceguide': sheetFaceGuide(); break;
       case 'fset': foodRead(); var kv = v.split(':'); S.food[kv[0]] = kv[0] === 'act' ? +kv[1] : kv[1]; save(); S.food.done = false; var pn1 = $('#pnl'); if (pn1) pn1.innerHTML = foodPanel('plan'); break;
       case 'fcalc':
         foodRead(); if (!foodCalc(S.food)) { toast('Completa edad, peso y estatura'); break; }
