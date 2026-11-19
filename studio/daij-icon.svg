@@ -1,11 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-<defs>
-<radialGradient id="bg" cx=".3" cy=".1" r="1.05"><stop offset="0" stop-color="#232a7a"/><stop offset=".55" stop-color="#11143f"/><stop offset="1" stop-color="#080a22"/></radialGradient>
-<linearGradient id="st" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2EE6F6"/><stop offset=".55" stop-color="#6D7BFF"/><stop offset="1" stop-color="#9B6BFF"/></linearGradient>
-<radialGradient id="dot" cx=".35" cy=".3" r=".8"><stop offset="0" stop-color="#E4FF8A"/><stop offset="1" stop-color="#A6EB1F"/></radialGradient>
-</defs>
-<rect width="512" height="512" rx="116" fill="url(#bg)"/>
-<rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="#fff" stroke-opacity=".09" stroke-width="3"/>
-<g transform="translate(-14,0)"><path d="M192,150 H250 A106,106 0 0 1 250,362 H192 Z" fill="none" stroke="url(#st)" stroke-width="30" stroke-linejoin="round" stroke-linecap="round"/>
-<circle cx="356" cy="148" r="17" fill="url(#dot)"/></g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="116" fill="#0B0D26"/><g transform="translate(124,120) scale(2.6)" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round"><circle cx="34" cy="70" r="30"/><path d="M64,0 V100"/></g><circle cx="378" cy="338" r="22" fill="#B6F23A"/></svg>

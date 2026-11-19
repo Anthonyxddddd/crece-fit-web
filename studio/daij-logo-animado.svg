@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -22 332 172" width="664" height="344">
+<style>
+.L .s{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 6s cubic-bezier(.6,0,.25,1) infinite;animation-delay:inherit}
+.L .s:nth-child(2){animation-delay:.12s}
+@keyframes draw{0%{stroke-dashoffset:1;opacity:1}14%{stroke-dashoffset:0}86%{stroke-dashoffset:0;opacity:1}95%{stroke-dashoffset:0;opacity:0}100%{stroke-dashoffset:1;opacity:0}}
+.dot{transform-box:fill-box;transform-origin:center;opacity:0;animation:drop 6s cubic-bezier(.3,1.6,.5,1) infinite}
+@keyframes drop{0%,16%{transform:translateY(-34px) scale(.2);opacity:0}23%{transform:translateY(0) scale(1.25);opacity:1}27%{transform:scale(.95)}30%{transform:scale(1)}84%{transform:scale(1);opacity:1}95%,100%{transform:scale(1);opacity:0}}
+.pulse{transform-box:fill-box;transform-origin:center;opacity:0;animation:pulse 6s ease-out infinite}
+@keyframes pulse{0%,24%{transform:scale(1);opacity:0}26%{opacity:.55}40%{transform:scale(3.4);opacity:0}100%{transform:scale(3.4);opacity:0}}
+</style>
+<g fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"><g transform="translate(0,0)" style="animation-delay:0.05s" class="L"><circle pathLength="1" class="s" cx="34" cy="70" r="30"/><path pathLength="1" class="s" d="M64,0 V100"/></g><g transform="translate(96,0)" style="animation-delay:0.3s" class="L"><circle pathLength="1" class="s" cx="34" cy="70" r="30"/><path pathLength="1" class="s" d="M64,40 V100"/></g><g transform="translate(197,0)" style="animation-delay:0.55s" class="L"><path pathLength="1" class="s" d="M0,40 V100"/></g><g transform="translate(252,0)" style="animation-delay:0.75s" class="L"><path pathLength="1" class="s" d="M0,40 V108 A18,18 0 0 1 -18,126"/></g></g>
+<circle class="pulse" cx="197" cy="14" r="7.5" fill="none" stroke="#B6F23A" stroke-width="2" style="animation-delay:.75s"/>
+<circle class="pulse" cx="252" cy="14" r="7.5" fill="none" stroke="#B6F23A" stroke-width="2" style="animation-delay:.9s"/>
+<circle class="dot" cx="197" cy="14" r="7.5" fill="#B6F23A" style="animation-delay:.75s"/>
+<circle class="dot" cx="252" cy="14" r="7.5" fill="#B6F23A" style="animation-delay:.9s"/>
+</svg>
