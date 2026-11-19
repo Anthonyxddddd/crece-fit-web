@@ -1003,7 +1003,8 @@
       h += statsCard();
     } else {
       h += '<div class="card"><p class="mut small" style="margin:0;line-height:1.6">Tu altura final depende sobre todo de la genética. Esta app te ayuda a dar lo mejor de ti: fortalece músculos y huesos, mejora tu postura y movilidad de columna, y te recuerda lo básico: dormir 8–10 h, comer bien y moverte a diario. Ningún ejercicio “estira” los huesos por arte de magia, ¡pero sí puedes verte y sentirte más alto y fuerte!</p></div>' +
-        '<button class="btn sec" style="margin-top:12px" data-a="tutopen">▶ Ver el tutorial</button>';
+        '<button class="btn sec" style="margin-top:12px" data-a="tutopen">▶ Ver el tutorial</button>' +
+        '<p class="mut small" style="margin:18px 0 0;text-align:center;letter-spacing:.3px">Una app de <b style="color:var(--txt);letter-spacing:1.5px">DAIJ STUDIO</b></p>';
     }
     return h;
   }
