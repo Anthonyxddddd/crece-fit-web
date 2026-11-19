@@ -789,3 +789,13 @@ body.entered .tabs{animation:tabsup .5s cubic-bezier(.2,.9,.3,1) .12s both}
 #splash .slogo,.oblogo{filter:drop-shadow(0 16px 36px rgba(var(--acc-rgb),.5))}
 #splash .sgl::before,#splash .sgl::after{border-color:rgba(var(--acc-rgb),.6)}
 #splash .stag{color:rgba(255,255,255,.62)}
+
+/* ===================== MARCA daij studio ===================== */
+.bsvg{height:30px;width:auto;display:inline-block;vertical-align:middle;color:var(--txt)}
+.brandline{margin-top:22px;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--mut);font-size:13px}
+.brandline .bsvg{height:26px}
+.brandline small{font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+#splash .sbrand{position:absolute;left:0;right:0;bottom:calc(34px + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:center;gap:8px;color:#fff;opacity:0;animation:sbr .7s ease-out .95s forwards}
+#splash .sbrand .bsvg{height:24px;color:#fff}
+#splash .sbrand small{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:700}
+@keyframes sbr{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
