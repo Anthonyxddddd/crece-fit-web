@@ -73,10 +73,49 @@
       '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>';
   }
 
+  /* Personaje: cabeza redonda, ojos grandes, pelo marrón, camisa azul, brazos y piernas de salchicha, pies redondos y contorno fino */
+  var OL = '#101119', SKIN = '#f1c9a5', HAIR = '#3a2418',
+      SHIRT = '#3a6ee0', SHIRT_F = '#2d57b5', PANTS = '#2b2f45', PANTS_F = '#1d2132', SHOE = '#ffffff', SHOE_F = '#c9d0e2';
+  function f2(n) { return n.toFixed(1); }
+  function pts(a) { return f2(a[0]) + ',' + f2(a[1]); }
+  function tube(a, b, c, w, col) {
+    var d = 'M' + pts(a) + ' L' + pts(b) + (c ? ' L' + pts(c) : '');
+    return '<path d="' + d + '" fill="none" stroke="' + OL + '" stroke-width="' + f2(w + 2.8) + '" stroke-linecap="round" stroke-linejoin="round"/>' +
+      '<path d="' + d + '" fill="none" stroke="' + col + '" stroke-width="' + f2(w) + '" stroke-linecap="round" stroke-linejoin="round"/>';
+  }
+  function hand(p, col) { return '<circle cx="' + f2(p[0]) + '" cy="' + f2(p[1]) + '" r="3.7" fill="' + col + '" stroke="' + OL + '" stroke-width="1.3"/>'; }
+  function shoeAt(f, t, col, front) {
+    if (front) return '<ellipse cx="' + f2(f[0]) + '" cy="' + f2(f[1] + 2) + '" rx="6.2" ry="4.3" fill="' + col + '" stroke="' + OL + '" stroke-width="1.3"/>';
+    var cx = (f[0] + t[0]) / 2 + 0.6, cy = (f[1] + t[1]) / 2 + 1.4, ang = Math.atan2(t[1] - f[1], t[0] - f[0]) / rad;
+    return '<ellipse cx="' + f2(cx) + '" cy="' + f2(cy) + '" rx="8.4" ry="4.6" fill="' + col + '" stroke="' + OL + '" stroke-width="1.3" transform="rotate(' + f2(ang) + ' ' + f2(cx) + ' ' + f2(cy) + ')"/>';
+  }
+  function head(J, p, front) {
+    var hx = J.h[0], hy = J.h[1], ang = (p.hd + 90), s = '';
+    s += '<g transform="translate(' + f2(hx) + ',' + f2(hy) + ') rotate(' + f2(ang) + ') scale(1.16)">';
+    if (front) {
+      s += '<circle r="10.6" fill="' + SKIN + '" stroke="' + OL + '" stroke-width="1.4"/>';
+      s += '<ellipse cx="-10.4" cy="1.6" rx="1.6" ry="2.6" fill="' + SKIN + '" stroke="' + OL + '" stroke-width="1"/><ellipse cx="10.4" cy="1.6" rx="1.6" ry="2.6" fill="' + SKIN + '" stroke="' + OL + '" stroke-width="1"/>';
+      s += '<path d="M-11,-1.5 A11,11 0 0 1 11,-1.5 Q8.5,-6.4 4,-5 Q0,-8.4 -4.5,-5.2 Q-9,-5 -11,-1.5 Z" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.2" stroke-linejoin="round"/>';
+      s += '<circle cx="-5" cy="-10" r="3.4" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.1"/><circle cx="2" cy="-11.4" r="3.6" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.1"/><circle cx="7.6" cy="-8.6" r="3.2" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.1"/>';
+      s += '<ellipse cx="-4.2" cy="2" rx="1.9" ry="2.5" fill="#15151c"/><ellipse cx="4.2" cy="2" rx="1.9" ry="2.5" fill="#15151c"/><circle cx="-3.5" cy="1.1" r=".75" fill="#fff"/><circle cx="4.9" cy="1.1" r=".75" fill="#fff"/>';
+      s += '<ellipse cx="-7.4" cy="5.4" rx="1.8" ry="1.1" fill="#ff8f8f" opacity=".7"/><ellipse cx="7.4" cy="5.4" rx="1.8" ry="1.1" fill="#ff8f8f" opacity=".7"/>';
+      s += '<path d="M-3.4,6.4 Q0,9.4 3.4,6.4" fill="none" stroke="#7a2a30" stroke-width="1.2" stroke-linecap="round"/>';
+    } else {
+      s += '<circle r="10.6" fill="' + SKIN + '" stroke="' + OL + '" stroke-width="1.4"/>';
+      s += '<circle cx="10.4" cy="3.2" r="1.7" fill="' + SKIN + '" stroke="' + OL + '" stroke-width="1.1"/>';
+      s += '<path d="M-10.8,1 A10.8,10.8 0 0 1 8.6,-6.4 Q4,-3.4 1,-3.2 Q-2.4,-2.4 -2,3.4 Q-3,6.4 -6,6.6 Q-10,6 -10.8,1 Z" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.2" stroke-linejoin="round"/>';
+      s += '<circle cx="-3.6" cy="-10" r="3.5" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.1"/><circle cx="3.4" cy="-10.8" r="3.5" fill="' + HAIR + '" stroke="' + OL + '" stroke-width="1.1"/>';
+      s += '<ellipse cx="-1.6" cy="3.4" rx="1.5" ry="2.4" fill="#e3b189" stroke="' + OL + '" stroke-width=".8"/>';
+      s += '<ellipse cx="5.2" cy="1.8" rx="1.9" ry="2.5" fill="#15151c"/><circle cx="5.9" cy="0.9" r=".75" fill="#fff"/>';
+      s += '<ellipse cx="6.8" cy="5.6" rx="1.7" ry="1" fill="#ff8f8f" opacity=".7"/>';
+      s += '<path d="M4,7 Q7,9.4 9.2,6.8" fill="none" stroke="#7a2a30" stroke-width="1.2" stroke-linecap="round"/>';
+    }
+    return s + '</g>';
+  }
+
   function draw(anim, p, J) {
     var front = anim.view === 'front';
-    var C = g.FigColors, far = C.far, near = C.near, skin = '#ffd9b3', dark = C.dark;
-    var s = '';
+    var C = g.FigColors, s = '';
     // suelo y sombra
     s += '<ellipse cx="' + J.p[0].toFixed(1) + '" cy="' + (GROUND + 2) + '" rx="62" ry="4" fill="' + C.shadow + '"/>';
     s += '<line x1="14" y1="' + GROUND + '" x2="226" y2="' + GROUND + '" stroke="' + C.ground + '" stroke-width="2" stroke-linecap="round"/>';
@@ -85,33 +124,27 @@
       s += '<line x1="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y1="-30" x2="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y2="' + GROUND + '" stroke="' + C.wallLine + '" stroke-width="2"/>';
     }
     // extremidades lejanas
-    s += limb(J.s2, J.e2, J.w2, 6.4, far);
-    s += limb(J.h2, J.k2, J.f2, 7.4, far);
-    if (!front) s += line(J.f2, J.t2, 6, far);
-    // torso (curva)
+    s += tube(J.s2, J.e2, J.w2, 7.4, SHIRT_F) + hand(J.w2, '#d9ac88');
+    s += tube(J.h2, J.k2, J.f2, 8.8, PANTS_F);
+    s += shoeAt(J.f2, J.t2, SHOE_F, front);
+    // torso (curva) con cintura de pantalón
     var d = [J.n[0] - J.p[0], J.n[1] - J.p[1]], len = Math.sqrt(d[0] * d[0] + d[1] * d[1]) || 1;
     var cx = (J.p[0] + J.n[0]) / 2 + (-d[1] / len) * p.tb, cy = (J.p[1] + J.n[1]) / 2 + (d[0] / len) * p.tb;
-    s += '<path d="M' + J.p[0].toFixed(1) + ',' + J.p[1].toFixed(1) + ' Q' + cx.toFixed(1) + ',' + cy.toFixed(1) + ' ' + J.n[0].toFixed(1) + ',' + J.n[1].toFixed(1) +
-      '" fill="none" stroke="' + dark + '" stroke-width="' + (front ? 15 : 12) + '" stroke-linecap="round"/>';
-    if (front) { s += line(J.s1, J.s2, 7, dark); s += line(J.h1, J.h2, 7, dark); }
+    var tw = front ? 17 : 14, tp = 'M' + J.p[0].toFixed(1) + ',' + J.p[1].toFixed(1) + ' Q' + cx.toFixed(1) + ',' + cy.toFixed(1) + ' ' + J.n[0].toFixed(1) + ',' + J.n[1].toFixed(1);
+    s += '<path d="' + tp + '" fill="none" stroke="' + OL + '" stroke-width="' + (tw + 2.8) + '" stroke-linecap="round"/>';
+    s += '<path d="' + tp + '" fill="none" stroke="' + SHIRT + '" stroke-width="' + tw + '" stroke-linecap="round"/>';
+    var wp = [J.p[0] + d[0] / len * 7, J.p[1] + d[1] / len * 7];
+    s += '<path d="M' + pts(J.p) + ' L' + pts(wp) + '" stroke="' + PANTS + '" stroke-width="' + tw + '" stroke-linecap="round"/>';
+    if (front) {
+      s += tube(J.s1, J.s2, null, 8, SHIRT) + tube(J.h1, J.h2, null, 7.6, PANTS);
+    }
     // extremidades cercanas
-    s += limb(J.h1, J.k1, J.f1, 8, near);
-    if (!front) s += line(J.f1, J.t1, 6.4, near);
-    s += limb(J.s1, J.e1, J.w1, 6.8, near);
-    s += '<circle cx="' + J.w1[0].toFixed(1) + '" cy="' + J.w1[1].toFixed(1) + '" r="3.6" fill="' + skin + '"/>';
-    s += '<circle cx="' + J.w2[0].toFixed(1) + '" cy="' + J.w2[1].toFixed(1) + '" r="3.2" fill="#b9b2ad" opacity=".9"/>';
-    // cabeza
-    s += '<circle cx="' + J.h[0].toFixed(1) + '" cy="' + J.h[1].toFixed(1) + '" r="9.5" fill="' + skin + '" stroke="#e8b987" stroke-width="1.5"/>';
-    // carita (mira hacia donde apunta la cara)
-    var fa = (p.hd > -180 && p.hd < 0 || p.hd >= 180) ? 1 : 1;
-    var ex = front ? 0 : 3.6, ey = -1;
-    var hx = J.h[0], hy = J.h[1];
-    var ang = (p.hd + 90) * rad; // rotación de la cabeza respecto a "arriba"
-    function rot(x, y) { return [hx + x * Math.cos(ang) - y * Math.sin(ang), hy + x * Math.sin(ang) + y * Math.cos(ang)]; }
-    var e1, e2;
-    if (front) { e1 = rot(-3.2, -1); e2 = rot(3.2, -1); } else { e1 = rot(ex, ey); e2 = null; }
-    s += '<circle cx="' + e1[0].toFixed(1) + '" cy="' + e1[1].toFixed(1) + '" r="1.5" fill="#33291f"/>';
-    if (e2) s += '<circle cx="' + e2[0].toFixed(1) + '" cy="' + e2[1].toFixed(1) + '" r="1.5" fill="#33291f"/>';
+    s += tube(J.h1, J.k1, J.f1, 9.4, PANTS);
+    s += shoeAt(J.f1, J.t1, SHOE, front);
+    s += tube(J.s1, J.e1, J.w1, 7.8, SHIRT) + hand(J.w1, SKIN);
+    // cuello y cabeza
+    s += '<line x1="' + pts(J.n).replace(',', '" y1="') + '" x2="' + f2(J.h[0]) + '" y2="' + f2(J.h[1] + 4) + '" stroke="' + SKIN + '" stroke-width="5"/>';
+    s += head(J, p, front);
     return s;
   }
 
