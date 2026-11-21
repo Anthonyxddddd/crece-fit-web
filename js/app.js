@@ -1619,7 +1619,7 @@
       case 'updno': dialogClose(); break;
       case 'updgo':
         upd.busy = true; S.updTry = { from: window.APP_VERSION || 0, t: Date.now() }; save();
-        $('#upd').innerHTML = '<h3 id="uph">Actualizando…</h3><div class="pbar"><i id="upi"></i></div><div class="upct" id="upt">0%</div><p class="mut small" id="upn" style="text-align:center;margin-top:6px">No cierres la app</p>';
+        $('#upd').innerHTML = '<h3 id="uph">Actualizando…</h3><svg id="uprk" width="190" height="190" style="display:block;margin:6px auto 0"></svg><div class="upct" id="upt" style="font-size:30px">0%</div><p class="mut small" id="upn" style="text-align:center;margin-top:6px">No cierres la app</p>'; startRocket($('#uprk'));
         try { if (AND() && AND().startUpdate) AND().startUpdate(); else { upd.busy = false; dialogClose(); location.reload(); } } catch (e) { window.__updateError(); }
         break;
       case 'mno': dialogClose(); break;
@@ -1751,6 +1751,59 @@
   function deferOrShow(fn) { if (P || $('#ob')) { upd.waitFn = fn; return; } fn(); }
   function runWaiting() { if (upd.waitFn) { var f = upd.waitFn; upd.waitFn = null; f(); } }
 
+
+  /* ---------- Animación de actualización: cohete de líneas -> check ---------- */
+  var RK = { N: 220, SRC: null, TGT: null };
+  function rkSamp(d, n) { var p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', d); var L = p.getTotalLength(), r = [], i, q; for (i = 0; i < n; i++) { q = p.getPointAtLength(L * i / (n - 1)); r.push([q.x, q.y]); } return r; }
+  function rkEase(t) { t = Math.max(0, Math.min(1, t)); return t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; }
+  function rkRnd(i) { var x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); }
+  function startRocket(svg) {
+    var A = getComputedStyle(document.documentElement).getPropertyValue('--acc').trim() || '#4aa8ff', MUT = (window.FigColors && window.FigColors.ground) || '#39406b';
+    var RKD = 'M85 82 L85 72 L74 56 L75.5 56 C76 44 72 28 60 14 C48 28 44 44 44.5 56 L46 56 L35 72 L35 82 L46 74 L74 74 Z';
+    if (!RK.SRC) {
+      RK.SRC = rkSamp('M24 108 L96 108 L85 82 L85 72 L74 56 L75.5 56 C76 44 72 28 60 14 C48 28 44 44 44.5 56 L46 56 L35 72 L35 82 L46 74 L74 74 L85 82', RK.N);
+      RK.TGT = rkSamp('M38 62 L54 77 L84 44', RK.N);
+    }
+    svg.setAttribute('viewBox', '0 0 120 120');
+    var st = { shown: 0, target: 0, t0: performance.now(), tf: -1, raf: 0 };
+    upd.rk = st;
+    function flame(t) { var k = .7 + .3 * Math.sin(t * 38), k2 = .7 + .3 * Math.sin(t * 31 + 1.7); return '<g fill="none" stroke="' + A + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M55 80 Q60 ' + (88 + 18 * k) + ' 65 80"/><path d="M60 86 L60 ' + (92 + 12 * k2) + '" opacity=".7"/></g>'; }
+    function speed(t, fade) { var o = '', i; for (i = 0; i < 9; i++) { var x = 14 + rkRnd(i) * 92, sp = 1.1 + rkRnd(i + 9) * .9, y = ((t * sp * 140 + rkRnd(i + 20) * 160) % 160) - 20, len = 10 + rkRnd(i + 5) * 14; if (Math.abs(x - 60) < 22) continue; o += '<line x1="' + x.toFixed(1) + '" y1="' + y.toFixed(1) + '" x2="' + x.toFixed(1) + '" y2="' + (y - len).toFixed(1) + '" stroke="' + A + '" stroke-width="2" stroke-linecap="round" opacity="' + ((.18 + .3 * rkRnd(i + 3)) * fade).toFixed(2) + '"/>'; } return o; }
+    function frame(now) {
+      if (!svg.isConnected) return;
+      var dt = (now - (st.last || now)) / 1000; st.last = now;
+      var t = (now - st.t0) / 1000, o = '';
+      // la barra alcanza al avance real (rápido) para que la animación se vea aunque la descarga sea corta
+      if (st.shown < st.target) st.shown = Math.min(st.target, st.shown + Math.max(dt * 260, (st.target - st.shown) * dt * 6));
+      var p = st.shown / 100, BX0 = 24, BX1 = 96, BY = 108;
+      if (st.tf < 0 && st.shown >= 100) st.tf = t;
+      if (st.tf < 0) {
+        var shake = Math.sin(t * 60) * .7 + Math.sin(t * 47) * .5, bob = Math.sin(t * 3) * 2.5;
+        o += speed(t, 1) + '<g transform="translate(' + shake.toFixed(2) + ',' + (bob - 6).toFixed(2) + ')">' + flame(t) + '<g fill="none" stroke="' + A + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="' + RKD + '"/><circle cx="60" cy="42" r="7"/></g></g>';
+        o += '<line x1="' + BX0 + '" y1="' + BY + '" x2="' + BX1 + '" y2="' + BY + '" stroke="' + MUT + '" stroke-width="3" stroke-linecap="round"/><line x1="' + BX0 + '" y1="' + BY + '" x2="' + (BX0 + (BX1 - BX0) * p).toFixed(1) + '" y2="' + BY + '" stroke="' + A + '" stroke-width="3.4" stroke-linecap="round"/>';
+      } else {
+        var u = t - st.tf, PA = .26, PM = .6;
+        o += speed(t, Math.max(0, 1 - u / .2));
+        if (u < PA) {
+          var q = rkEase(u / PA);
+          if (u < .12) o += '<g transform="translate(0,-6)" opacity="' + (1 - u / .12).toFixed(2) + '">' + flame(t) + '</g>';
+          o += '<g transform="translate(0,' + (-6 * (1 - q)).toFixed(2) + ')" fill="none" stroke="' + A + '" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="' + RKD + '"/><circle cx="60" cy="42" r="' + (7 * (1 - q)).toFixed(2) + '" opacity="' + (1 - q).toFixed(2) + '"/></g>';
+          o += '<line x1="' + BX0 + '" y1="' + BY + '" x2="' + BX1 + '" y2="' + BY + '" stroke="' + A + '" stroke-width="3.2" stroke-linecap="round"/>';
+          o += '<path d="M96 108 L85 82" fill="none" stroke="' + A + '" stroke-width="3.2" stroke-linecap="round" stroke-dasharray="28" stroke-dashoffset="' + (28 * (1 - q)).toFixed(1) + '"/>';
+        } else {
+          var m = rkEase(Math.min(1, (u - PA) / PM)), d = '', i;
+          for (i = 0; i < RK.N; i++) { d += (i ? ' L' : 'M') + (RK.SRC[i][0] + (RK.TGT[i][0] - RK.SRC[i][0]) * m).toFixed(2) + ' ' + (RK.SRC[i][1] + (RK.TGT[i][1] - RK.SRC[i][1]) * m).toFixed(2); }
+          var cu = rkEase(Math.max(0, Math.min(1, (u - PA - PM * .25) / (PM * .8)))), CC = 2 * Math.PI * 44, pul = 1 + Math.sin(Math.max(0, Math.min(1, (u - PA - PM * .85) / .4)) * Math.PI) * .06;
+          o += '<g transform="translate(60,60) scale(' + pul.toFixed(3) + ') translate(-60,-60)"><circle cx="60" cy="60" r="44" fill="none" stroke="' + A + '" stroke-width="3.6" stroke-linecap="round" stroke-dasharray="' + CC.toFixed(1) + '" stroke-dashoffset="' + (CC * (1 - cu)).toFixed(1) + '" transform="rotate(-90 60 60)"/>';
+          o += '<path d="' + d + '" fill="none" stroke="' + A + '" stroke-width="' + (3.2 + m * 2.2).toFixed(2) + '" stroke-linecap="round" stroke-linejoin="round"/></g>';
+          var wv = (u - PA - PM * .9) / .6; if (wv > 0 && wv < 1) o += '<circle cx="60" cy="60" r="' + (46 + wv * 20).toFixed(1) + '" fill="none" stroke="' + A + '" stroke-width="2" opacity="' + (.5 * (1 - wv)).toFixed(2) + '"/>';
+        }
+      }
+      svg.innerHTML = o;
+      st.raf = requestAnimationFrame(frame);
+    }
+    st.raf = requestAnimationFrame(frame);
+  }
   function showUpd() {
     var m = $('#modal');
     m.innerHTML = '<div class="dlg" id="upd"><h3>🚀 Actualización disponible</h3><p class="mut" style="line-height:1.45">Hay mejoras nuevas y <b>no necesitas instalar nada</b>. Se descargan ahora: la app se cerrará sola y, al abrirla de nuevo, ya estará actualizada.</p>' +
@@ -1822,8 +1875,9 @@
   window.__updateProgress = function (p) {
     var i = $('#upi'), t = $('#upt'), h = $('#uph');
     if (i) i.style.width = p + '%';
+    if (upd.rk) upd.rk.target = p;
     if (t) t.textContent = p + '%';
-    if (p >= 100 && h) { h.textContent = '¡Listo! ✅ Cerrando la app…'; var n = $('#upn'); if (n) n.textContent = 'La próxima vez que entres ya estará actualizada'; }
+    if (p >= 100 && h) { h.textContent = '¡Listo! Cerrando la app…'; var n = $('#upn'); if (n) n.textContent = 'La próxima vez que entres ya estará actualizada'; }
   };
   window.__updateError = function (m) {
     statEvent('upd_err', { m: String(m || '').slice(0, 120) });
