@@ -799,3 +799,8 @@ body.entered .tabs{animation:tabsup .5s cubic-bezier(.2,.9,.3,1) .12s both}
 #splash .sbrand .bsvg{height:24px;color:#fff}
 #splash .sbrand small{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.55);font-weight:700}
 @keyframes sbr{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.cal .d{position:relative}
+.cal .d.done.rl{border-top-left-radius:8px;border-bottom-left-radius:8px}
+.cal .d.done.rr{border-top-right-radius:8px;border-bottom-right-radius:8px}
+.cal .d.done.rr::after{content:'';position:absolute;right:-5px;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--fire),var(--fire2))}

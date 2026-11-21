@@ -72,6 +72,23 @@
     return { cur: cur, best: best, doneToday: done, total: S.total, mins: Math.round(mins), chains: S.chains, lvl: levelOf(S.xp),
       maxReps: maxReps, early: early, goalsHit: Object.keys(S.goalsHit).length, planDone: !!S.planDone, habitDays: hd };
   }
+  /* insignias de racha: próxima meta y avisos al desbloquear */
+  function nextStreak(st) {
+    var cur = Math.max(st.cur, 0), i, nx = 0, prev = 0;
+    for (i = 0; i < STREAK_STEPS.length; i++) { if (STREAK_STEPS[i] > cur) { nx = STREAK_STEPS[i]; break; } prev = STREAK_STEPS[i]; }
+    return nx ? { n: nx, left: nx - cur, pct: Math.round((cur - prev) / (nx - prev) * 100), prev: prev } : null;
+  }
+  function streakBadgeCard(st) {
+    var nx = nextStreak(st);
+    if (!nx) return '<div class="card" style="text-align:center"><b>🏆 ¡Tienes todas las insignias de racha!</b></div>';
+    return '<div class="card"><div class="row"><div class="sp"><b>Próxima insignia: ' + nx.n + ' días</b><div class="mut small">' + (nx.left === 1 ? 'Te falta 1 día' : 'Te faltan ' + nx.left + ' días') + ' · racha actual ' + st.cur + '</div></div><div style="font-size:30px">🔥</div></div><div class="pbar" style="margin:12px 0 0"><i style="width:' + nx.pct + '%"></i></div></div>';
+  }
+  function checkBadges(silent) {
+    var st = stats(), seen = S.bseen || (S.bseen = {}), fresh = [], first = !S.bseenInit;
+    BADGES.forEach(function (b) { if (b.f(st) && !seen[b.id]) { seen[b.id] = 1; if (!first) fresh.push(b); } });
+    S.bseenInit = 1; if (!silent || fresh.length || first) save();
+    return fresh;
+  }
   /* semana actual (lunes a domingo): entrenamientos hechos */
   function weekKey() { var d = new Date(), wd = (d.getDay() + 6) % 7; d.setDate(d.getDate() - wd); return dstr(d); }
   function weekCount() {
@@ -114,12 +131,25 @@
     try { if (AND() && AND().vibrate) AND().vibrate(ms); else if (navigator.vibrate) navigator.vibrate(ms); } catch (e) { }
   }
   function keepAwake(on) { try { if (AND() && AND().keepAwake) AND().keepAwake(on); } catch (e) { } }
+  /* recordatorio inteligente: aprende a qué hora entrenas y avisa un poco antes */
+  function smartMin() {
+    var h = (S.hrs || []).slice(-14);
+    if (h.length < 3) return null;
+    h = h.slice().sort(function (x, y) { return x - y; });
+    var med = h[Math.floor(h.length / 2)];
+    return Math.max(360, Math.min(1290, med - 20));
+  }
+  function remTime() {
+    var sm = S.settings.smart ? smartMin() : null;
+    return sm == null ? { h: S.settings.rh, m: S.settings.rm, smart: false } : { h: Math.floor(sm / 60), m: sm % 60, smart: true };
+  }
   function syncReminder() {
     try {
       if (!AND() || !AND().setReminder) return;
       var st = stats(), msg = st.cur > 0 ? '¡Mantén tu racha de ' + st.cur + ' día' + (st.cur > 1 ? 's' : '') + '! 🔥 Hoy toca entrenar.' : '¡Es hora de entrenar! Empieza tu racha hoy 💪';
-      var last = Object.keys(S.days).sort().pop() || '';
-      AND().setReminder(!!S.settings.rem, S.settings.rh, S.settings.rm, msg, last);
+      var nb = nextStreak(st); if (nb && nb.left <= 3 && st.cur > 0) msg = '🔥 Racha de ' + st.cur + ' días: ' + (nb.left === 1 ? 'mañana' : 'en ' + nb.left + ' días') + ' ganas la insignia de ' + nb.n + '.';
+      var last = Object.keys(S.days).sort().pop() || '', rt = remTime();
+      AND().setReminder(!!S.settings.rem, rt.h, rt.m, msg, last);
     } catch (e) { }
     syncWidget();
   }
@@ -839,13 +869,22 @@
     return intro + '<div class="mut small" style="margin:0 2px 10px">' + n + ' ejercicios en esta categoría</div>' + h + '</div>';
   }
 
+  var cal_sum = '';
   function calHTML() {
     var base = new Date(); base.setDate(1); base.setMonth(base.getMonth() + calOff);
     var y = base.getFullYear(), m = base.getMonth(), first = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate(), i, c = '';
     DAYS.forEach(function (d) { c += '<div class="h">' + d + '</div>'; });
     for (i = 0; i < first; i++) c += '<div></div>';
-    for (i = 1; i <= n; i++) { var k = y + '-' + pad(m + 1) + '-' + pad(i); var rr = S.days[k]; c += '<div class="d' + (rr && rr.w > 0 ? ' done' : rr && rr.freeze ? ' freeze' : '') + (k === today() ? ' today' : '') + '">' + i + '</div>'; }
-    return '<div class="row" style="margin-bottom:10px"><button class="btn sec sm" data-a="calp">‹</button><div class="sp" style="text-align:center;font-weight:800">' + MONTHS[m] + ' ' + y + '</div><button class="btn sec sm" data-a="caln">›</button></div><div class="cal">' + c + '</div>';
+    var mdone = 0, mbest = 0, mrun = 0;
+    function isDone(dd) { var q = S.days[dd]; return !!(q && (q.w > 0 || q.freeze)); }
+    for (i = 1; i <= n; i++) {
+      var k = y + '-' + pad(m + 1) + '-' + pad(i), rr = S.days[k], dn = !!(rr && rr.w > 0), on = isDone(k), col = (first + i - 1) % 7, ky = new Date(y, m, i - 1), kn = new Date(y, m, i + 1);
+      var pv = on && col > 0 && i > 1 && isDone(y + '-' + pad(m + 1) + '-' + pad(i - 1)), nx = on && col < 6 && i < n && isDone(y + '-' + pad(m + 1) + '-' + pad(i + 1));
+      if (dn) { mdone++; mrun++; if (mrun > mbest) mbest = mrun; } else if (!on) mrun = 0;
+      c += '<div class="d' + (dn ? ' done' : rr && rr.freeze ? ' freeze' : '') + (pv ? ' rl' : '') + (nx ? ' rr' : '') + (k === today() ? ' today' : '') + '">' + i + '</div>';
+    }
+    cal_sum = mdone + ' día' + (mdone === 1 ? '' : 's') + ' entrenado' + (mdone === 1 ? '' : 's') + ' este mes' + (mbest > 1 ? ' · mejor racha del mes: ' + mbest : '');
+    return '<div class="row" style="margin-bottom:10px"><button class="btn sec sm" data-a="calp">‹</button><div class="sp" style="text-align:center;font-weight:800">' + MONTHS[m] + ' ' + y + '</div><button class="btn sec sm" data-a="caln">›</button></div><div class="cal">' + c + '</div><p class="mut small" style="text-align:center;margin:10px 0 0;font-weight:700">' + cal_sum + '</p>';
   }
 
   function lineChart(pts) {
@@ -919,7 +958,7 @@
       if (last.length) h += '<div class="exl" style="margin-top:10px">' + last.map(function (m) { return '<div class="li"><b>' + m.d + '</b><span>' + (m.h ? m.h + ' cm ' : '') + (m.w ? m.w + ' kg' : '') + '</span></div>'; }).join('') + '</div>';
       h += '<div class="note">💡 Mide siempre a la misma hora (mejor por la mañana). La estatura depende mucho de la genética: entrenar, dormir bien, comer proteína y mantener buena postura te ayudan a alcanzar tu máximo.</div></div>';
     } else if (k === 'logros') {
-      h += '<div class="badges">' + BADGES.map(function (b) { var ok = b.f(st); return '<div class="badge' + (ok ? '' : ' lock') + '"><span class="e">' + b.e + '</span>' + b.n + '</div>'; }).join('') + '</div>';
+      h += streakBadgeCard(st) + '<div class="badges" style="margin-top:12px">' + BADGES.map(function (b) { var ok = b.f(st); return '<div class="badge' + (ok ? '' : ' lock') + '"><span class="e">' + b.e + '</span>' + b.n + '</div>'; }).join('') + '</div>';
     } else {
       h += '<div class="card"><b>🏅 Mis récords</b><div style="margin-top:8px">' + recsHTML() + '</div></div>';
       h += '<div class="h2">Nivel de tus ejercicios</div><div class="card">' + Object.keys(CHAINS).map(function (c) {
@@ -957,7 +996,7 @@
       ['prof', '🎯', 'Mi objetivo y nivel', S.profile ? GOALS[S.profile.goal].n + ' · ' + LEVELS[S.profile.level].n : 'Elige tu objetivo'],
       ['train', '🏋️', 'Entrenamiento', 'Meta ' + s.goal + ' días · descanso ' + s.rest + ' s'],
       ['look', '🎨', 'Apariencia', (THEME_N[s.theme] || '') + ' · ' + (MODE_N[s.mode] || '')],
-      ['sound', '🔔', 'Sonido y avisos', (s.sound ? 'Sonido' : 'Sin sonido') + (s.voice ? ' · voz' : '') + (s.rem ? ' · recordatorio ' + pad(s.rh) + ':' + pad(s.rm) : '')],
+      ['sound', '🔔', 'Sonido y avisos', (s.sound ? 'Sonido' : 'Sin sonido') + (s.voice ? ' · voz' : '') + (s.rem ? ' · recordatorio ' + pad(remTime().h) + ':' + pad(remTime().m) : '')],
       ['cloud', '☁️', 'Nube y copia de seguridad', !CLOUD_URL ? 'Copia manual' : (c.code ? 'Copia en la nube activa' : 'Sin activar')],
       ['upd', '🔄', 'Actualizaciones', 'Contenido v' + (window.APP_VERSION || '?') + ' · APK v' + apkName()]
     ];
@@ -992,7 +1031,8 @@
         '<div class="set"><div class="sp"><b>🗣 Voz</b><div class="mut small">Dice el ejercicio y cuenta contigo</div></div>' + sw('voice') + '</div>' +
         '<div class="set" style="border:0"><div class="sp"><b>📳 Vibración</b><div class="mut small">Avisos con vibración</div></div>' + sw('vib') + '</div></div>' +
         '<div class="card"><div class="set"><div class="sp"><b>⏰ Recordatorio diario</b><div class="mut small">Con botones “Empezar” y “En 1 hora”</div></div>' + sw('rem') + '</div>' +
-        (s.rem ? '<div style="padding:4px 0 12px"><input type="time" id="rt" data-set="rtime" value="' + pad(s.rh) + ':' + pad(s.rm) + '"></div>' : '') +
+        (s.rem ? (function () { var rt = remTime(), sm = smartMin(); return '<div style="padding:4px 0 6px"><input type="time" id="rt" data-set="rtime" value="' + pad(rt.h) + ':' + pad(rt.m) + '"' + (rt.smart ? ' disabled style="opacity:.55"' : '') + '></div>' +
+          '<div class="set"><div class="sp"><b>Hora inteligente</b><div class="mut small">' + (s.smart ? (sm == null ? 'Aprende tu horario tras 3 entrenamientos' : 'Avisa 20 min antes de tu hora habitual') : 'Aprende a qué hora entrenas') + '</div></div>' + sw('smart') + '</div>'; })() : '') +
         '<div class="set" style="border-bottom:0"><div class="sp"><b>🔥 Aviso de racha en peligro</b><div class="mut small">A las 9 pm, solo si aún no entrenaste</div></div>' + sw('risk') + '</div>' +
         (nativeOk('setReminderPlus') ? '' : '<p class="mut small" style="margin:0">Los botones y este aviso necesitan la última versión del APK.</p>') + '</div>' + widgetCard();
     } else if (k === 'cloud') {
@@ -1388,6 +1428,7 @@
     if (new Date().getHours() < 8) day.early = 1;
     // ajustes rápidos hechos durante la sesión
     Object.keys(P.adj).forEach(function (k) { if (CHAINS[k]) S.chains[k].v = Math.min(CHAINS[k][S.chains[k].i].max, P.adj[k]); else P.exk[k] = P.adj[k]; });
+    var nw = new Date(); (S.hrs || (S.hrs = [])).push(nw.getHours() * 60 + nw.getMinutes()); if (S.hrs.length > 30) S.hrs.shift();
     S.total++; S.log.push({ d: d, id: id, sec: secs }); if (S.log.length > 300) S.log.shift();
     var done = Object.keys(P.chains);
     if (!light) {
@@ -1406,6 +1447,7 @@
     if (tp && tp.t !== 'R') { gain += 10; P.planDay = true; }
     if (tp && tp.i >= 27) S.planDone = true;
     var up = addXP(gain); P.xp = { gain: gain, up: up };
+    save(); P.newBadges = checkBadges(false);
     save(); syncReminder(); cloudAuto();
     statEvent('workout', { r: /^U\d+/.test(id) ? 'U' : /^CH:/.test(id) ? 'CH' : id, s: secs, n: P.sets }); statsPing(true);
     beep(1000, 200); setTimeout(function () { beep(1400, 400); }, 220); vib(400); say('Entrenamiento completado. ¡Buen trabajo!');
@@ -1429,6 +1471,7 @@
       '<div class="card streak" style="margin-top:16px;text-align:center"><div class="flame" style="font-size:44px">🔥</div><div class="num">' + st.cur + '</div><div style="font-weight:800">' + (st.cur === 1 ? 'día de racha' : 'días de racha') + '</div></div>' +
       '<div class="row" style="justify-content:center;flex-wrap:wrap;margin-bottom:6px"><span class="chip on">+' + x.gain + ' XP</span>' + (P.goalHit ? '<span class="chip">🎯 ¡Meta semanal cumplida! +50</span>' : '') + (P.planDay ? '<span class="chip">📅 Día del plan ✓</span>' : '') + '</div>' +
       (P.chalMsg ? '<div class="note shine" style="text-align:center;font-weight:800">' + P.chalMsg + '</div>' : '') +
+      (P.newBadges && P.newBadges.length ? '<div class="note shine" style="text-align:center;font-weight:800">' + P.newBadges.map(function (b) { return b.e + ' ¡Nueva insignia: ' + b.n + '!'; }).join('<br>') + '</div>' : '') +
       (x.up ? '<div class="note shine" style="text-align:center;font-weight:800">⭐ ¡Subiste al nivel ' + x.up + ': ' + lvlName(x.up) + '!</div>' : '') +
       '<div class="sumgrid"><div><b>' + mmss(secs) + '</b><span>Tiempo</span></div><div><b>' + P.sets + '</b><span>Series</span></div><div><b>' + P.exs + '</b><span>Ejercicios</span></div></div>';
     if (!light && S.last && (S.last.done.length || (S.last.donex || []).length)) {
@@ -1547,6 +1590,7 @@
         setBool(v); if (v === 'fx' || v === 'black') applyTheme();
         if (v === 'voice' && S.settings.voice) say('Voz activada');
         if (v === 'stats') { if (S.settings.stats) { statsPing(true); } else statsDelete(); }
+        if (v === 'smart') syncReminder();
         if (v === 'rem' || v === 'risk') { if ((S.settings.rem || S.settings.risk) && AND() && AND().requestNotif) { try { AND().requestNotif(); } catch (e) { } } syncReminder(); }
         render(); break;
       case 'backup': var js = JSON.stringify(S);
@@ -1893,7 +1937,7 @@
 
   document.addEventListener('visibilitychange', function () { if (!document.hidden && !P) { autoFreezeMsg(); render(); } });
   function autoFreezeMsg() { if (S.setup && autoFreeze()) toast('❄️ Usamos un congelamiento: ¡tu racha sigue viva!'); }
-  load(); applyProgram(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
+  load(); checkBadges(true); applyProgram(); autoFreezeMsg(); applyTheme(); render(true); syncReminder();
   setTimeout(function () { jsCheck(false); }, 2500);
   setTimeout(cloudAuto, 6000);
   setTimeout(statsStart, 4500);

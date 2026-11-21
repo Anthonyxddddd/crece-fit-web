@@ -673,6 +673,7 @@ var TIPS = [
   'Mide tu estatura cada 2–4 semanas, a la misma hora (por la mañana eres un poco más alto).'
 ];
 
+var STREAK_STEPS = [3, 7, 14, 21, 30, 50, 100, 200, 365];
 var BADGES = [
   { id: 'first', e: '🌟', n: 'Primer entrenamiento', f: function (s) { return s.total >= 1; } },
   { id: 'w5', e: '💪', n: '5 entrenamientos', f: function (s) { return s.total >= 5; } },
@@ -681,7 +682,12 @@ var BADGES = [
   { id: 's3', e: '🔥', n: 'Racha de 3 días', f: function (s) { return s.best >= 3; } },
   { id: 's7', e: '🚀', n: 'Racha de 7 días', f: function (s) { return s.best >= 7; } },
   { id: 's14', e: '⚡', n: 'Racha de 14 días', f: function (s) { return s.best >= 14; } },
+  { id: 's21', e: '🌱', n: 'Racha de 21 días', f: function (s) { return s.best >= 21; } },
   { id: 's30', e: '👑', n: 'Racha de 30 días', f: function (s) { return s.best >= 30; } },
+  { id: 's50', e: '🌟', n: 'Racha de 50 días', f: function (s) { return s.best >= 50; } },
+  { id: 's100', e: '🏆', n: 'Racha de 100 días', f: function (s) { return s.best >= 100; } },
+  { id: 's200', e: '🌠', n: 'Racha de 200 días', f: function (s) { return s.best >= 200; } },
+  { id: 's365', e: '👑', n: 'Un año de racha', f: function (s) { return s.best >= 365; } },
   { id: 'lvl3', e: '⭐', n: 'Nivel 3', f: function (s) { return s.lvl >= 3; } },
   { id: 'lvl6', e: '🌠', n: 'Nivel 6', f: function (s) { return s.lvl >= 6; } },
   { id: 'goal1', e: '🎯', n: 'Meta semanal cumplida', f: function (s) { return s.goalsHit >= 1; } },
