@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ambiente · reloj y sonidos para dormir</title>
+<meta name="description" content="Ambiente: un reloj de mesa de noche con sonidos de relajación mezclables, temporizador y modo oscuro. Un app de daij studio para Android.">
+<link rel="icon" href="img/icon.png">
+<style>
+:root{--bg:#0b1630;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--tx:#eaf3ff;--mut:#9db6d8;--acc:#7dd3fc;--b:#3b82f6}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(1200px 700px at 20% -10%,#24508f 0,transparent 60%),linear-gradient(180deg,#0d1b3a,#0b1630);min-height:100vh;color:var(--tx);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.55}
+.w{max-width:960px;margin:0 auto;padding:0 20px 60px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:14px;color:var(--mut)}
+nav a{color:var(--mut);text-decoration:none}nav a:hover{color:var(--tx)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;padding:24px 0 40px}
+.hero img.ic{width:84px;height:84px;border-radius:22px;box-shadow:0 14px 30px -10px rgba(0,0,0,.5)}
+h1{font-size:clamp(34px,6vw,54px);font-weight:700;letter-spacing:-.02em;margin:16px 0 8px}
+.lead{font-size:18px;color:var(--mut);max-width:520px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:16px;background:var(--acc);color:#07203a;font-weight:700;font-size:17px;text-decoration:none;margin-top:22px;border:0;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chip{padding:6px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.shot{display:flex;justify-content:center}
+.shot img{width:min(280px,70vw);border-radius:34px;border:6px solid #16284f;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+section{margin-top:34px}
+h2{font-size:22px;font-weight:600;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+.card h3{font-size:16px;margin-bottom:6px}.card p{font-size:14px;color:var(--mut)}
+.card svg{width:26px;height:26px;stroke:var(--acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px}
+ul.n{padding-left:20px;color:var(--mut);font-size:15px}ul.n li{margin:5px 0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ol{padding-left:20px;color:var(--mut);font-size:15px}ol li{margin:6px 0}
+.land{width:100%;border-radius:22px;border:1px solid var(--line);margin-top:6px}
+code{background:rgba(255,255,255,.1);padding:2px 7px;border-radius:8px;font-size:12px;word-break:break-all}
+footer{margin-top:44px;text-align:center;color:var(--mut);font-size:13px}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.shot{order:-1}.row2{grid-template-columns:1fr}}
+</style></head><body><div class="w">
+<nav><a href="/">daij studio</a><a href="#instalar">Cómo instalar</a></nav>
+<div class="hero"><div>
+ <img class="ic" src="img/icon.png" alt="Ambiente">
+ <h1>Ambiente</h1>
+ <p class="lead">Un reloj de mesa de noche con sonidos de relajación que mezclas a tu gusto: lluvia, mar, bosque, fuego y más. Para dormir, estudiar o concentrarte.</p>
+ <a class="btn" id="dl" href="Ambiente.apk" download>Descargar para Android</a>
+ <div class="meta"><span class="chip" id="mv">Versión …</span><span class="chip" id="ms">…</span><span class="chip" id="md">…</span><span class="chip">Gratis</span><span class="chip">Sin internet</span></div>
+</div><div class="shot"><img src="img/p.webp" alt="Ambiente en el teléfono"></div></div>
+
+<section><h2>Qué incluye</h2><div class="grid">
+ <div class="card"><svg viewBox="0 0 24 24"><path d="M7 15a4 4 0 0 1-.5-7.9A5.5 5.5 0 0 1 17 6.6 3.7 3.7 0 0 1 17 15H7z"/><path d="M8 18l-1 3M12 18l-1 3M16 18l-1 3"/></svg><h3>8 sonidos mezclables</h3><p>Lluvia, tormenta, mar, bosque, viento, fuego, noche y ruido suave. Cada uno con su volumen.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><h3>Temporizador</h3><p>Apaga los sonidos solo después de 15 a 120 minutos, bajando el volumen poco a poco.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg><h3>Modo mesa de noche</h3><p>Brillo mínimo y reloj tenue para dejarlo encendido toda la noche.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg><h3>Fondo que reacciona</h3><p>Gotas, olas, chispas y hojas que cambian según lo que suena.</p></div>
+</div></section>
+
+<section><h2>Pantalla horizontal</h2><img class="land" src="img/l.webp" alt="Ambiente en horizontal"></section>
+
+<section class="row2">
+ <div class="card"><h2 style="font-size:18px">Novedades de la app (APK)</h2><ul class="n" id="an"><li>Cargando…</li></ul></div>
+ <div class="card"><h2 style="font-size:18px">Actualizaciones de contenido <span class="chip" id="wv" style="font-size:11px">…</span></h2><ul class="n" id="wn"><li>Cargando…</li></ul><p class="chip" style="margin-top:10px;display:inline-block" id="wd"></p></div>
+</section>
+
+<section id="instalar"><h2>Cómo instalar</h2><div class="card"><ol>
+ <li>Pulsa <b>Descargar para Android</b> y abre el archivo <code>Ambiente.apk</code>.</li>
+ <li>Si Android lo pide, permite <b>instalar apps de esta fuente</b> (solo esta vez).</li>
+ <li>Pulsa <b>Instalar</b> y abre Ambiente.</li>
+ <li>Las mejoras de contenido llegan solas al abrir la app: <b>no hace falta volver a descargar</b>. Solo cuando haya un APK nuevo te lo avisa aquí.</li>
+</ol><p style="margin-top:12px;font-size:12px;color:var(--mut)">Huella SHA-256 del APK: <code id="sh">…</code></p></div></section>
+<footer>Ambiente · un app de daij studio</footer></div>
+<script>
+function g(u,f){fetch(u+'?t='+Date.now()).then(function(r){return r.json()}).then(f,function(){})}
+function li(a){return(a&&a.length?a:['Primera versión']).map(function(x){var l=document.createElement('li');l.textContent=x;return l.outerHTML}).join('')}
+g('apk.json',function(a){document.getElementById('mv').textContent='Versión '+a.version;document.getElementById('ms').textContent=(a.size/1048576).toFixed(2).replace(/\.?0+$/,'')+' MB';document.getElementById('md').textContent=a.date;document.getElementById('an').innerHTML=li(a.notes);if(a.sha256)document.getElementById('sh').textContent=a.sha256});
+g('web.json',function(w){document.getElementById('wv').textContent='contenido v'+w.version;document.getElementById('wn').innerHTML=li(w.notes);document.getElementById('wd').textContent='Última actualización: '+w.date});
+</script></body></html>
