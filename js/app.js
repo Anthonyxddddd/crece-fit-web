@@ -1671,7 +1671,7 @@
       case 'oblvl': obLvl = +v; Array.prototype.forEach.call(document.querySelectorAll('.lopt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'obgoal': obGoal = v; Array.prototype.forEach.call(document.querySelectorAll('.gopt'), function (b) { b.classList.toggle('on', b.getAttribute('data-v') === v); }); break;
       case 'profopen': profileSheet(); break;
-      case 'studio': try { var su = 'https://daijstudio.daijstudio.workers.dev/'; if (AND() && AND().openUrl) AND().openUrl(su); else if (AND() && AND().copy) { AND().copy(su); toast('Enlace copiado'); } else window.open(su, '_blank'); } catch (e) { } break;
+      case 'studio': try { var su = 'https://daijstudio.daijstudio.workers.dev/studio/'; if (AND() && AND().openUrl) AND().openUrl(su); else if (AND() && AND().copy) { AND().copy(su); toast('Enlace copiado'); } else window.open(su, '_blank'); } catch (e) { } break;
       case 'boxclasses': sheetClasses(); break;
       case 'chalstart': S.chal = { id: v, start: today(), done: {}, last: '' }; save(); toast('Reto iniciado: ' + CHALLENGES[v].n); switchPanelRefresh2(); break;
       case 'chalquit': dialog('¿Abandonar el reto?', 'Perderás el progreso de este reto. Tu racha y demás datos no se tocan.', 'Abandonar', function () { S.chal = null; save(); switchPanelRefresh2(); }, true); break;
