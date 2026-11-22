@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>daij studio</title>
-<meta name="description" content="daij studio: estudio independiente que crea apps y juegos para móvil, y el servidor de Minecraft Voltrix.">
+<meta name="description" content="daij studio: estudio independiente que crea apps y juegos para móvil.">
 <meta name="theme-color" content="#0a0a0a">
 <link rel="icon" type="image/svg+xml" href="/studio/daij-icon.svg">
 <link rel="apple-touch-icon" href="/studio/daij-icon-512.png">
@@ -66,13 +66,13 @@ footer small{color:var(--mut)}
 <div class="wrap">
   <nav>
     <a href="#inicio"><img src="/studio/daij-wordmark-white.svg" alt="daij studio"></a>
-    <div class="links"><a href="#productos">Productos</a><a href="#voltrix">Voltrix</a><a href="#proximo">Próximamente</a><a href="#valores">Nosotros</a></div>
+    <div class="links"><a href="#productos">Productos</a><a href="#proximo">Próximamente</a><a href="#valores">Nosotros</a></div>
   </nav>
 
   <header class="hero" id="inicio">
     <img class="mark" src="/studio/daij-logo-animado.svg" alt="daij studio">
     <h1>Apps y juegos hechos con <span>constancia</span></h1>
-    <p class="lead">daij studio es un estudio independiente que crea apps y juegos para móvil, y también un servidor de Minecraft. Todo en español y pensado para quedarse contigo.</p>
+    <p class="lead">daij studio es un estudio independiente que crea apps y juegos para móvil. Todo en español y pensado para quedarse contigo.</p>
     <a class="btn" href="#productos">Ver nuestros productos</a>
   </header>
 
@@ -87,18 +87,6 @@ footer small{color:var(--mut)}
           <p>Rutinas sin equipo con tutoriales animados, retos de 30 días, hábitos, comida y widgets. Gratis para Android.</p>
           <div class="tags"><span class="tag">Android</span><span class="tag">Gratis</span><span class="tag">Salud y fitness</span></div>
           <a class="btn" href="/descargar/">Descargar</a>
-        </div>
-      </div>
-      <div class="card prod rv" id="voltrix">
-        <img src="/studio/voltrix-icon.png" alt="Voltrix" style="border-radius:50%">
-        <div>
-          <h3>Voltrix</h3>
-          <span class="by">un servidor de daij studio</span>
-          <p>Servidor survival de Minecraft Java para jugar tranquilo, construir a tu ritmo y hacer amigos. Rangos y cosméticos sin ventajas de pago.</p>
-          <div class="tags"><span class="tag">Minecraft Java</span><span class="tag">Survival</span><span class="tag">Sin pay-to-win</span></div>
-          <!-- Pon aquí la IP real en data-ip. Mientras esté vacío, el botón queda como "IP próximamente". -->
-          <button class="btn" id="copyip" data-ip="" disabled>IP próximamente</button>
-          <small class="disc">Voltrix es un servidor independiente. NOT AN OFFICIAL MINECRAFT SERVICE. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.</small>
         </div>
       </div>
       <div class="card soon wide rv" id="proximo">
@@ -121,16 +109,13 @@ footer small{color:var(--mut)}
 
   <footer>
     <img src="/studio/daij-wordmark-white.svg" alt="daij studio">
-    <small>&copy; 2026 daij studio. Todos los derechos reservados. Voltrix no es un servicio oficial de Minecraft ni está afiliado a Mojang o Microsoft.</small>
+    <small>&copy; 2026 daij studio. Todos los derechos reservados.</small>
   </footer>
 </div>
 <script>
 (function(){var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
 document.querySelectorAll('.rv').forEach(function(el){io.observe(el)});
-var b=document.getElementById('copyip'),ip=b&&b.dataset.ip;
-if(b&&ip){b.disabled=false;b.textContent='Copiar IP: '+ip;b.addEventListener('click',function(){
- try{navigator.clipboard.writeText(ip)}catch(e){}
- b.textContent='¡Copiada!';setTimeout(function(){b.textContent='Copiar IP: '+ip},1800)})}})();
+})();
 </script>
 </body>
 </html>
