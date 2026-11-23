@@ -89,7 +89,7 @@ function el2d(e){var on=sel===e.id,g='';
    else g+='<rect x="'+t.x*S+'" y="'+t.y*S+'" width="'+t.w*S+'" height="'+t.h*S+'" fill="#fff" stroke="#12294a" stroke-width="2"/><text x="'+(t.x+.18)*S+'" y="'+(t.y+t.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5b7191">'+t.n+'</text>'});
   e.tramos.forEach(function(t){if(t.tipo!=='pasos')return;var cx=(t.x+t.w/2)*S,L=t.n*e.huella,up=t.dir==='N',ya=(up?t.y0-.12:t.y0+.12)*S,yb=(up?t.y0-L+.12:t.y0+L-.12)*S,hd=up?14:-14;
    g+='<g stroke="#2f6fe0" fill="#2f6fe0" stroke-width="3"><line x1="'+cx+'" y1="'+ya+'" x2="'+cx+'" y2="'+yb+'"/><path d="M'+(cx-9)+' '+(yb+hd)+' L'+cx+' '+yb+' L'+(cx+9)+' '+(yb+hd)+'" fill="none"/>'+(first?'<text x="'+(cx+14)+'" y="'+(up?t.y0-.75:t.y0+.75)*S+'" stroke="none" font-size="14" font-weight="700">SUBE</text>':'')+'</g>';first=false});
-  if(showCot){g+=dimH(bb.x,bb.x+bb.w,bb.y-.28,f2(bb.w)+' m')+dimV(bb.y,bb.y+bb.h,bb.x+bb.w+.28,f2(bb.h)+' m');
+  if(showCot){g+=dimH(bb.x,bb.x+bb.w,bb.y-.28,'Ancho '+f2(bb.w)+' m')+dimV(bb.y,bb.y+bb.h,bb.x+bb.w+.28,'Largo '+f2(bb.h)+' m');g+='<g transform="translate('+(bb.x+bb.w+.6)*S+','+(bb.y+bb.h/2)*S+')"><rect x="0" y="-26" width="150" height="52" rx="10" fill="#fff" stroke="#c0392b" stroke-width="2"/><text x="75" y="-6" text-anchor="middle" font-size="13" fill="#c0392b" font-weight="700">Altura total</text><text x="75" y="15" text-anchor="middle" font-size="17" fill="#c0392b" font-weight="700">'+f2(q.subida)+' m</text></g>';
    q.steps.forEach(function(t){if(t.tipo==='descanso')g+=dimV(t.y,t.y+t.h,t.x-.28,f2(t.h)+' m',13)});
    var f=q.steps[0];g+=dimV(f.y,f.y+f.h,f.x-.28,f2(e.huella),12)}} else if(e.tipo==='zona'){g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="url(#hatch)" stroke="#8aa0bf" stroke-width="2" stroke-dasharray="10 6"/><text x="'+(e.x+e.w/2)*S+'" y="'+(e.y+e.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#12294a" font-weight="700">'+esc(e.nombre)+'</text>';if(showCot)g+=dimV(e.y,e.y+e.h,e.x+e.w+.28,f2(e.h)+' m')}
  else{g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="#fff" stroke="#12294a" stroke-width="'+(e.tipo==='habitacion'?9:3)+'"/><text x="'+(e.x+e.w/2)*S+'" y="'+(e.y+e.h/2)*S+'" text-anchor="middle" font-size="18" fill="#12294a" font-weight="700">'+esc(e.nombre)+'</text>';
@@ -126,12 +126,12 @@ function cotas3D(){var W=P.terreno.w,L=P.terreno.l;
  dim3([0,0,-.4],[W,0,-.4],f2(W)+' m',TZ);dim3([-.4,0,0],[-.4,0,L],f2(L)+' m',TX);
  P.elementos.forEach(function(e){
   if(e.tipo==='gradas'){var q=gradas(e),bb=q.bbox,st=q.steps,f=st[0],last=st[st.length-1],ds=st.filter(function(t){return t.tipo==='descanso'})[0];
-   if(!ds||Math.abs(ds.w-bb.w)>1e-6)dim3([bb.x,0,bb.y-.3],[bb.x+bb.w,0,bb.y-.3],f2(bb.w)+' m',TZ);dim3([bb.x+bb.w+.3,0,bb.y],[bb.x+bb.w+.3,0,bb.y+bb.h],f2(bb.h)+' m',TX);
+   dim3([bb.x,0,bb.y+bb.h+.32],[bb.x+bb.w,0,bb.y+bb.h+.32],'Ancho '+f2(bb.w)+' m',TZ);dim3([bb.x+bb.w+.3,0,bb.y],[bb.x+bb.w+.3,0,bb.y+bb.h],'Largo '+f2(bb.h)+' m',TX);
    if(ds){dim3([ds.x,ds.top+.03,ds.y-.12],[ds.x+ds.w,ds.top+.03,ds.y-.12],'Descanso '+f2(ds.w)+' m',TZ);dim3([ds.x+ds.w+.12,ds.top+.03,ds.y],[ds.x+ds.w+.12,ds.top+.03,ds.y+ds.h],f2(ds.h)+' m',TX);
-    dim3([ds.x-.2,0,ds.y+ds.h/2],[ds.x-.2,ds.top,ds.y+ds.h/2],'Altura '+f2(ds.top)+' m',TX)}
+    dim3([ds.x-.2,0,ds.y+ds.h/2],[ds.x-.2,ds.top,ds.y+ds.h/2],'Altura descanso '+f2(ds.top)+' m',TX)}
    dim3([f.x-.2,0,f.y+f.h+.45],[f.x-.2,f.top,f.y+f.h+.45],'Contrahuella '+f2(e.alto)+' m',TX);dim3([f.x-.75,f.top,f.y],[f.x-.75,f.top,f.y+f.h],'Huella '+f2(e.huella)+' m',TX);
-   dim3([last.x+last.w+.25,0,last.y+last.h],[last.x+last.w+.25,q.subida,last.y+last.h],'Sube '+f2(q.subida)+' m',TX)}
-  else if(e.tipo==='zona'){dim3([e.x+e.w+.3,0,e.y],[e.x+e.w+.3,0,e.y+e.h],f2(e.h)+' m',TX);dim3([e.x,0,e.y+e.h+.3],[e.x+e.w,0,e.y+e.h+.3],f2(e.w)+' m',TZ)}
+   dim3([last.x+last.w+.25,0,last.y+last.h],[last.x+last.w+.25,q.subida,last.y+last.h],'Altura total '+f2(q.subida)+' m',TX)}
+  else if(e.tipo==='zona'){dim3([e.x+e.w+.75,0,e.y],[e.x+e.w+.75,0,e.y+e.h],f2(e.h)+' m',TX);dim3([e.x,0,e.y+e.h+.3],[e.x+e.w,0,e.y+e.h+.3],f2(e.w)+' m',TZ)}
   else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8);dim3([e.x,h+.02,e.y-.2],[e.x+e.w,h+.02,e.y-.2],f2(e.w)+' m',TZ);dim3([e.x-.2,h+.02,e.y],[e.x-.2,h+.02,e.y+e.h],f2(e.h)+' m',TX)}})}
 function build3D(){labels=[];$('lbl').innerHTML='';while(grp.children.length){var c=grp.children.pop();c.traverse(function(n){if(n.geometry)n.geometry.dispose();if(n.material)n.material.dispose()})}
  var W=P.terreno.w,L=P.terreno.l;
@@ -148,7 +148,7 @@ function resize(){var m=$('v3'),w=m.clientWidth,h=m.clientHeight;if(!w||!h)retur
 var _v=new THREE.Vector3();
 (function loop(){requestAnimationFrame(loop);if(view!=='2d'){ctl.update();R.render(scn,cam);var w=cv.clientWidth,h=cv.clientHeight;labels.forEach(function(l){_v.copy(l.p).project(cam);var ok=_v.z<1&&_v.z>-1;l.el.style.display=ok?'block':'none';if(ok){l.el.style.left=(_v.x*.5+.5)*w+'px';l.el.style.top=(-_v.y*.5+.5)*h+'px'}})}})();
 /* ---- UI ---- */
-function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e),ds=q.steps.filter(function(t){return t.tipo==='descanso'}).map(function(t){return f2(t.w)+' × '+f2(t.h)+' m'}).join(', ');x='<small>'+q.pasos+' pasos de '+f2(e.huella)+' m'+(ds?' + descanso de '+ds:'')+'</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
+function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e),ds=q.steps.filter(function(t){return t.tipo==='descanso'}).map(function(t){return f2(t.w)+' × '+f2(t.h)+' m'}).join(', ');x='<small>'+q.pasos+' pasos de '+f2(e.huella)+' m'+(ds?' + descanso de '+ds:'')+'</small><small><b>Ancho '+f2(q.bbox.w)+' m · Largo '+f2(q.bbox.h)+' m · Altura '+f2(q.subida)+' m</b></small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
  return '<div class="it'+(sel===e.id?' on':'')+'" data-id="'+esc(e.id)+'"><b>'+esc(e.nombre)+'</b><small>'+esc(e.tipo)+' · '+f2(e.w)+' × '+f2(e.h)+' m · x '+f2(e.x)+', y '+f2(e.y)+'</small>'+x+'</div>'}).join('')||'<div class="card"><p>Sin elementos todavía.</p></div>';
  [].forEach.call($('pl').querySelectorAll('.it'),function(e){e.onclick=function(){pick(e.getAttribute('data-id'))}})}
 function pick(id){sel=(sel===id)?null:id;lista();render2D();build3D()}
