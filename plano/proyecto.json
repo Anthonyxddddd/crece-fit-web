@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "titulo": "Casa 6.30 × 6.40 m",
+  "actualizado": "2026-11-23",
+  "terreno": { "w": 6.30, "l": 6.40 },
+  "altura_entrepiso": null,
+  "cambios": ["Plano en blanco: terreno de 6.30 × 6.40 m (40.32 m²) con las gradas actuales en la esquina inferior izquierda."],
+  "elementos": [
+    { "id": "gradas", "tipo": "gradas", "nombre": "Gradas (actuales)", "x": 0, "y": 4.40, "w": 2.0, "h": 2.0,
+      "ancho": 1.75, "pasos": 7, "huella": 0.25, "descanso": 0.25, "franja": 0.25, "alto": 0.18 }
+  ]
+}
