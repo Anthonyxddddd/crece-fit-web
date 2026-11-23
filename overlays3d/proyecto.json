@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "titulo": "Overlay TikTok vertical",
+  "actualizado": "2026-11-23",
+  "escenario": { "w": 1080, "h": 1920 },
+  "cambios": ["Diseño inicial de ejemplo con las piezas base. Dime qué agregar o cambiar."],
+  "piezas": [
+    { "id": "envivo",  "tipo": "pildora",  "nombre": "Píldora superior", "x": 150, "y": 190, "w": 240, "h": 70,  "estilo": "claro" },
+    { "id": "meta",    "tipo": "progreso", "nombre": "Barra de meta",    "x": 330, "y": 300, "w": 600, "h": 56,  "estilo": "claro", "p": 55 },
+    { "id": "camara",  "tipo": "marco",    "nombre": "Marco de cámara",  "x": 330, "y": 560, "w": 560, "h": 420, "r": 40, "bw": 14, "estilo": "azul" },
+    { "id": "chat",    "tipo": "panel",    "nombre": "Panel de chat",    "x": 330, "y": 1180, "w": 600, "h": 520, "r": 34, "estilo": "claro" }
+  ]
+}
