@@ -63,15 +63,14 @@ var f2=function(n){return (Math.round(n*100)/100).toFixed(2)};
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on')},3500)}
 /* ---- geometria de gradas (recta, sube hacia arriba del plano) ---- */
-function gradas(e){var R=e.alto,T=e.huella,st=[],yb=e.y+e.h,k;
- for(k=1;k<=e.pasos;k++)st.push({x:e.x,y:yb-k*T,w:e.ancho,h:T,top:k*R,n:k});
- var land={x:e.x,y:yb-e.pasos*T-e.descanso,w:e.ancho,h:e.descanso,top:(e.pasos+1)*R};
- var strip={x:e.x+e.ancho,y:e.y,w:e.franja,h:e.h};
- return {steps:st,land:land,strip:strip,largo:e.pasos*T+e.descanso,subida:(e.pasos+1)*R,escalones:e.pasos+1}}
+function gradas(e){var R=e.alto,T=e.huella,st=[],yb=e.y+e.h,lv=0,pos=0,n=0,tr=e.tramos||[{pasos:e.pasos},{descanso:e.descanso||0}];
+ tr.forEach(function(t){if(t.pasos){for(var k=0;k<t.pasos;k++){lv++;n++;pos+=T;st.push({tipo:'paso',x:e.x,y:yb-pos,w:e.ancho,h:T,top:lv*R,n:n})}}
+  else if(t.descanso>0){lv++;pos+=t.descanso;st.push({tipo:'descanso',x:e.x,y:yb-pos,w:e.ancho,h:t.descanso,top:lv*R,n:0})}});
+ return {steps:st,largo:pos,subida:(lv+1)*R,escalones:lv+1,pasos:n,strip:{x:e.x+e.ancho,y:e.y,w:e.franja||0,h:e.h}}}
 /* ---- avisos de cuadre ---- */
 function avisos(){var a=[],W=P.terreno.w,L=P.terreno.l;
  P.elementos.forEach(function(e){if(e.x<-1e-9||e.y<-1e-9||e.x+e.w>W+1e-9||e.y+e.h>L+1e-9)a.push('«'+e.nombre+'» se sale del terreno de '+f2(W)+' × '+f2(L)+' m.');
-  if(e.tipo==='gradas'){var g=gradas(e);if(g.largo>e.h+1e-9)a.push('Las gradas necesitan '+f2(g.largo)+' m de largo y solo hay '+f2(e.h)+' m.');if(e.ancho+e.franja>e.w+1e-9)a.push('Las gradas necesitan '+f2(e.ancho+e.franja)+' m de ancho y solo hay '+f2(e.w)+' m.')}});
+  if(e.tipo==='gradas'){var g=gradas(e);if(g.largo>e.h+1e-9)a.push('Las gradas necesitan '+f2(g.largo)+' m de largo y solo hay '+f2(e.h)+' m.');if(e.ancho+(e.franja||0)>e.w+1e-9)a.push('Las gradas necesitan '+f2(e.ancho+(e.franja||0))+' m de ancho y solo hay '+f2(e.w)+' m.')}});
  var al=P.altura_entrepiso;if(al){var g=P.elementos.filter(function(e){return e.tipo==='gradas'})[0];if(g){var s=gradas(g).subida;if(s<al-1e-9)a.push('Las gradas actuales suben '+f2(s)+' m pero el entrepiso mide '+f2(al)+' m: faltan '+f2(al-s)+' m ('+Math.ceil((al-s)/g.alto)+' escalones).')}}
  else a.push('Falta la altura del entrepiso para comprobar la escalera.');
  return a}
@@ -81,12 +80,12 @@ function dimV(y1,y2,x,txt,off){return '<g stroke="#c0392b" fill="#c0392b" stroke
 function el2d(e){var on=sel===e.id,g='';
  if(e.tipo==='gradas'){var q=gradas(e);
   g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="#f1f6ff" stroke="#9db6d8" stroke-width="1.5" stroke-dasharray="8 6"/>';
-  if(e.franja>0)g+='<rect x="'+q.strip.x*S+'" y="'+q.strip.y*S+'" width="'+q.strip.w*S+'" height="'+q.strip.h*S+'" fill="url(#hatch)" stroke="#b7c4d8" stroke-width="1"/>';
-  if(e.descanso>0)g+='<rect x="'+q.land.x*S+'" y="'+q.land.y*S+'" width="'+q.land.w*S+'" height="'+q.land.h*S+'" fill="#cfe0f7" stroke="#12294a" stroke-width="2"/>';
-  q.steps.forEach(function(s){g+='<rect x="'+s.x*S+'" y="'+s.y*S+'" width="'+s.w*S+'" height="'+s.h*S+'" fill="#fff" stroke="#12294a" stroke-width="2"/><text x="'+(s.x+.18)*S+'" y="'+(s.y+s.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5b7191">'+s.n+'</text>'});
-  var cx=(e.x+e.ancho/2)*S;g+='<g stroke="#2f6fe0" fill="#2f6fe0" stroke-width="3"><line x1="'+cx+'" y1="'+(e.y+e.h-.1)*S+'" x2="'+cx+'" y2="'+(q.land.y+q.land.h+.1)*S+'"/><path d="M'+(cx-9)+' '+((q.land.y+q.land.h+.1)*S+14)+' L'+cx+' '+((q.land.y+q.land.h+.1)*S)+' L'+(cx+9)+' '+((q.land.y+q.land.h+.1)*S+14)+'" fill="none"/><text x="'+(cx+14)+'" y="'+(e.y+e.h-.75)*S+'" stroke="none" font-size="14" font-weight="700">SUBE</text></g>';
-  if(e.descanso>0)g+='<text x="'+(q.land.x+q.land.w/2)*S+'" y="'+(q.land.y+q.land.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#12294a">Descanso</text>';
-  if(showCot){g+=dimH(e.x,e.x+e.ancho,e.y+e.h+.28,f2(e.ancho)+' m')+dimV(e.y+e.h-e.pasos*e.huella,e.y+e.h,e.x+e.ancho+e.franja+.28,f2(e.pasos*e.huella)+' m')+dimV(e.y+e.h-e.huella,e.y+e.h,e.x-.28,f2(e.huella),12)+(e.franja>0?dimH(e.x+e.ancho,e.x+e.w,e.y-.2,f2(e.franja),12):'')}}
+  q.steps.forEach(function(t){if(t.tipo==='descanso')g+='<rect x="'+t.x*S+'" y="'+t.y*S+'" width="'+t.w*S+'" height="'+t.h*S+'" fill="#cfe0f7" stroke="#12294a" stroke-width="2"/><text x="'+(t.x+t.w/2)*S+'" y="'+(t.y+t.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#12294a" font-weight="700">Descanso '+f2(t.h)+' m</text>';
+   else g+='<rect x="'+t.x*S+'" y="'+t.y*S+'" width="'+t.w*S+'" height="'+t.h*S+'" fill="#fff" stroke="#12294a" stroke-width="2"/><text x="'+(t.x+.18)*S+'" y="'+(t.y+t.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5b7191">'+t.n+'</text>'});
+  var cx=(e.x+e.ancho/2)*S,ya=(e.y+e.h-.15)*S,yb2=(e.y+.2)*S;g+='<g stroke="#2f6fe0" fill="#2f6fe0" stroke-width="3"><line x1="'+cx+'" y1="'+ya+'" x2="'+cx+'" y2="'+yb2+'"/><path d="M'+(cx-9)+' '+(yb2+14)+' L'+cx+' '+yb2+' L'+(cx+9)+' '+(yb2+14)+'" fill="none"/><text x="'+(cx+14)+'" y="'+(e.y+e.h-.75)*S+'" stroke="none" font-size="14" font-weight="700">SUBE</text></g>';
+  if(showCot){g+=dimH(e.x,e.x+e.ancho,e.y+e.h+.28,f2(e.ancho)+' m')+dimV(e.y,e.y+e.h,e.x+e.w+.28,f2(q.largo)+' m');
+   q.steps.forEach(function(t){if(t.tipo==='descanso')g+=dimV(t.y,t.y+t.h,e.x-.28,f2(t.h)+' m',13)});
+   var f=q.steps[0];g+=dimV(f.y,f.y+f.h,e.x-.28,f2(e.huella),12)}} else if(e.tipo==='zona'){g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="url(#hatch)" stroke="#8aa0bf" stroke-width="2" stroke-dasharray="10 6"/><text x="'+(e.x+e.w/2)*S+'" y="'+(e.y+e.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="15" fill="#12294a" font-weight="700">'+esc(e.nombre)+'</text>';if(showCot)g+=dimV(e.y,e.y+e.h,e.x+e.w+.28,f2(e.h)+' m')}
  else{g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="#fff" stroke="#12294a" stroke-width="'+(e.tipo==='habitacion'?9:3)+'"/><text x="'+(e.x+e.w/2)*S+'" y="'+(e.y+e.h/2)*S+'" text-anchor="middle" font-size="18" fill="#12294a" font-weight="700">'+esc(e.nombre)+'</text>';
   if(showCot)g+=dimH(e.x,e.x+e.w,e.y-.2,f2(e.w)+' m')+dimV(e.y,e.y+e.h,e.x-.2,f2(e.h)+' m')}
  var hi=on?'<rect x="'+(e.x*S-6)+'" y="'+(e.y*S-6)+'" width="'+(e.w*S+12)+'" height="'+(e.h*S+12)+'" fill="none" stroke="#ffb020" stroke-width="3" stroke-dasharray="12 7"/>':'';
@@ -117,14 +116,15 @@ function build3D(){while(grp.children.length){var c=grp.children.pop();c.travers
  var gr=new THREE.GridHelper(Math.max(W,L),Math.max(W,L)*2,0x9db6d8,0xc9d5e6);gr.position.set(W/2,.002,L/2);gr.scale.set(1,1,1);grp.add(gr);
  var wt=.1,wh=.12,col=0x12294a;grp.add(box(W+wt,wh,wt,W/2,wh/2,-wt/2,col));grp.add(box(W+wt,wh,wt,W/2,wh/2,L+wt/2,col));grp.add(box(wt,wh,L,-wt/2,wh/2,L/2,col));grp.add(box(wt,wh,L,W+wt/2,wh/2,L/2,col));
  P.elementos.forEach(function(e){var on=sel===e.id;
-  if(e.tipo==='gradas'){var q=gradas(e);q.steps.forEach(function(s){grp.add(box(s.w,s.top,s.h,s.x+s.w/2,s.top/2,s.y+s.h/2,0x4f95ff,on))});if(e.descanso>0)grp.add(box(q.land.w,q.land.top,q.land.h,q.land.x+q.land.w/2,q.land.top/2,q.land.y+q.land.h/2,0x2f6fe0,on))}
+  if(e.tipo==='gradas'){var q=gradas(e);q.steps.forEach(function(t){grp.add(box(t.w,t.top,t.h,t.x+t.w/2,t.top/2,t.y+t.h/2,t.tipo==='descanso'?0x2f6fe0:0x4f95ff,on))})}
+  else if(e.tipo==='zona'){grp.add(box(e.w,.01,e.h,e.x+e.w/2,.01,e.y+e.h/2,0xc9d5e6,on))}
   else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8),t=.12;if(e.tipo==='habitacion'){[[e.w,t,e.x+e.w/2,e.y],[e.w,t,e.x+e.w/2,e.y+e.h],[t,e.h,e.x,e.y+e.h/2],[t,e.h,e.x+e.w,e.y+e.h/2]].forEach(function(p){grp.add(box(p[0],h,p[1],p[2],h/2,p[3],0xd7e3f5,on))})}else grp.add(box(e.w,h,e.h,e.x+e.w/2,h/2,e.y+e.h/2,0x9db6d8,on))}})}
 function look(top){var W=P.terreno.w,L=P.terreno.l,c=new THREE.Vector3(W/2,0,L/2),d=Math.max(W,L)/2/Math.tan(THREE.MathUtils.degToRad(17.5))*1.9;
  var v=top?new THREE.Vector3(0,1,.001):new THREE.Vector3(-.55,.75,1).normalize();cam.position.copy(c).addScaledVector(v.normalize(),d);ctl.target.copy(c);ctl.update()}
 function resize(){var m=$('v3'),w=m.clientWidth,h=m.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
 (function loop(){requestAnimationFrame(loop);if(view!=='2d'){ctl.update();R.render(scn,cam)}})();
 /* ---- UI ---- */
-function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e);x='<small>'+e.pasos+' pasos de '+f2(e.huella)+' m'+(e.descanso>0?' + descanso '+f2(e.descanso)+' m':'')+'</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
+function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e),ds=q.steps.filter(function(t){return t.tipo==='descanso'}).map(function(t){return f2(t.h)+' m'}).join(', ');x='<small>'+q.pasos+' pasos de '+f2(e.huella)+' m'+(ds?' + descanso de '+ds:'')+'</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m · largo '+f2(q.largo)+' m</small>'}
  return '<div class="it'+(sel===e.id?' on':'')+'" data-id="'+esc(e.id)+'"><b>'+esc(e.nombre)+'</b><small>'+esc(e.tipo)+' · '+f2(e.w)+' × '+f2(e.h)+' m · x '+f2(e.x)+', y '+f2(e.y)+'</small>'+x+'</div>'}).join('')||'<div class="card"><p>Sin elementos todavía.</p></div>';
  [].forEach.call($('pl').querySelectorAll('.it'),function(e){e.onclick=function(){pick(e.getAttribute('data-id'))}})}
 function pick(id){sel=(sel===id)?null:id;lista();render2D();build3D()}

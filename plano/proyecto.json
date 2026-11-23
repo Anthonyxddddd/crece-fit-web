@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "titulo": "Casa 6.30 × 6.40 m",
   "actualizado": "2026-11-23",
   "terreno": {
@@ -8,8 +8,9 @@
   },
   "altura_entrepiso": null,
   "cambios": [
-    "Gradas ahora de 2.00 m de ancho × 3.75 m de largo (15 pasos de 0.25 m), en la esquina inferior izquierda.",
-    "Plano en blanco: terreno de 6.30 × 6.40 m (40.32 m²)."
+    "Agregado 1.00 m libre entre el inicio (pared sur) y el primer escalón.",
+    "Agregado un descanso de 1.00 m a la mitad de las gradas: 7 pasos + descanso + 7 pasos (16 contrahuellas, sube 2.88 m).",
+    "Las gradas ahora miden 2.00 m de ancho × 4.50 m de largo (antes 3.75 m)."
   ],
   "elementos": [
     {
@@ -17,15 +18,32 @@
       "tipo": "gradas",
       "nombre": "Gradas",
       "x": 0,
-      "y": 2.65,
+      "y": 0.9,
       "w": 2.0,
-      "h": 3.75,
+      "h": 4.5,
       "ancho": 2.0,
-      "pasos": 15,
       "huella": 0.25,
-      "descanso": 0,
-      "franja": 0,
-      "alto": 0.18
+      "alto": 0.18,
+      "tramos": [
+        {
+          "pasos": 7
+        },
+        {
+          "descanso": 1.0
+        },
+        {
+          "pasos": 7
+        }
+      ]
+    },
+    {
+      "id": "acceso",
+      "tipo": "zona",
+      "nombre": "1.00 m libre",
+      "x": 0,
+      "y": 5.4,
+      "w": 2.0,
+      "h": 1.0
     }
   ]
 }
