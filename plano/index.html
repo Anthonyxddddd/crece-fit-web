@@ -81,12 +81,12 @@ function dimV(y1,y2,x,txt,off){return '<g stroke="#c0392b" fill="#c0392b" stroke
 function el2d(e){var on=sel===e.id,g='';
  if(e.tipo==='gradas'){var q=gradas(e);
   g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="#f1f6ff" stroke="#9db6d8" stroke-width="1.5" stroke-dasharray="8 6"/>';
-  g+='<rect x="'+q.strip.x*S+'" y="'+q.strip.y*S+'" width="'+q.strip.w*S+'" height="'+q.strip.h*S+'" fill="url(#hatch)" stroke="#b7c4d8" stroke-width="1"/>';
-  g+='<rect x="'+q.land.x*S+'" y="'+q.land.y*S+'" width="'+q.land.w*S+'" height="'+q.land.h*S+'" fill="#cfe0f7" stroke="#12294a" stroke-width="2"/>';
+  if(e.franja>0)g+='<rect x="'+q.strip.x*S+'" y="'+q.strip.y*S+'" width="'+q.strip.w*S+'" height="'+q.strip.h*S+'" fill="url(#hatch)" stroke="#b7c4d8" stroke-width="1"/>';
+  if(e.descanso>0)g+='<rect x="'+q.land.x*S+'" y="'+q.land.y*S+'" width="'+q.land.w*S+'" height="'+q.land.h*S+'" fill="#cfe0f7" stroke="#12294a" stroke-width="2"/>';
   q.steps.forEach(function(s){g+='<rect x="'+s.x*S+'" y="'+s.y*S+'" width="'+s.w*S+'" height="'+s.h*S+'" fill="#fff" stroke="#12294a" stroke-width="2"/><text x="'+(s.x+.18)*S+'" y="'+(s.y+s.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5b7191">'+s.n+'</text>'});
   var cx=(e.x+e.ancho/2)*S;g+='<g stroke="#2f6fe0" fill="#2f6fe0" stroke-width="3"><line x1="'+cx+'" y1="'+(e.y+e.h-.1)*S+'" x2="'+cx+'" y2="'+(q.land.y+q.land.h+.1)*S+'"/><path d="M'+(cx-9)+' '+((q.land.y+q.land.h+.1)*S+14)+' L'+cx+' '+((q.land.y+q.land.h+.1)*S)+' L'+(cx+9)+' '+((q.land.y+q.land.h+.1)*S+14)+'" fill="none"/><text x="'+(cx+14)+'" y="'+(e.y+e.h-.75)*S+'" stroke="none" font-size="14" font-weight="700">SUBE</text></g>';
-  g+='<text x="'+(q.land.x+q.land.w/2)*S+'" y="'+(q.land.y+q.land.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#12294a">Descanso</text>';
-  if(showCot){g+=dimH(e.x,e.x+e.ancho,e.y+e.h+.28,f2(e.ancho)+' m')+dimV(e.y+e.h-e.pasos*e.huella,e.y+e.h,e.x+e.ancho+e.franja+.28,f2(e.pasos*e.huella)+' m')+dimV(e.y+e.h-e.huella,e.y+e.h,e.x-.28,f2(e.huella),12)+dimH(e.x+e.ancho,e.x+e.w,e.y-.2,f2(e.franja),12)}}
+  if(e.descanso>0)g+='<text x="'+(q.land.x+q.land.w/2)*S+'" y="'+(q.land.y+q.land.h/2)*S+'" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#12294a">Descanso</text>';
+  if(showCot){g+=dimH(e.x,e.x+e.ancho,e.y+e.h+.28,f2(e.ancho)+' m')+dimV(e.y+e.h-e.pasos*e.huella,e.y+e.h,e.x+e.ancho+e.franja+.28,f2(e.pasos*e.huella)+' m')+dimV(e.y+e.h-e.huella,e.y+e.h,e.x-.28,f2(e.huella),12)+(e.franja>0?dimH(e.x+e.ancho,e.x+e.w,e.y-.2,f2(e.franja),12):'')}}
  else{g+='<rect x="'+e.x*S+'" y="'+e.y*S+'" width="'+e.w*S+'" height="'+e.h*S+'" fill="#fff" stroke="#12294a" stroke-width="'+(e.tipo==='habitacion'?9:3)+'"/><text x="'+(e.x+e.w/2)*S+'" y="'+(e.y+e.h/2)*S+'" text-anchor="middle" font-size="18" fill="#12294a" font-weight="700">'+esc(e.nombre)+'</text>';
   if(showCot)g+=dimH(e.x,e.x+e.w,e.y-.2,f2(e.w)+' m')+dimV(e.y,e.y+e.h,e.x-.2,f2(e.h)+' m')}
  var hi=on?'<rect x="'+(e.x*S-6)+'" y="'+(e.y*S-6)+'" width="'+(e.w*S+12)+'" height="'+(e.h*S+12)+'" fill="none" stroke="#ffb020" stroke-width="3" stroke-dasharray="12 7"/>':'';
@@ -117,14 +117,14 @@ function build3D(){while(grp.children.length){var c=grp.children.pop();c.travers
  var gr=new THREE.GridHelper(Math.max(W,L),Math.max(W,L)*2,0x9db6d8,0xc9d5e6);gr.position.set(W/2,.002,L/2);gr.scale.set(1,1,1);grp.add(gr);
  var wt=.1,wh=.12,col=0x12294a;grp.add(box(W+wt,wh,wt,W/2,wh/2,-wt/2,col));grp.add(box(W+wt,wh,wt,W/2,wh/2,L+wt/2,col));grp.add(box(wt,wh,L,-wt/2,wh/2,L/2,col));grp.add(box(wt,wh,L,W+wt/2,wh/2,L/2,col));
  P.elementos.forEach(function(e){var on=sel===e.id;
-  if(e.tipo==='gradas'){var q=gradas(e);q.steps.forEach(function(s){grp.add(box(s.w,s.top,s.h,s.x+s.w/2,s.top/2,s.y+s.h/2,0x4f95ff,on))});grp.add(box(q.land.w,q.land.top,q.land.h,q.land.x+q.land.w/2,q.land.top/2,q.land.y+q.land.h/2,0x2f6fe0,on))}
+  if(e.tipo==='gradas'){var q=gradas(e);q.steps.forEach(function(s){grp.add(box(s.w,s.top,s.h,s.x+s.w/2,s.top/2,s.y+s.h/2,0x4f95ff,on))});if(e.descanso>0)grp.add(box(q.land.w,q.land.top,q.land.h,q.land.x+q.land.w/2,q.land.top/2,q.land.y+q.land.h/2,0x2f6fe0,on))}
   else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8),t=.12;if(e.tipo==='habitacion'){[[e.w,t,e.x+e.w/2,e.y],[e.w,t,e.x+e.w/2,e.y+e.h],[t,e.h,e.x,e.y+e.h/2],[t,e.h,e.x+e.w,e.y+e.h/2]].forEach(function(p){grp.add(box(p[0],h,p[1],p[2],h/2,p[3],0xd7e3f5,on))})}else grp.add(box(e.w,h,e.h,e.x+e.w/2,h/2,e.y+e.h/2,0x9db6d8,on))}})}
 function look(top){var W=P.terreno.w,L=P.terreno.l,c=new THREE.Vector3(W/2,0,L/2),d=Math.max(W,L)/2/Math.tan(THREE.MathUtils.degToRad(17.5))*1.9;
  var v=top?new THREE.Vector3(0,1,.001):new THREE.Vector3(-.55,.75,1).normalize();cam.position.copy(c).addScaledVector(v.normalize(),d);ctl.target.copy(c);ctl.update()}
 function resize(){var m=$('v3'),w=m.clientWidth,h=m.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
 (function loop(){requestAnimationFrame(loop);if(view!=='2d'){ctl.update();R.render(scn,cam)}})();
 /* ---- UI ---- */
-function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e);x='<small>'+e.pasos+' pasos de '+f2(e.huella)+' m + descanso '+f2(e.descanso)+' m</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
+function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e);x='<small>'+e.pasos+' pasos de '+f2(e.huella)+' m'+(e.descanso>0?' + descanso '+f2(e.descanso)+' m':'')+'</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
  return '<div class="it'+(sel===e.id?' on':'')+'" data-id="'+esc(e.id)+'"><b>'+esc(e.nombre)+'</b><small>'+esc(e.tipo)+' · '+f2(e.w)+' × '+f2(e.h)+' m · x '+f2(e.x)+', y '+f2(e.y)+'</small>'+x+'</div>'}).join('')||'<div class="card"><p>Sin elementos todavía.</p></div>';
  [].forEach.call($('pl').querySelectorAll('.it'),function(e){e.onclick=function(){pick(e.getAttribute('data-id'))}})}
 function pick(id){sel=(sel===id)?null:id;lista();render2D();build3D()}
