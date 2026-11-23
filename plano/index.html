@@ -34,6 +34,8 @@ aside h3{font-size:12px;color:var(--mut);font-weight:600;text-transform:uppercas
 .it b{font-size:14px;font-weight:600}.it small{display:block;color:var(--mut);font-size:12px;margin-top:2px;font-variant-numeric:tabular-nums}
 ul{padding-left:18px;font-size:13px;color:var(--mut);line-height:1.5}
 .warn{border-color:#ffb86b;color:#ffd9a8;font-size:12px;line-height:1.5}
+#lbl{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:3}
+.dl{position:absolute;transform:translate(-50%,-50%);background:#fff;color:#c0392b;border:1.5px solid #c0392b;border-radius:8px;padding:1px 7px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.35)}
 #toast{position:fixed;left:50%;top:70px;transform:translate(-50%,-20px);background:var(--acc);color:#07203a;font-weight:600;padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:all .3s;z-index:20}
 #toast.on{opacity:1;transform:translate(-50%,0)}
 @media(max-width:860px){#app{grid-template-columns:1fr;grid-template-rows:56px 1fr 200px}header{grid-column:1}aside{border-left:0;border-top:1px solid var(--line)}header span{display:none}main.split #panes{grid-template-columns:1fr;grid-template-rows:1fr 1fr}.pane+.pane{border-left:0;border-top:1px solid var(--line)}}
@@ -43,7 +45,7 @@ ul{padding-left:18px;font-size:13px;color:var(--mut);line-height:1.5}
  <div class="seg" id="seg"><button data-v="2d" class="on">Planta 2D</button><button data-v="3d">3D</button><button data-v="split">Dividido</button></div></header>
 <main id="main"><div id="panes">
  <div class="pane" id="v2"><div class="lab">Planta (medidas en metros)</div><div id="svgw"></div></div>
- <div class="pane h" id="v3"><div class="lab">Vista 3D · arrastra para girar</div><canvas id="cv"></canvas></div>
+ <div class="pane h" id="v3"><div class="lab">Vista 3D · arrastra para girar</div><canvas id="cv"></canvas><div id="lbl"></div></div>
  </div>
  <div id="tools"><button class="tb on" id="bCot">Cotas</button><button class="tb on" id="bGrid">Cuadrícula</button><button class="tb" id="bTop">3D desde arriba</button><button class="tb" id="bPersp">3D en perspectiva</button><button class="tb" id="bPng">Guardar PNG</button></div>
 </main>
@@ -114,7 +116,24 @@ var sun=new THREE.DirectionalLight(0xffffff,1.6);sun.position.set(-5,9,12);scn.a
 var ctl=new OrbitControls(cam,cv);ctl.enableDamping=true;ctl.dampingFactor=.08;ctl.maxDistance=60;ctl.minDistance=2;ctl.maxPolarAngle=Math.PI/2.02;
 var grp=new THREE.Group();scn.add(grp);
 function box(w,h,d,x,y,z,col,sel_){var m=new THREE.MeshStandardMaterial({color:col,roughness:.6,metalness:0});if(sel_)m.emissive=new THREE.Color(0x4a3300);var b=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);b.position.set(x,y,z);return b}
-function build3D(){while(grp.children.length){var c=grp.children.pop();c.traverse(function(n){if(n.geometry)n.geometry.dispose();if(n.material)n.material.dispose()})}
+var labels=[];
+function dim3(a,b,txt,tk){var A=new THREE.Vector3(a[0],a[1],a[2]),B=new THREE.Vector3(b[0],b[1],b[2]),t=tk||new THREE.Vector3(0,.12,0);
+ var g=new THREE.BufferGeometry().setFromPoints([A,B,A.clone().sub(t),A.clone().add(t),B.clone().sub(t),B.clone().add(t)]);
+ var l=new THREE.LineSegments(g,new THREE.LineBasicMaterial({color:0xc0392b,depthTest:false,transparent:true}));l.renderOrder=20;grp.add(l);
+ var el=document.createElement('div');el.className='dl';el.textContent=txt;$('lbl').appendChild(el);labels.push({el:el,p:A.clone().add(B).multiplyScalar(.5)})}
+var TX=new THREE.Vector3(.12,0,0),TZ=new THREE.Vector3(0,0,.12);
+function cotas3D(){var W=P.terreno.w,L=P.terreno.l;
+ dim3([0,0,-.4],[W,0,-.4],f2(W)+' m',TZ);dim3([-.4,0,0],[-.4,0,L],f2(L)+' m',TX);
+ P.elementos.forEach(function(e){
+  if(e.tipo==='gradas'){var q=gradas(e),bb=q.bbox,st=q.steps,f=st[0],last=st[st.length-1],ds=st.filter(function(t){return t.tipo==='descanso'})[0];
+   if(!ds||Math.abs(ds.w-bb.w)>1e-6)dim3([bb.x,0,bb.y-.3],[bb.x+bb.w,0,bb.y-.3],f2(bb.w)+' m',TZ);dim3([bb.x+bb.w+.3,0,bb.y],[bb.x+bb.w+.3,0,bb.y+bb.h],f2(bb.h)+' m',TX);
+   if(ds){dim3([ds.x,ds.top+.03,ds.y-.12],[ds.x+ds.w,ds.top+.03,ds.y-.12],'Descanso '+f2(ds.w)+' m',TZ);dim3([ds.x+ds.w+.12,ds.top+.03,ds.y],[ds.x+ds.w+.12,ds.top+.03,ds.y+ds.h],f2(ds.h)+' m',TX);
+    dim3([ds.x-.2,0,ds.y+ds.h/2],[ds.x-.2,ds.top,ds.y+ds.h/2],'Altura '+f2(ds.top)+' m',TX)}
+   dim3([f.x-.2,0,f.y+f.h+.45],[f.x-.2,f.top,f.y+f.h+.45],'Contrahuella '+f2(e.alto)+' m',TX);dim3([f.x-.75,f.top,f.y],[f.x-.75,f.top,f.y+f.h],'Huella '+f2(e.huella)+' m',TX);
+   dim3([last.x+last.w+.25,0,last.y+last.h],[last.x+last.w+.25,q.subida,last.y+last.h],'Sube '+f2(q.subida)+' m',TX)}
+  else if(e.tipo==='zona'){dim3([e.x+e.w+.3,0,e.y],[e.x+e.w+.3,0,e.y+e.h],f2(e.h)+' m',TX);dim3([e.x,0,e.y+e.h+.3],[e.x+e.w,0,e.y+e.h+.3],f2(e.w)+' m',TZ)}
+  else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8);dim3([e.x,h+.02,e.y-.2],[e.x+e.w,h+.02,e.y-.2],f2(e.w)+' m',TZ);dim3([e.x-.2,h+.02,e.y],[e.x-.2,h+.02,e.y+e.h],f2(e.h)+' m',TX)}})}
+function build3D(){labels=[];$('lbl').innerHTML='';while(grp.children.length){var c=grp.children.pop();c.traverse(function(n){if(n.geometry)n.geometry.dispose();if(n.material)n.material.dispose()})}
  var W=P.terreno.w,L=P.terreno.l;
  grp.add(box(W,.05,L,W/2,-.025,L/2,0xe9eef6));
  var gr=new THREE.GridHelper(Math.max(W,L),Math.max(W,L)*2,0x9db6d8,0xc9d5e6);gr.position.set(W/2,.002,L/2);gr.scale.set(1,1,1);grp.add(gr);
@@ -122,11 +141,12 @@ function build3D(){while(grp.children.length){var c=grp.children.pop();c.travers
  P.elementos.forEach(function(e){var on=sel===e.id;
   if(e.tipo==='gradas'){var q=gradas(e);q.steps.forEach(function(t){grp.add(box(t.w,t.top,t.h,t.x+t.w/2,t.top/2,t.y+t.h/2,t.tipo==='descanso'?0x2f6fe0:0x4f95ff,on))})}
   else if(e.tipo==='zona'){grp.add(box(e.w,.01,e.h,e.x+e.w/2,.01,e.y+e.h/2,0xc9d5e6,on))}
-  else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8),t=.12;if(e.tipo==='habitacion'){[[e.w,t,e.x+e.w/2,e.y],[e.w,t,e.x+e.w/2,e.y+e.h],[t,e.h,e.x,e.y+e.h/2],[t,e.h,e.x+e.w,e.y+e.h/2]].forEach(function(p){grp.add(box(p[0],h,p[1],p[2],h/2,p[3],0xd7e3f5,on))})}else grp.add(box(e.w,h,e.h,e.x+e.w/2,h/2,e.y+e.h/2,0x9db6d8,on))}})}
-function look(top){var W=P.terreno.w,L=P.terreno.l,c=new THREE.Vector3(W/2,0,L/2),d=Math.max(W,L)/2/Math.tan(THREE.MathUtils.degToRad(17.5))*1.9;
+  else{var h=e.alto3d||(e.tipo==='habitacion'?2.6:.8),t=.12;if(e.tipo==='habitacion'){[[e.w,t,e.x+e.w/2,e.y],[e.w,t,e.x+e.w/2,e.y+e.h],[t,e.h,e.x,e.y+e.h/2],[t,e.h,e.x+e.w,e.y+e.h/2]].forEach(function(p){grp.add(box(p[0],h,p[1],p[2],h/2,p[3],0xd7e3f5,on))})}else grp.add(box(e.w,h,e.h,e.x+e.w/2,h/2,e.y+e.h/2,0x9db6d8,on))}});if(showCot)cotas3D()}
+function look(top){var W=P.terreno.w,L=P.terreno.l,c=new THREE.Vector3(W/2,0,L/2),d=Math.max(W,L)/2/Math.tan(THREE.MathUtils.degToRad(17.5))*1.45;
  var v=top?new THREE.Vector3(0,1,.001):new THREE.Vector3(-.55,.75,1).normalize();cam.position.copy(c).addScaledVector(v.normalize(),d);ctl.target.copy(c);ctl.update()}
 function resize(){var m=$('v3'),w=m.clientWidth,h=m.clientHeight;if(!w||!h)return;R.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
-(function loop(){requestAnimationFrame(loop);if(view!=='2d'){ctl.update();R.render(scn,cam)}})();
+var _v=new THREE.Vector3();
+(function loop(){requestAnimationFrame(loop);if(view!=='2d'){ctl.update();R.render(scn,cam);var w=cv.clientWidth,h=cv.clientHeight;labels.forEach(function(l){_v.copy(l.p).project(cam);var ok=_v.z<1&&_v.z>-1;l.el.style.display=ok?'block':'none';if(ok){l.el.style.left=(_v.x*.5+.5)*w+'px';l.el.style.top=(-_v.y*.5+.5)*h+'px'}})}})();
 /* ---- UI ---- */
 function lista(){$('pl').innerHTML=P.elementos.map(function(e){var x='';if(e.tipo==='gradas'){var q=gradas(e),ds=q.steps.filter(function(t){return t.tipo==='descanso'}).map(function(t){return f2(t.w)+' × '+f2(t.h)+' m'}).join(', ');x='<small>'+q.pasos+' pasos de '+f2(e.huella)+' m'+(ds?' + descanso de '+ds:'')+'</small><small>Contrahuella '+Math.round(e.alto*100)+' cm · '+q.escalones+' escalones · sube '+f2(q.subida)+' m</small>'}
  return '<div class="it'+(sel===e.id?' on':'')+'" data-id="'+esc(e.id)+'"><b>'+esc(e.nombre)+'</b><small>'+esc(e.tipo)+' · '+f2(e.w)+' × '+f2(e.h)+' m · x '+f2(e.x)+', y '+f2(e.y)+'</small>'+x+'</div>'}).join('')||'<div class="card"><p>Sin elementos todavía.</p></div>';
@@ -136,7 +156,7 @@ function ui(){$('ttl').textContent=P.titulo||'';$('pt').textContent=P.titulo;$('
  $('ch').innerHTML=(P.cambios||[]).map(function(c){return '<li>'+esc(c)+'</li>'}).join('');$('av').innerHTML=avisos().map(function(a){return '<div class="card warn">'+esc(a)+'</div>'}).join('');lista();render2D();build3D()}
 function setView(v){view=v;$('main').classList.toggle('split',v==='split');$('v2').classList.toggle('h',v==='3d');$('v3').classList.toggle('h',v==='2d');document.querySelectorAll('#seg button').forEach(function(b){b.classList.toggle('on',b.dataset.v===v)});setTimeout(function(){resize();look(false)},60)}
 document.querySelectorAll('#seg button').forEach(function(b){b.onclick=function(){setView(b.dataset.v)}});
-$('bCot').onclick=function(){showCot=!showCot;$('bCot').classList.toggle('on',showCot);render2D()};
+$('bCot').onclick=function(){showCot=!showCot;$('bCot').classList.toggle('on',showCot);render2D();build3D()};
 $('bGrid').onclick=function(){showGrid=!showGrid;$('bGrid').classList.toggle('on',showGrid);render2D()};
 $('bTop').onclick=function(){look(true)};$('bPersp').onclick=function(){look(false)};
 $('bPng').onclick=function(){if(view==='3d'){R.render(scn,cam);cv.toBlob(function(b){var a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='plano-3d.png';a.click()})}else{
