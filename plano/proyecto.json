@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "titulo": "Casa 6.30 × 6.40 m",
   "actualizado": "2026-11-23",
   "terreno": {
@@ -8,9 +8,9 @@
   },
   "altura_entrepiso": 2.6,
   "cambios": [
-    "Altura del entrepiso: 2.60 m, medida desde la losa (piso de arriba) hasta el suelo.",
-    "La contrahuella se ajusta sola: 2.60 m / 16 escalones = 16.25 cm. El descanso queda a 1.30 m (la mitad).",
-    "Antes la escalera subía 2.88 m (contrahuella de 18 cm)."
+    "SIMULACIÓN (se apaga con el botón «Simulación»): un local con puerta de garaje y un Chevrolet Aveo Family aparcado, solo para ver cómo se vería.",
+    "El local usa todo el terreno de 6.30 × 6.40 m con 2.60 m de alto; la puerta de garaje (2.50 m) en la pared sur es un supuesto.",
+    "Carro con medidas aproximadas: 4.31 m de largo, 1.71 m de ancho, 1.505 m de alto y 2.48 m entre ejes."
   ],
   "elementos": [
     {
@@ -53,6 +53,37 @@
       "y": 5.4,
       "w": 1.0,
       "h": 1.0
+    },
+    {
+      "id": "local",
+      "tipo": "local",
+      "nombre": "Local",
+      "x": 0,
+      "y": 0,
+      "w": 6.3,
+      "h": 6.4,
+      "alto3d": 2.6,
+      "simulacion": true,
+      "puerta": {
+        "lado": "S",
+        "x": 2.9,
+        "w": 2.5,
+        "alto": 2.2,
+        "nombre": "Puerta de garaje (supuesto)"
+      }
+    },
+    {
+      "id": "auto",
+      "tipo": "auto",
+      "nombre": "Chevrolet Aveo Family (aprox.)",
+      "x": 4.15,
+      "y": 3.2,
+      "largo": 4.31,
+      "ancho": 1.71,
+      "alto": 1.505,
+      "entre_ejes": 2.48,
+      "rot": 0,
+      "simulacion": true
     }
   ]
 }
