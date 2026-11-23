@@ -1,5 +1,5 @@
 {
-  "version": 4,
+  "version": 5,
   "titulo": "Casa 6.30 × 6.40 m",
   "actualizado": "2026-11-23",
   "terreno": {
@@ -8,9 +8,9 @@
   },
   "altura_entrepiso": null,
   "cambios": [
-    "Escalera en U: el descanso se agranda hacia la derecha (4.00 × 1.00 m) y el segundo tramo vuelve hacia el inicio.",
-    "Primer tramo sube hacia el norte (7 pasos); segundo tramo baja en el plano hacia el sur (7 pasos). Siguen 16 contrahuellas de 18 cm: sube 2.88 m.",
-    "Se mantiene 1.00 m libre entre el inicio y el primer escalón."
+    "Descanso reducido a 2.00 × 1.00 m.",
+    "Para que el descanso de 2.00 m conecte los dos tramos de la U, cada tramo mide 1.00 m de ancho (antes 2.00 m).",
+    "Escalera: 7 pasos + descanso + 7 pasos, 16 contrahuellas de 18 cm (sube 2.88 m). Ocupa 2.00 × 2.75 m."
   ],
   "elementos": [
     {
@@ -26,22 +26,22 @@
           "dir": "N",
           "x": 0,
           "y0": 5.4,
-          "w": 2.0
+          "w": 1.0
         },
         {
           "tipo": "descanso",
           "x": 0,
           "y": 2.65,
-          "w": 4.0,
+          "w": 2.0,
           "h": 1.0
         },
         {
           "tipo": "pasos",
           "n": 7,
           "dir": "S",
-          "x": 2.0,
+          "x": 1.0,
           "y0": 3.65,
-          "w": 2.0
+          "w": 1.0
         }
       ]
     },
@@ -51,7 +51,7 @@
       "nombre": "1.00 m libre",
       "x": 0,
       "y": 5.4,
-      "w": 2.0,
+      "w": 1.0,
       "h": 1.0
     }
   ]
