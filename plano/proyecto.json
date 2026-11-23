@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "titulo": "Casa 6.30 × 6.40 m",
   "actualizado": "2026-11-23",
   "terreno": {
@@ -8,31 +8,40 @@
   },
   "altura_entrepiso": null,
   "cambios": [
-    "Agregado 1.00 m libre entre el inicio (pared sur) y el primer escalón.",
-    "Agregado un descanso de 1.00 m a la mitad de las gradas: 7 pasos + descanso + 7 pasos (16 contrahuellas, sube 2.88 m).",
-    "Las gradas ahora miden 2.00 m de ancho × 4.50 m de largo (antes 3.75 m)."
+    "Escalera en U: el descanso se agranda hacia la derecha (4.00 × 1.00 m) y el segundo tramo vuelve hacia el inicio.",
+    "Primer tramo sube hacia el norte (7 pasos); segundo tramo baja en el plano hacia el sur (7 pasos). Siguen 16 contrahuellas de 18 cm: sube 2.88 m.",
+    "Se mantiene 1.00 m libre entre el inicio y el primer escalón."
   ],
   "elementos": [
     {
       "id": "gradas",
       "tipo": "gradas",
-      "nombre": "Gradas",
-      "x": 0,
-      "y": 0.9,
-      "w": 2.0,
-      "h": 4.5,
-      "ancho": 2.0,
-      "huella": 0.25,
+      "nombre": "Gradas en U",
       "alto": 0.18,
+      "huella": 0.25,
       "tramos": [
         {
-          "pasos": 7
+          "tipo": "pasos",
+          "n": 7,
+          "dir": "N",
+          "x": 0,
+          "y0": 5.4,
+          "w": 2.0
         },
         {
-          "descanso": 1.0
+          "tipo": "descanso",
+          "x": 0,
+          "y": 2.65,
+          "w": 4.0,
+          "h": 1.0
         },
         {
-          "pasos": 7
+          "tipo": "pasos",
+          "n": 7,
+          "dir": "S",
+          "x": 2.0,
+          "y0": 3.65,
+          "w": 2.0
         }
       ]
     },
