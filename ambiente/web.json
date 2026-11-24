@@ -1,1 +1,1 @@
-{"version": 2, "date": "24/11/2026", "notes": ["Corrige las actualizaciones: ahora la app puede buscar y descargar mejoras (le faltaba el permiso de internet)"]}
+{"version": 3, "date": "24/11/2026", "notes": ["Las actualizaciones ahora se comprueban al abrir la app, igual que en Crece Fit", "Si una mejora necesita un APK nuevo, avisa para instalarlo desde la página web; si no, se descarga y la app se cierra sola"]}
