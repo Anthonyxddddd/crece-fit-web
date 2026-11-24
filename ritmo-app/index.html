@@ -111,6 +111,20 @@ input[type=range].sk::-webkit-slider-thumb{-webkit-appearance:none;width:0;heigh
 .ctl button{color:#fff;display:grid;place-items:center;font-size:38px;width:64px;height:64px}
 .ctl button.pp{font-size:48px;width:80px;height:80px}
 .ctl button:active{transform:scale(.88)}.ctl button{transition:transform .2s var(--ease)}
+#artw{position:relative}
+#lyr{position:absolute;inset:0;overflow-y:auto;opacity:0;pointer-events:none;transition:opacity .35s;-webkit-mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(transparent,#000 12%,#000 88%,transparent);padding:18vh 6px;scrollbar-width:none;touch-action:pan-y}
+#lyr::-webkit-scrollbar{display:none}
+#pl.lyrOn #lyr{opacity:1;pointer-events:auto}#pl.lyrOn #art{opacity:0;transform:scale(.7);pointer-events:none}
+#art{transition:transform .6s var(--ease),opacity .35s}
+#lyr .ll{font-size:26px;line-height:1.25;font-weight:800;color:rgba(255,255,255,.34);padding:8px 4px;transition:color .3s,transform .3s,filter .3s;transform-origin:left center;cursor:pointer}
+#lyr .ll.past{color:rgba(255,255,255,.5)}
+#lyr .ll.on{color:#fff;transform:scale(1.04)}
+#lyr.plain .ll{font-size:20px;font-weight:700;color:rgba(255,255,255,.85);cursor:default;padding:5px 4px}
+#lyr .lm{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;height:100%;margin-top:-10vh;text-align:center;color:rgba(255,255,255,.7);font-size:15px;font-weight:600;padding:0 18px}
+#lyr .lm button{background:rgba(255,255,255,.18);color:#fff;border-radius:99px;padding:10px 18px;font-weight:700;font-size:14px}
+#lyr .lm small{font-size:12px;opacity:.6;font-weight:500}
+#lyr .src{font-size:11px;color:rgba(255,255,255,.4);padding:18px 4px;font-weight:600}
+.pbar button{width:44px}
 .pbar{display:flex;justify-content:space-around;margin-top:6px}
 .pbar button{width:50px;height:46px;display:grid;place-items:center;font-size:22px;color:rgba(255,255,255,.68);position:relative}
 .pbar button.on{color:#fff}.pbar button.on::after{content:"";position:absolute;bottom:3px;left:50%;width:5px;height:5px;border-radius:50%;background:#fff;transform:translateX(-50%)}
@@ -166,6 +180,7 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 <symbol id="i-timer" viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-next2" viewBox="0 0 24 24"><path d="M5 12h9M10 7l5 5-5 5M19 5v14"/></symbol>
+<symbol id="i-lyr" viewBox="0 0 24 24"><path d="M5 5h14a1 1 0 011 1v9a1 1 0 01-1 1h-7l-4 4v-4H5a1 1 0 01-1-1V6a1 1 0 011-1zM8 9h8M8 12h5"/></symbol>
 <symbol id="i-queue" viewBox="0 0 24 24"><path d="M4 6h12M4 12h12M4 18h7M17 15l4 3-4 3z"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></symbol>
@@ -186,11 +201,11 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 <div id="pl"><div class="pbg" id="pbA"></div><div class="pbg" id="pbB"></div><div id="pov"></div>
  <div class="grab" id="grab"></div>
  <div id="pt1"><button class="ib press" id="pClose"><svg class="i" style="font-size:26px"><use href="#i-down"/></svg></button><span id="pSrc">Reproduciendo</span><button class="ib press" id="pMore"><svg class="i"><use href="#i-more"/></svg></button></div>
- <div id="artw"><div id="art"><div class="cv" id="pArt"></div></div></div>
+ <div id="artw"><div id="art"><div class="cv" id="pArt"></div></div><div id="lyr"></div></div>
  <div class="meta"><div class="tx"><div id="pt"></div><div id="pa"></div></div><button class="ib press" id="cFav"><svg class="i"><use href="#i-heart"/></svg></button></div>
  <div class="srow" id="srow"><input type="range" class="sk" id="seek" min="0" max="1000" value="0"><div class="tm"><span id="eT">0:00</span><span id="dT">0:00</span></div></div>
  <div class="ctl"><button id="cPr"><svg class="i f"><use href="#i-prev"/></svg></button><button class="pp" id="cPP"><svg class="i f"><use href="#i-play"/></svg></button><button id="cNx"><svg class="i f"><use href="#i-next"/></svg></button></div>
- <div class="pbar"><button id="cSh"><svg class="i"><use href="#i-shuf"/></svg></button><button id="cRe"><svg class="i"><use href="#i-rep"/></svg></button><button id="cSl"><svg class="i"><use href="#i-timer"/></svg></button><button id="cSp"><svg class="i"><use href="#i-speed"/></svg><small id="spT" style="display:none"></small></button><button id="cEq"><svg class="i"><use href="#i-eq"/></svg></button><button id="cQu"><svg class="i"><use href="#i-queue"/></svg></button></div>
+ <div class="pbar"><button id="cSh"><svg class="i"><use href="#i-shuf"/></svg></button><button id="cRe"><svg class="i"><use href="#i-rep"/></svg></button><button id="cSl"><svg class="i"><use href="#i-timer"/></svg></button><button id="cSp"><svg class="i"><use href="#i-speed"/></svg><small id="spT" style="display:none"></small></button><button id="cEq"><svg class="i"><use href="#i-eq"/></svg></button><button id="cLy"><svg class="i"><use href="#i-lyr"/></svg></button><button id="cQu"><svg class="i"><use href="#i-queue"/></svg></button></div>
 </div>
 <div id="ov"></div><div id="sh"></div><div id="toast"></div><div id="utoast"></div><div id="umodal"></div>
 <script>
@@ -433,6 +448,31 @@ $('mPP').onclick=function(e){e.stopPropagation();P.toggle()};$('mN').onclick=fun
 $('pClose').onclick=function(){openP(false)};$('pMore').onclick=function(){if(ST.id)menu(ST.id)};
 $('cPP').onclick=function(){P.toggle()};$('cNx').onclick=function(){P.next()};$('cPr').onclick=function(){P.prev()};
 $('cSh').onclick=function(){P.shuffle(!ST.shuffle)};$('cRe').onclick=function(){P.repeat((ST.repeat+1)%3)};
+
+/* ---- letras ---- */
+var LY={id:0,st:'idle',lines:[],plain:'',src:'',act:-1,res:null},lyrOn=false;
+function lrcParse(t){var out=[],re=/\[(\d+):(\d+(?:[.,]\d+)?)\]/g;String(t).split(/\r?\n/).forEach(function(l){var m,ts=[],last=0;re.lastIndex=0;while((m=re.exec(l))){ts.push((+m[1])*60000+Math.round(parseFloat(m[2].replace(',','.'))*1000));last=re.lastIndex}if(!ts.length)return;var tx=l.slice(last).replace(/<\d+:\d+(?:[.,]\d+)?>/g,'').trim();ts.forEach(function(x){out.push({t:x,s:tx})})});out.sort(function(a,b){return a.t-b.t});return out}
+function lyrMsg(h){var e=$('lyr');e.className='';e.innerHTML='<div class="lm">'+h+'</div>'}
+function lyrShow(){var e=$('lyr'),r=LY.res;if(!r){return}
+ if(r.none){var h=r.instrumental?ic('note','', 'font-size:34px')+'Instrumental':(r.error?'No se pudo cargar la letra':'No hay letra guardada para esta canción');
+  if(!r.instrumental&&(r.needOnline||!DB.lyrOnline))h+='<small>Puedes buscarla en internet (LRCLIB). Se envía el título, artista y duración de la canción.</small><button id="lyNet">Buscar en internet</button>';
+  else if(!r.instrumental)h+='<small>No se encontró en LRCLIB.</small>';
+  lyrMsg(h);var b=$('lyNet');if(b)b.onclick=function(){DB.lyrOnline=true;save();lyrLoad(true)};return}
+ var syn=r.synced?lrcParse(r.synced):[];LY.act=-1;
+ if(syn.length){LY.lines=syn;e.className='';e.innerHTML=syn.map(function(l,i){return '<div class="ll" data-i="'+i+'" data-t="'+l.t+'">'+(esc(l.s)||'&#9835;')+'</div>'}).join('')+'<div class="src">Letra: '+esc(r.src||'')+'</div>'}
+ else{LY.lines=[];e.className='plain';e.innerHTML=String(r.plain||'').split(/\n/).map(function(l){return '<div class="ll">'+(esc(l)||'&nbsp;')+'</div>'}).join('')+'<div class="src">Letra: '+esc(r.src||'')+'</div>';e.scrollTop=0}
+ [].forEach.call(e.querySelectorAll('.ll[data-t]'),function(d){d.onclick=function(){P.seek(+d.dataset.t)}});lyrTick(true)}
+function lyrLoad(force){if(!ST.id)return;LY.id=ST.id;LY.res=null;LY.lines=[];LY.act=-1;
+ if(DEMO){lyrMsg('Cargando letra…');var d=ST.dur||200000,syn='',pl=[];var T=['Camino entre luces de la ciudad','Y el viento canta una vieja canción','Cada paso me lleva más lejos','Sin mirar atrás, sin miedo ni dudas','Luces de neón sobre el horizonte','Y yo sigo el ritmo del corazón'];for(var i=0;i<24;i++){var ms=8000+i*Math.floor((d-12000)/24),m=Math.floor(ms/60000),sc=((ms%60000)/1000).toFixed(2);syn+='[0'+m+':'+(sc<10?'0':'')+sc+']'+T[i%T.length]+'\n';pl.push(T[i%T.length])}setTimeout(function(){LY.res={synced:syn,plain:pl.join('\n'),src:'demo'};lyrShow()},400);return}
+ if(!has('lyrics')){lyrMsg('Las letras necesitan la versión nueva de la app<small>Instálala desde la página de descarga.</small>');return}
+ lyrMsg('Buscando letra…');var t=BY[ST.id]||{};nat('lyrics',String(ST.id),ST.title||t.t||'',ST.artist||t.a||'',t.al||'',Math.round(ST.dur||t.d||0),!!DB.lyrOnline)}
+window.__lyr=function(id,r){if(id!==LY.id)return;LY.res=r;if(lyrOn)lyrShow()};
+function lyrTick(snap){if(!lyrOn||!LY.lines.length)return;var p=ST.pos+250,a=-1,L=LY.lines;for(var i=0;i<L.length;i++){if(L[i].t<=p)a=i;else break}
+ if(a===LY.act&&!snap)return;LY.act=a;var e=$('lyr'),ds=e.querySelectorAll('.ll');for(var j=0;j<ds.length;j++){ds[j].classList.toggle('on',j===a);ds[j].classList.toggle('past',j<a)}
+ if(a>=0&&ds[a]){var tgt=ds[a].offsetTop-e.clientHeight/2+ds[a].offsetHeight/2;try{e.scrollTo({top:tgt,behavior:snap?'auto':'smooth'})}catch(x){e.scrollTop=tgt}}}
+function lyrToggle(){lyrOn=!lyrOn;$('pl').classList.toggle('lyrOn',lyrOn);$('cLy').classList.toggle('on',lyrOn);if(lyrOn&&ST.id&&LY.id!==ST.id)lyrLoad();else if(lyrOn&&LY.res)lyrShow()}
+$('cLy').onclick=lyrToggle;
+var onState0=onState;onState=function(s){onState0(s);if(lyrOn&&ST.id){if(LY.id!==ST.id)lyrLoad();else lyrTick()}};
 $('cFav').onclick=function(){if(!ST.id)return;if(DB.fav[ST.id])delete DB.fav[ST.id];else DB.fav[ST.id]=1;save();onState();var b=$('cFav');b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');toast(DB.fav[ST.id]?'Agregada a favoritas':'Quitada de favoritas')};
 $('cSl').onclick=sleepSheet;$('cSp').onclick=speedSheet;$('cEq').onclick=eqSheet;$('cQu').onclick=queueSheet;
 var sk=$('seek');sk.addEventListener('input',function(){drag=true;$('srow').classList.add('d');var ms=ST.dur*sk.value/1000;$('eT').textContent=fmt(ms);$('dT').textContent='-'+fmt(ST.dur-ms);sk.style.setProperty('--p',(sk.value/10)+'%')});
