@@ -804,3 +804,5 @@ body.entered .tabs{animation:tabsup .5s cubic-bezier(.2,.9,.3,1) .12s both}
 .cal .d.done.rl{border-top-left-radius:8px;border-bottom-left-radius:8px}
 .cal .d.done.rr{border-top-right-radius:8px;border-bottom-right-radius:8px}
 .cal .d.done.rr::after{content:'';position:absolute;right:-5px;top:0;bottom:0;width:5px;background:linear-gradient(180deg,var(--fire),var(--fire2))}
+.wd.rest{opacity:.45}
+.wd.rest .dot{background:transparent;border:2px dashed var(--bd)}

@@ -16,6 +16,14 @@
   function pad(n) { return n < 10 ? '0' + n : '' + n; }
   function dstr(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function today() { return dstr(new Date()); }
+  /* días de entrenamiento elegidos (L=0 ... D=6). Sin elegir = todos los días */
+  var DAYS3 = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'], DAYS_FULL = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+  function tdArr() { var t = S && S.settings && S.settings.tdays; return (t && t.length && t.length < 7) ? t : null; }
+  function wdOf(n) { return (new Date(n * 86400000).getUTCDay() + 6) % 7; }
+  function isRestN(n) { var t = tdArr(); return !!t && t.indexOf(wdOf(n)) < 0; }
+  function tdaysText() { var t = tdArr(); return t ? t.slice().sort().map(function (i) { return DAYS_FULL[i]; }).join(', ') : 'todos los días'; }
+  function tdMask() { var t = tdArr(), m = 0; if (t) t.forEach(function (i) { m |= (1 << i); }); return m; }
+  function gapOk(a, b) { var i; for (i = a + 1; i < b; i++) if (!isRestN(i)) return false; return true; }
   function dnum(s) { var p = s.split('-'); return Math.round(Date.UTC(+p[0], +p[1] - 1, +p[2]) / 86400000); }
   function nstr(n) { var d = new Date(n * 86400000); return d.getUTCFullYear() + '-' + pad(d.getUTCMonth() + 1) + '-' + pad(d.getUTCDate()); }
   function mmss(s) { s = Math.max(0, Math.round(s)); return Math.floor(s / 60) + ':' + pad(s % 60); }
@@ -62,11 +70,11 @@
   function stats() {
     var keys = Object.keys(S.days).sort(), best = 0, run = 0, prev = null, maxReps = 0, early = false;
     keys.forEach(function (k) {
-      var n = dnum(k); run = (prev !== null && n - prev === 1) ? run + 1 : 1; if (run > best) best = run; prev = n;
+      var n = dnum(k); run = (prev !== null && gapOk(prev, n)) ? run + 1 : 1; if (run > best) best = run; prev = n;
       if ((S.days[k].reps || 0) > maxReps) maxReps = S.days[k].reps; if (S.days[k].early) early = true;
     });
     var td = S.days[today()], t = dnum(today()), done = !!(td && td.w > 0), n = done ? t : t - 1, cur = 0;
-    while (S.days[nstr(n)]) { cur++; n--; }
+    var guard = 0; for (;;) { if (S.days[nstr(n)]) { cur++; n--; } else if (isRestN(n) && guard++ < 400) { n--; } else break; }
     var mins = 0; keys.forEach(function (k) { mins += (S.days[k].sec || 0) / 60; });
     var hd = 0; Object.keys(S.habits).forEach(function (k) { if (S.habits[k].xp) hd++; });
     return { cur: cur, best: best, doneToday: done, total: S.total, mins: Math.round(mins), chains: S.chains, lvl: levelOf(S.xp),
@@ -98,9 +106,9 @@
   }
   /* congelamiento automático: si ayer faltaste y anteayer entrenaste, un congelamiento mantiene la racha (2 por mes) */
   function autoFreeze() {
-    var t = dnum(today()), y = nstr(t - 1), yy = nstr(t - 2), mk = today().slice(0, 7);
+    var t = dnum(today()), y = nstr(t - 1), pn = t - 2, mk = today().slice(0, 7); while (isRestN(pn) && t - pn < 8) pn--; var yy = nstr(pn);
     if (S.freeze.m !== mk) S.freeze = { m: mk, used: 0 };
-    if (!S.days[y] && S.days[yy] && !S.days[yy].freeze && S.freeze.used < 2) {
+    if (!S.days[y] && !isRestN(t - 1) && S.days[yy] && !S.days[yy].freeze && S.freeze.used < 2) {
       S.days[y] = { w: 0, sec: 0, sets: 0, freeze: true }; S.freeze.used++; save(); return true;
     }
     return false;
@@ -146,6 +154,7 @@
   function syncReminder() {
     try {
       if (!AND() || !AND().setReminder) return;
+      try { if (AND().setTrainDays) AND().setTrainDays(tdMask()); } catch (e) { }
       var st = stats(), msg = st.cur > 0 ? '¡Mantén tu racha de ' + st.cur + ' día' + (st.cur > 1 ? 's' : '') + '! 🔥 Hoy toca entrenar.' : '¡Es hora de entrenar! Empieza tu racha hoy 💪';
       var nb = nextStreak(st); if (nb && nb.left <= 3 && st.cur > 0) msg = '🔥 Racha de ' + st.cur + ' días: ' + (nb.left === 1 ? 'mañana' : 'en ' + nb.left + ' días') + ' ganas la insignia de ' + nb.n + '.';
       var last = Object.keys(S.days).sort().pop() || '', rt = remTime();
@@ -544,8 +553,8 @@
     var d = new Date(), wd = (d.getDay() + 6) % 7, out = '', i;
     d.setDate(d.getDate() - wd);
     for (i = 0; i < 7; i++) {
-      var k = dstr(d), r = S.days[k], done = !!(r && r.w > 0), fr = !!(r && r.freeze), isT = k === today();
-      out += '<div class="wd' + (done ? ' done' : '') + (fr ? ' fz' : '') + (isT ? ' today' : '') + '">' + DAYS[i] + '<div class="dot">' + (done ? '✓' : fr ? '❄️' : '') + '</div></div>';
+      var k = dstr(d), r = S.days[k], done = !!(r && r.w > 0), fr = !!(r && r.freeze), isT = k === today(), rs = !done && isRestN(dnum(k));
+      out += '<div class="wd' + (done ? ' done' : '') + (fr ? ' fz' : '') + (isT ? ' today' : '') + (rs ? ' rest' : '') + '">' + DAYS[i] + '<div class="dot">' + (done ? '✓' : fr ? '❄️' : '') + '</div></div>';
       d.setDate(d.getDate() + 1);
     }
     return '<div class="week">' + out + '</div>';
@@ -618,6 +627,7 @@
     var c = homeCtx(), st = c.st, tp = c.tp, id = c.id, h = '';
     if (k === 'hoy') {
       var planTag = tp ? '<span class="chip">📅 Plan · día ' + (tp.i + 1) + '/28</span>' : '';
+      if (!st.doneToday && isRestN(dnum(today()))) h += '<div class="card" style="border:1px solid var(--acc)"><b>😴 Hoy es tu día de descanso</b><div class="mut small" style="margin-top:4px;line-height:1.45">Tus días de entrenamiento: <b style="color:var(--txt)">' + tdaysText() + '</b>. Si quieres, puedes entrenar igual: tu racha no se rompe ni por entrenar ni por descansar.</div></div>';
       if (st.doneToday) {
         h += '<div class="card wcard"><div style="font-size:19px;font-weight:900">Hoy ya entrenaste ✅</div><p class="mut small" style="margin:6px 0 12px">Descansa: los músculos crecen mientras duermes. Si quieres, haz algo suave para tu postura.</p>' +
           '<div class="col"><button class="btn sec" data-a="start" data-v="P">🧍 Postura (2 min)</button><button class="btn sec" data-a="start" data-v="S">🌱 Estirar (6 min)</button></div>' +
@@ -972,6 +982,7 @@
   function seg(key, opts, cur) {
     return '<div class="seg">' + opts.map(function (o) { return '<button class="' + (String(cur) === String(o[0]) ? 'on' : '') + '" data-a="opt" data-v="' + key + ':' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div>';
   }
+  function setTDays() { var t = tdArr(); if (t) S.settings.goal = t.length; save(); syncReminder(); }
   function nativeOk(fn) { try { return !!(AND() && AND()[fn]); } catch (e) { return false; } }
   function statsCard() {
     if (!CLOUD_URL) return '';
@@ -1014,7 +1025,8 @@
     } else if (k === 'train') {
       h += '<div class="card"><label style="margin-top:0">Tu nombre</label><input type="text" id="nm" data-set="name" value="' + esc(S.name) + '" placeholder="Opcional" maxlength="20">' +
         '<label>Descanso entre series: <b id="rv" style="color:var(--acc)">' + s.rest + ' s</b></label><input type="range" min="15" max="90" step="5" value="' + s.rest + '" data-set="rest"></div>' +
-        '<div class="card"><label style="margin-top:0">Meta semanal (días por semana)</label>' + seg('goal', [[2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']], s.goal) +
+        '<div class="card"><label style="margin-top:0">Días de entrenamiento</label><div class="mut small" style="margin:4px 0 10px;line-height:1.45">Elige qué días entrenas: puede ser uno solo o los que quieras. Los demás son descanso y no rompen tu racha.</div><div class="seg" style="gap:5px">' + DAYS3.map(function (d, i) { var on = !tdArr() || tdArr().indexOf(i) >= 0; return '<button class="' + (on ? 'on' : '') + '" style="padding:11px 0;font-size:12px" data-a="tday" data-v="' + i + '">' + d + '</button>'; }).join('') + '</div><div class="row" style="margin-top:10px"><div class="mut small sp">Entrenas: <b style="color:var(--txt)">' + tdaysText() + '</b></div><button class="btn ghost sm" data-a="tdall" style="width:auto;padding:8px 14px">Todos</button></div></div>' +
+        (tdArr() ? '<div class="card"><b>🎯 Meta semanal: ' + tdArr().length + (tdArr().length === 1 ? ' día' : ' días') + '</b><div class="mut small" style="margin-top:4px">Sigue los días que elegiste arriba.</div>' : '<div class="card"><label style="margin-top:0">Meta semanal (días por semana)</label>' + seg('goal', [[1, '1'], [2, '2'], [3, '3'], [4, '4'], [5, '5'], [6, '6']], s.goal)) +
         '<label>Calentamiento</label>' + seg('warm', [['cardio', '🏃 Cardio'], ['suave', '🧘 Suave'], ['none', 'Ninguno']], s.warm) +
         '<label>Estiramiento final</label>' + seg('cool', [['all', 'Todo'], ['legs', 'Piernas'], ['back', 'Espalda'], ['upper', 'Brazos'], ['none', 'Ninguno']], s.cool) + '</div>' +
         '<div class="card"><div class="set"><div class="sp"><b>🙌 Modo manos libres</b><div class="mut small">Cuenta las repeticiones con voz y avanza solo. Ideal con el teléfono apoyado.</div></div>' + sw('hands') + '</div>' +
@@ -1583,6 +1595,10 @@
         if (!h && !w) { toast('Escribe tu estatura o peso'); break; }
         if (h && (h < 80 || h > 250)) { toast('Revisa la estatura (cm)'); break; }
         S.meas.push({ d: today(), h: h || 0, w: w || 0 }); save(); toast('Medida guardada ✅'); render(); break;
+      case 'tday': var ix = +v, cur = (tdArr() || [0, 1, 2, 3, 4, 5, 6]).slice(), pos = cur.indexOf(ix);
+        if (pos >= 0) { if (cur.length === 1) { toast('Deja al menos un día'); break; } cur.splice(pos, 1); } else cur.push(ix);
+        cur.sort(function (a, b) { return a - b; }); S.settings.tdays = cur.length === 7 ? null : cur; setTDays(); render(); break;
+      case 'tdall': S.settings.tdays = null; setTDays(); render(); break;
       case 'theme': S.settings.theme = v; save(); applyTheme(); render(); break;
       case 'style': S.settings.style = v; save(); applyTheme(); render(); break;
       case 'mode': S.settings.mode = v; save(); applyTheme(); render(); break;
