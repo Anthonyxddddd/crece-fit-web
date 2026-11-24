@@ -548,12 +548,13 @@ function startRocket(svg){
  st.raf=requestAnimationFrame(frame)}
 /* dialogos */
 function showUpd(){show('<h3>Actualización disponible</h3><p>Hay mejoras nuevas y <b>no necesitas instalar nada</b>. Se descargan ahora: la app se cerrará sola y, al abrirla de nuevo, ya estará actualizada.</p><div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="go">Actualizar</button></div>')}
+function showUpdFail(web){var d='Instalada: v'+(window.APP_VERSION||0)+' · Disponible: v'+upd.target+' · APK '+(window.APK_NAME||'?')+' ('+apkCode()+')';show('<h3>La actualización no se aplicó</h3><p>Se descargó pero la app sigue en la versión anterior.</p><p style="margin-top:8px;font-size:12px">'+esc(d)+'</p><div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="go">Reintentar</button></div>')}
 function notes(i){return(i&&i.notes&&i.notes.length)?'<ul>'+i.notes.slice(0,3).map(function(n){return'<li>'+esc(n)+'</li>'}).join('')+'</ul>':''}
 function showApk(info,req){lastApk=req?0:(info&&info.code)||0;var v=info&&info.version?info.version:'?';show('<h3>'+(req?'Necesitas la nueva versión':'Nueva versión disponible')+'</h3><p>'+(req?'Esta actualización necesita instalar un APK nuevo (v'+esc(v)+'). ':'Hay un APK nuevo (v'+esc(v)+') con mejoras. ')+'Descárgalo desde la página, ábrelo e instálalo encima: <b>no pierdes tus ajustes</b>.</p>'+notes(info)+'<div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="site">Ir a descargar</button></div>')}
 $('umodal').addEventListener('click',function(e){var a=e.target.getAttribute&&e.target.getAttribute('data-a');if(!a)return;
  if(a==='no'){if(lastApk){try{localStorage.setItem('apkd',String(lastApk))}catch(x){}lastApk=0}hide()}
  else if(a==='site'){hide();try{A.openUrl('https://daijstudio.daijstudio.workers.dev/ritmo/')}catch(x){}}
- else if(a==='go'){upd.busy=true;show('<h3 id="uph">Actualizando…</h3><svg id="uprk" width="180" height="180" style="display:block;margin:4px auto 0"></svg><div class="pct" id="upt">0%</div><p id="upn" style="margin-top:6px">No cierres la app</p>');startRocket($('uprk'));
+ else if(a==='go'){try{localStorage.setItem('otaTry',JSON.stringify({v:upd.target||0,t:Date.now()}))}catch(x){}upd.busy=true;show('<h3 id="uph">Actualizando…</h3><svg id="uprk" width="180" height="180" style="display:block;margin:4px auto 0"></svg><div class="pct" id="upt">0%</div><p id="upn" style="margin-top:6px">No cierres la app</p>');startRocket($('uprk'));
   try{if(A&&A.startUpdate)A.startUpdate();else{upd.busy=false;hide();location.reload()}}catch(x){window.__updateError()}}});
 /* consulta */
 function loadMeta(cb){var out={web:null,apk:null},n=0;function fin(){if(++n===2)cb(out)}
@@ -565,7 +566,7 @@ function decide(out,nativeV,manual){
  var webNew=canOta&&!!(nativeV||(web&&web.version>(window.APP_VERSION||0)));
  if(!web&&!apk){if(nativeV&&!upd.shown){upd.shown=true;showUpd()}else if(manual)toast('No se pudo consultar. Revisa tu internet.');return}
  if(apkReq){if(manual||!upd.apkShown){upd.apkShown=true;showApk(apk,true)}}
- else if(webNew){if(manual)upd.shown=false;if(!upd.shown){upd.shown=true;showUpd()}}
+ else if(webNew){upd.target=Math.max((web&&web.version)||0,nativeV||0);var tr=null;try{tr=JSON.parse(localStorage.getItem('otaTry')||'null')}catch(x){}if(tr&&(window.APP_VERSION||0)>=tr.v){try{localStorage.removeItem('otaTry')}catch(x){}tr=null}if(manual)upd.shown=false;if(!upd.shown){upd.shown=true;if(tr&&tr.v===upd.target&&Date.now()-tr.t<864e5)showUpdFail(web);else showUpd()}}
  else if(apkInfo){var dis=0;try{dis=+localStorage.getItem('apkd')||0}catch(x){}if(manual||(!upd.apkShown&&dis!==apk.code)){upd.apkShown=true;showApk(apk,false)}}
  else if(manual)toast('Ya tienes lo último')}
 function jsCheck(manual){loadMeta(function(o){jsStat=o.web?'Web: v'+o.web.version:'Sin conexión con la web';decide(o,0,manual);window.__ambStatus&&window.__ambStatus()})}
