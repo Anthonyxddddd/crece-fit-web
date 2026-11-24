@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ritmo · tu música descargada</title>
+<meta name="description" content="Ritmo: un reproductor para la música que ya tienes en el teléfono, con listas, favoritas, temporizador para dormir y reproducción en segundo plano. Un app de daij studio para Android.">
+<link rel="icon" href="img/icon.png">
+<style>
+:root{--bg:#0b1630;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--tx:#eaf3ff;--mut:#9db6d8;--acc:#7dd3fc;--b:#3b82f6}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(1200px 700px at 20% -10%,#24508f 0,transparent 60%),linear-gradient(180deg,#0d1b3a,#0b1630);min-height:100vh;color:var(--tx);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.55}
+.w{max-width:960px;margin:0 auto;padding:0 20px 60px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0;font-size:14px;color:var(--mut)}
+nav a{color:var(--mut);text-decoration:none}nav a:hover{color:var(--tx)}
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:36px;align-items:center;padding:24px 0 40px}
+.hero img.ic{width:84px;height:84px;border-radius:22px;box-shadow:0 14px 30px -10px rgba(0,0,0,.5)}
+h1{font-size:clamp(34px,6vw,54px);font-weight:700;letter-spacing:-.02em;margin:16px 0 8px}
+.lead{font-size:18px;color:var(--mut);max-width:520px}
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 26px;border-radius:16px;background:var(--acc);color:#07203a;font-weight:700;font-size:17px;text-decoration:none;margin-top:22px;border:0;cursor:pointer}
+.btn:hover{filter:brightness(1.08)}
+.meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.chip{padding:6px 14px;border-radius:99px;background:var(--card);border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.shot{display:flex;justify-content:center}
+.shot img{width:min(280px,70vw);border-radius:34px;border:6px solid #16284f;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+section{margin-top:34px}
+h2{font-size:22px;font-weight:600;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}
+.card h3{font-size:16px;margin-bottom:6px}.card p{font-size:14px;color:var(--mut)}
+.card svg{width:26px;height:26px;stroke:var(--acc);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:10px}
+ul.n{padding-left:20px;color:var(--mut);font-size:15px}ul.n li{margin:5px 0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+ol{padding-left:20px;color:var(--mut);font-size:15px}ol li{margin:6px 0}
+.land{width:100%;border-radius:22px;border:1px solid var(--line);margin-top:6px}
+code{background:rgba(255,255,255,.1);padding:2px 7px;border-radius:8px;font-size:12px;word-break:break-all}
+footer{margin-top:44px;text-align:center;color:var(--mut);font-size:13px}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.shot{order:-1}.row2{grid-template-columns:1fr}}
+</style></head><body><div class="w">
+<nav><a href="/studio/">daij studio</a><a href="#instalar">Cómo instalar</a></nav>
+<div class="hero"><div>
+ <img class="ic" src="img/icon.png" alt="Ritmo">
+ <h1>Ritmo</h1>
+ <p class="lead">Un reproductor para la música que ya descargaste en tu teléfono. Ordena tus canciones por álbum y artista, crea listas, marca favoritas y sigue escuchando con la pantalla apagada.</p>
+ <a class="btn" id="dl" href="Ritmo.apk" download>Descargar para Android</a>
+ <div class="meta"><span class="chip" id="mv">Versión …</span><span class="chip" id="ms">…</span><span class="chip" id="md">…</span><span class="chip">Gratis</span><span class="chip">Sin internet</span><span class="chip">Sin anuncios</span></div>
+</div><div class="shot"><img src="img/p.webp" alt="Ritmo en el teléfono"></div></div>
+
+<section><h2>Qué incluye</h2><div class="grid">
+ <div class="card"><svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg><h3>Tu música, tal cual</h3><p>Lee las canciones descargadas en tu teléfono. No sube nada a ningún lado y funciona sin internet.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="2.5"/></svg><h3>Álbumes y artistas</h3><p>Se ordena sola con las portadas de tus archivos. Busca por canción, artista o álbum.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><path d="M12 21s-8-5.3-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.7-8 11-8 11z"/></svg><h3>Favoritas y listas</h3><p>Marca tus canciones favoritas y crea todas las listas que quieras.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg><h3>Temporizador para dormir</h3><p>La música baja el volumen y se apaga sola después del tiempo que elijas.</p></div>
+ <div class="card"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg><h3>Con la pantalla apagada</h3><p>Sigue sonando en segundo plano, con controles en la notificación y la pantalla de bloqueo.</p></div>
+</div></section>
+<section><h2>Así se ve</h2><div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px"><img class="land" style="margin:0" src="img/l.webp" alt="Pantalla de reproducción"><img class="land" style="margin:0" src="img/a.webp" alt="Álbumes"><img class="land" style="margin:0" src="img/p.webp" alt="Canciones"></div></section>
+
+<section class="row2">
+ <div class="card"><h2 style="font-size:18px">Novedades de la app (APK)</h2><ul class="n" id="an"><li>Cargando…</li></ul></div>
+ <div class="card"><h2 style="font-size:18px">Actualizaciones de contenido <span class="chip" id="wv" style="font-size:11px">…</span></h2><ul class="n" id="wn"><li>Cargando…</li></ul><p class="chip" style="margin-top:10px;display:inline-block" id="wd"></p></div>
+</section>
+
+<section id="instalar"><h2>Cómo instalar</h2><div class="card"><ol>
+ <li>Pulsa <b>Descargar para Android</b> y abre el archivo <code>Ritmo.apk</code>.</li>
+ <li>Si Android lo pide, permite <b>instalar apps de esta fuente</b> (solo esta vez).</li>
+ <li>Pulsa <b>Instalar</b> y abre Ritmo.</li>
+ <li>Al abrir Ritmo por primera vez, <b>permite el acceso a la música</b> para que pueda mostrar tus canciones. Las mejoras llegan solas al abrir la app; solo cuando haya un APK nuevo te lo avisa.</li>
+</ol><p style="margin-top:12px;font-size:12px;color:var(--mut)">Huella SHA-256 del APK: <code id="sh">…</code></p></div></section>
+<footer>Ritmo · un app de daij studio</footer></div>
+<script>
+function g(u,f){fetch(u+'?t='+Date.now()).then(function(r){return r.json()}).then(f,function(){})}
+function li(a){return(a&&a.length?a:['Primera versión']).map(function(x){var l=document.createElement('li');l.textContent=x;return l.outerHTML}).join('')}
+g('apk.json',function(a){document.getElementById('mv').textContent='Versión '+a.version;document.getElementById('ms').textContent=(a.size/1048576).toFixed(2).replace(/\.?0+$/,'')+' MB';document.getElementById('md').textContent=a.date;document.getElementById('an').innerHTML=li(a.notes);if(a.sha256)document.getElementById('sh').textContent=a.sha256});
+g('web.json',function(w){document.getElementById('wv').textContent='contenido v'+w.version;document.getElementById('wn').innerHTML=li(w.notes);document.getElementById('wd').textContent='Última actualización: '+w.date});
+</script></body></html>
