@@ -1786,7 +1786,7 @@
   /* ---------- actualizaciones: dos tipos ----------
      1) De contenido (sin instalar): botón Actualizar con porcentaje y la app se cierra.
      2) De APK (hay que instalar): aviso con botón que lleva a la página de descargas. */
-  var SITE = 'https://crecefit.daijstudio.workers.dev/descargar/';
+  var SITE = 'https://daijstudio.daijstudio.workers.dev/descargar/';
   var REMOTE = 'https://raw.githubusercontent.com/Anthonyxddddd/crece-fit-web/main/';
   var upd = { v: 0, busy: false, shown: false, apkShown: false, waitFn: null };
   var jsStat = '', natStat = '', apkInfo = null, apkReq = false;
