@@ -55,6 +55,12 @@ svg.f{fill:currentColor;stroke:none}
 .lr{display:flex;align-items:center;gap:14px;padding:0 18px;animation:up .38s var(--ease) both}
 .lr .ic{width:34px;font-size:22px;color:var(--acc);text-align:center}
 .lr .rt{padding:14px 0}.lr .rt b{font-size:17px;font-weight:400}.lr .n{color:var(--mut);font-size:15px;display:flex;align-items:center;gap:4px}
+.gc{flex:none;border-radius:18px;padding:14px;color:#fff;position:relative;overflow:hidden;min-height:104px;display:flex;flex-direction:column;justify-content:flex-end;gap:2px;opacity:0;animation:cin .45s var(--ease) forwards;box-shadow:0 14px 26px -16px rgba(0,0,0,.6)}
+.gc .gi{position:absolute;right:-6px;top:-6px;font-size:86px;opacity:.2;transform:rotate(14deg);stroke-width:1.5}
+.gc b{font-size:16px;font-weight:700;position:relative}.gc span{font-size:12px;opacity:.8;position:relative}
+.hs .gc{width:148px}.ggrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px 18px}
+.hero.gh .gbig{width:min(48vw,190px);height:min(48vw,190px);border-radius:28px;display:grid;place-items:center;color:#fff;font-size:84px;box-shadow:0 24px 40px -18px rgba(0,0,0,.6)}
+@keyframes cin{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
 .hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:6px 24px 6px}
 .hero .cv{width:min(62vw,250px);height:min(62vw,250px);border-radius:16px;box-shadow:0 24px 40px -18px rgba(0,0,0,.6)}
 .hero.ar .cv{border-radius:50%}.hero h2{font-size:23px;font-weight:700;letter-spacing:-.02em;margin-top:16px}.hero p{color:var(--mut);font-size:14px;margin-top:3px}.hero .sub{color:var(--acc);font-size:16px;margin-top:2px}
@@ -188,6 +194,15 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 <symbol id="i-lib" viewBox="0 0 24 24"><rect x="3" y="4" width="4" height="16" rx="1"/><rect x="9" y="4" width="4" height="16" rx="1"/><path d="M15.5 5.5l3.8-1 3 14-3.8 1z"/></symbol>
 <symbol id="i-speed" viewBox="0 0 24 24"><path d="M12 14l4-5M3 18a9 9 0 1 1 18 0"/></symbol>
 <symbol id="i-eq" viewBox="0 0 24 24"><path d="M5 4v16M12 4v16M19 4v16"/><circle cx="5" cy="14" r="2" fill="currentColor"/><circle cx="12" cy="8" r="2" fill="currentColor"/><circle cx="19" cy="15" r="2" fill="currentColor"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3zM5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+<symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.3 1.1 6.1L12 16.8l-5.4 3 1.1-6.1L3.2 9.4l6.1-.8z"/></symbol>
+<symbol id="i-wave" viewBox="0 0 24 24"><path d="M4 10v4M8 6v12M12 3v18M16 8v8M20 11v2"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 3c1 3.5 5 5.5 5 10a5 5 0 0 1-10 0c0-2 1-3.2 2-4 0 2 1 3 2 3 0-3-1-6 1-9z"/></symbol>
+<symbol id="i-leaf" viewBox="0 0 24 24"><path d="M5 19c0-8 5-13 14-14 0 9-5 14-13 14zM5 19l7-7"/></symbol>
+<symbol id="i-keys" viewBox="0 0 24 24"><path d="M3 5h18v14H3zM9 5v14M15 5v14M9 5v8M15 5v8"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
+<symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></symbol>
 <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
@@ -327,11 +342,28 @@ function render(dir){var m=$('main'),v=top(),h='',cls=dir==='r'?'r':dir==='l'?'l
  else if(!LIB.length){title='Nova Music';h='<div class="empty"><div class="big">'+ic('note')+'</div><h3>No encontramos canciones</h3>Revisa que tus canciones estén guardadas en el teléfono (carpetas Música o Descargas) y vuelve a buscar.<button class="bt p press" data-a="rescan">Buscar de nuevo</button></div>'}
  else{var r=view_(v);h=r.h;title=r.t}
  setHdr(title);m.innerHTML='<div class="pg '+cls+'">'+h+'</div>';m.scrollTop=0;$('hdr').classList.remove('sc');moreRows();observe(m);[].forEach.call(m.querySelectorAll('.sbar input'),function(e){e.oninput=function(){q=this.value.trim();var rs=$('res');if(rs)rs.innerHTML=results();observe($('main'))}})}
+
+/* ---------- géneros ---------- */
+var G_ID3=['Blues','Classic Rock','Country','Dance','Disco','Funk','Grunge','Hip-Hop','Jazz','Metal','New Age','Oldies','Other','Pop','R&B','Rap','Reggae','Rock','Techno','Industrial','Alternative','Ska','Death Metal','Pranks','Soundtrack','Euro-Techno','Ambient','Trip-Hop','Vocal','Jazz+Funk','Fusion','Trance','Classical','Instrumental','Acid','House','Game','Sound Clip','Gospel','Noise','Alternative Rock','Bass','Soul','Punk','Space','Meditative','Instrumental Pop','Instrumental Rock','Ethnic','Gothic','Darkwave','Techno-Industrial','Electronic','Pop-Folk','Eurodance','Dream','Southern Rock','Comedy','Cult','Gangsta','Top 40','Christian Rap','Pop/Funk','Jungle','Native American','Cabaret','New Wave','Psychedelic','Rave','Showtunes','Trailer','Lo-Fi','Tribal','Acid Punk','Acid Jazz','Polka','Retro','Musical','Rock & Roll','Hard Rock'];
+function gnorm(raw){if(raw==null)return 'Sin género';var s=String(raw).replace(/_/g,' ').trim(),m=s.match(/^\(?(\d{1,3})\)?$/);if(m){s=G_ID3[+m[1]]||''}else{m=s.match(/^\((\d{1,3})\)\s*(.*)$/);if(m)s=m[2]||G_ID3[+m[1]]||''}
+ s=s.split(/[;,\/]/)[0].replace(/\s+/g,' ').trim();if(!s||/^(unknown|desconocido|other|otro|none|\<unknown\>)$/i.test(s))return 'Sin género';
+ var k=s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9& ]/g,'');
+ var syn={'hiphop':'Hip hop','hip hop':'Hip hop','rap':'Hip hop','rnb':'R&B','r&b':'R&B','r and b':'R&B','reggaeton':'Reggaeton','reguetón':'Reggaeton','reguet':'Reggaeton','electronica':'Electrónica','electronic':'Electrónica','edm':'Electrónica','dance':'Electrónica','clasica':'Clásica','classical':'Clásica','latino':'Latina','latin':'Latina','alternativa':'Alternativa','alternative':'Alternativa','indie':'Indie','rock and roll':'Rock','soundtrack':'Bandas sonoras','banda sonora':'Bandas sonoras','pop':'Pop','rock':'Rock','jazz':'Jazz','blues':'Blues','metal':'Metal','country':'Country','folk':'Folk','reggae':'Reggae','salsa':'Salsa','cumbia':'Cumbia','bachata':'Bachata','trap':'Trap'};
+ if(syn[k])return syn[k];return s.charAt(0).toUpperCase()+(s===s.toLowerCase()?s.slice(1):s.slice(1))}
+var GS=[[/metal|hard/,'#9aa0ae','#20242c','bolt'],[/rock|punk|grunge|alter/,'#ff5a4d','#6e1a2a','bolt'],[/indie/,'#60a5fa','#1e3a8a','star'],[/hip|rap|trap/,'#a78bfa','#33257a','mic'],[/r&b|soul|funk|disco/,'#f59e0b','#70330e','heart'],[/electr|techno|house|trance|edm|dance|rave|dubstep/,'#22d3ee','#0b3f78','wave'],[/reggaeton|latin|salsa|cumbia|bachata|merengue|urban|regional|norte|corrido|mariachi|banda/,'#ff9a3d','#942410','flame'],[/reggae|ska/,'#34d399','#0e5a43','sun'],[/jazz|blues|swing/,'#fbbf24','#6a380d','keys'],[/clasic|orquest|opera|banda sonora|instrumental|piano/,'#d9c9a3','#54452a','keys'],[/folk|country|acust|folclor|andina|tradicional/,'#8fcf5a','#2c5a1c','leaf'],[/chill|ambient|lo.?fi|relax|new age|meditat|dream/,'#7dd3fc','#2e2a7a','moon'],[/gospel|crist|worship|alabanza|religios/,'#fde68a','#6e5210','sun'],[/pop/,'#ff4f9a','#661e6b','star']];
+function gstyle(n){var k=n.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');for(var i=0;i<GS.length;i++)if(GS[i][0].test(k))return{a:GS[i][1],b:GS[i][2],i:GS[i][3]};if(n==='Sin género')return{a:'#6b7280',b:'#1f2937',i:'note'};var h=hue(n);return{a:'hsl('+h+',60%,50%)',b:'hsl('+((h+50)%360)+',60%,26%)',i:'note'}}
+function genresList(){var m={};LIB.forEach(function(t){var n=gnorm(t.g);(m[n]=m[n]||{key:n,name:n,tr:[]}).tr.push(t)});return Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){if(a.name==='Sin género')return 1;if(b.name==='Sin género')return -1;return b.tr.length-a.tr.length||a.name.localeCompare(b.name)})}
+function realGenres(){return genresList().filter(function(g){return g.name!=='Sin género'})}
+function gcard(x,k){var id='G'+x.key,st=gstyle(x.name);HOLD[id]=x;return '<div class="gc press" data-ge="'+esc(id)+'" style="background:linear-gradient(135deg,'+st.a+','+st.b+');animation-delay:'+Math.min(k,10)*40+'ms">'+ic(st.i,'gi')+'<b>'+esc(x.name)+'</b><span>'+plural(x.tr.length,'canción','canciones')+'</span></div>'}
+function genreCards(l,max){return '<div class="hs">'+l.slice(0,max||12).map(gcard).join('')+'</div>'}
+function genreNote(){if(!DEMO&&!has('genres'))return '<div class="empty" style="padding:20px 24px">Para ver los géneros instala la última versión de Nova Music.</div>';return ''}
 function view_(v){var t=v.t;
  if(t==='home')return home();if(t==='lib')return lib();if(t==='search')return search();
  if(t==='songs'){var a=srt(LIB);return {t:'Canciones',h:'<div class="lt">Canciones</div>'+demoBan()+actBtns()+rows(a)}}
  if(t==='albums'){var al=albums();return {t:'Álbumes',h:'<div class="lt">Álbumes</div>'+grid(al,'al')}}
  if(t==='artists'){var ar=artists();return {t:'Artistas',h:'<div class="lt">Artistas</div>'+ar.map(function(x,k){var id='R'+x.key;HOLD[id]=x;return '<div class="row press" data-ar="'+esc(id)+'" style="animation-delay:'+Math.min(k,12)*22+'ms"><div style="width:52px;height:52px;flex:none">'+cover(x.tr[0].i,x.name,'width:52px;height:52px;border-radius:50%')+'</div><div class="rt"><b>'+esc(x.name)+'</b><span>'+plural(x.tr.length,'canción','canciones')+'</span></div><div class="end">'+ic('chev','','font-size:14px')+'</div></div>'}).join('')}}
+ if(t==='genres'){var gl=genresList();return {t:'Géneros',h:'<div class="lt">Géneros</div>'+genreNote()+'<div class="ggrid">'+gl.map(gcard).join('')+'</div>'}}
+ if(t==='genre'){var g2=HOLD[v.id],st2=gstyle(g2.name),it3=srt(g2.tr);return {t:g2.name,h:'<div class="hero gh"><div class="gbig" style="background:linear-gradient(135deg,'+st2.a+','+st2.b+')">'+ic(st2.i)+'</div><h2>'+esc(g2.name)+'</h2><p>'+plural(it3.length,'canción','canciones')+' · '+mins(total(it3))+'</p></div>'+actBtns()+rows(it3)}}
  if(t==='lists'){return {t:'Listas',h:'<div class="lt">Listas</div>'+listRows()}}
  if(t==='album'){var a2=HOLD[v.id];var items=a2.tr.slice().sort(function(x,y){return x.t.localeCompare(y.t)});return {t:a2.name,h:'<div class="hero"><div class="cv" data-art="'+a2.tr[0].i+'" style="background:'+(ART[a2.tr[0].i]?'url('+ART[a2.tr[0].i]+') center/cover':grad(a2.name))+'">'+(ART[a2.tr[0].i]?'':ic('note','','font-size:60px'))+'</div><h2>'+esc(a2.name)+'</h2><div class="sub">'+esc(a2.artist)+'</div><p>'+plural(items.length,'canción','canciones')+' · '+mins(total(items))+'</p></div>'+actBtns()+rows(items)}}
  if(t==='artist'){var x2=HOLD[v.id];var it=srt(x2.tr);var als=albums().filter(function(a){return a.tr.some(function(tr){return tr.a===x2.name})});return {t:x2.name,h:'<div class="hero ar"><div class="cv" data-art="'+x2.tr[0].i+'" style="background:'+(ART[x2.tr[0].i]?'url('+ART[x2.tr[0].i]+') center/cover':grad(x2.name))+'">'+(ART[x2.tr[0].i]?'':ic('user','','font-size:70px'))+'</div><h2>'+esc(x2.name)+'</h2><p>'+plural(it.length,'canción','canciones')+' · '+mins(total(it))+'</p></div>'+actBtns()+(als.length>1?secH('Álbumes')+albumCards(als):'')+secH('Canciones')+rows(it)}}
@@ -353,13 +385,14 @@ function home(){var h='<div class="lt">Inicio</div>'+demoBan(),hr=new Date().get
   '<div class="mx press" data-go="top" style="background:linear-gradient(135deg,#ff6b6b,#7a1f4d)">'+ic('bolt')+'<div><b>Más reproducidas</b><span>Tus favoritas del momento</span></div></div></div>';
  var rc=DB.recent.map(function(i){return BY[i]}).filter(Boolean).slice(0,15);if(rc.length)h+=secH('Escuchadas recientemente','<span data-go="rec">Ver todo</span>')+trackCards(rc,'rc');
  var nw=newest(15);h+=secH('Agregadas recientemente','<span data-go="new">Ver todo</span>')+trackCards(nw,'nw');
+ var gl=realGenres();if(gl.length&&(DEMO||has('genres')))h+=secH('Géneros','<span data-tab2="genres">Ver todo</span>')+genreCards(gl,12);
  var ar=artists();if(ar.length>1)h+=secH('Tus artistas','<span data-tab2="artists">Ver todo</span>')+artistCards(ar,14);
  var al=albums();if(al.length)h+=secH('Álbumes','<span data-tab2="albums">Ver todo</span>')+albumCards(shuffled(al),12);
  var fv=favs();if(fv.length)h+=secH('Favoritas','<span data-go="fav">Ver todo</span>')+trackCards(fv.slice(0,15),'fv');
  var un=unheard();if(un.length>4&&Object.keys(DB.plays).length)h+=secH('Para descubrir','<span data-go="unheard">Ver todo</span>')+trackCards(shuffled(un).slice(0,15),'un');
  h+='<div style="height:6px"></div>';window.__TC={rc:rc,nw:nw,fv:fv,un:un};return {t:'Inicio',h:h}}
 function lib(){var h='<div class="lt">Biblioteca</div>'+demoBan();
- h+=lrow('list','Listas',DB.lists.length,'data-tab2="lists"',0)+lrow('user','Artistas',artists().length,'data-tab2="artists"',1)+lrow('disc','Álbumes',albums().length,'data-tab2="albums"',2)+lrow('note','Canciones',LIB.length,'data-tab2="songs"',3)+lrow('heart','Favoritas',favs().length,'data-go="fav"',4)+lrow('clock','Escuchadas recientemente',null,'data-go="rec"',5)+
+ h+=lrow('list','Listas',DB.lists.length,'data-tab2="lists"',0)+lrow('user','Artistas',artists().length,'data-tab2="artists"',1)+lrow('disc','Álbumes',albums().length,'data-tab2="albums"',2)+lrow('tag','Géneros',realGenres().length,'data-tab2="genres"',2)+lrow('note','Canciones',LIB.length,'data-tab2="songs"',3)+lrow('heart','Favoritas',favs().length,'data-go="fav"',4)+lrow('clock','Escuchadas recientemente',null,'data-go="rec"',5)+
   secH('Mezclas')+'<div class="mix">'+[['short','Cortas','linear-gradient(135deg,#34d399,#0f5f4a)','timer'],['long','Largas','linear-gradient(135deg,#a78bfa,#3a2a7a)','clock'],['unheard','Para descubrir','linear-gradient(135deg,#ff9a3d,#7a3a12)','bolt'],['top','Más reproducidas','linear-gradient(135deg,#ff4f7b,#6a1840)','bolt']].map(function(x,i){return '<div class="mx press" data-go="'+x[0]+'" style="background:'+x[2]+';animation-delay:'+i*50+'ms">'+ic(x[3])+'<div><b>'+x[1]+'</b></div></div>'}).join('')+'</div>';
  var nw=newest(8),al=albums().sort(function(a,b){return b.tr[0].da-a.tr[0].da}).slice(0,6);if(al.length)h+=secH('Agregados recientemente')+grid(al,'al');
  return {t:'Biblioteca',h:h}}
@@ -410,6 +443,7 @@ document.addEventListener('click',function(e){var t=e.target,el;
  if((el=t.closest('[data-tc]'))){var p=el.dataset.tc.split(':'),arr=(window.__TC||{})[p[0]]||[];playItems(arr,+p[1],false);return}
  if((el=t.closest('.row[data-k]'))){var src=(el.closest('#res')?window.__SR:LST&&LST.items)||[];var k=+el.dataset.k;if(el.closest('#res'))P.play(src.map(function(x){return x.i}),k,false);else playItems(LST.items,k,false);if(q&&q.length>1){DB.searches=[q].concat(DB.searches.filter(function(s){return s!==q})).slice(0,8);save()}return}
  if((el=t.closest('[data-al]'))){var a=HOLD[el.dataset.al];nav.stack.push({t:'album',id:el.dataset.al,title:nav.stack.length?(HOLD[top().id]||{}).name:undefined});render('r');return}
+ if((el=t.closest('[data-ge]'))){nav.stack.push({t:'genre',id:el.dataset.ge});render('r');return}
  if((el=t.closest('[data-ar]'))){nav.stack.push({t:'artist',id:el.dataset.ar});render('r');return}
  if((el=t.closest('[data-ls]'))){nav.stack.push({t:'list',k:+el.dataset.ls});render('r');return}
  if((el=t.closest('[data-go]'))){nav.stack.push({t:'smart',id:el.dataset.go});render('r');return}
@@ -488,7 +522,7 @@ window.__back=function(){if($('sh').classList.contains('on')){closeSheet();retur
 window.__perm=function(ok){permState=ok?'ok':'denied';if(ok){loaded=false;render();nat('scan')}else render()};
 window.__lib=function(a){setLib(a)};
 function DEMO_LIB(){var T=[['Noche en calma','Luna Verde','Cielos'],['Camino a casa','Luna Verde','Cielos'],['Olas de tarde','Marea Alta','Costa'],['Rumbo norte','Marea Alta','Costa'],['Polvo de estrellas','Aurora','Brillo'],['Despertar','Aurora','Brillo'],['Ciudad dormida','Los Faroles','Avenida'],['Lluvia en la ventana','Los Faroles','Avenida'],['Domingo lento','Café Azul','Mañanas'],['Verano eterno','Café Azul','Mañanas'],['Bajo la luna','Luna Verde','Cielos'],['Fuego tranquilo','Aurora','Brillo'],['Luces de neón','Los Faroles','Avenida'],['Brisa del mar','Marea Alta','Costa']];
- return T.map(function(x,k){return {i:100+k,t:x[0],a:x[1],al:x[2],ai:x[2].length,d:(150+k*17)*1000,da:1700000000+k*86400}})}
+ var GG=['Pop','Rock','Electronic','Hip-Hop','Reggaeton','Jazz','Pop','Rock','Chill','Latin','Classical','Folk','Electronic','Reggae'];return T.map(function(x,k){return {i:100+k,t:x[0],a:x[1],al:x[2],ai:x[2].length,d:(150+k*17)*1000,da:1700000000+k*86400,g:GG[k]}})}
 look();
 if(DEMO){setLib(DEMO_LIB())}else{if(nat('hasPerm')){permState='ok';nat('scan')}else{permState='ask';render()};try{var s0=JSON.parse(nat('state')||'{}');if(s0.id)onState(s0)}catch(e){}
  if(has('speed')&&DB.speed!==1)nat('speed',DB.speed);P.eq()}
