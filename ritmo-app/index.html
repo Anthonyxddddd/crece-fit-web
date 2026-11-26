@@ -162,7 +162,7 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 .dlg h3{font-size:19px;font-weight:600;margin-bottom:8px}.dlg p{font-size:14px;color:var(--mut);line-height:1.5}
 .dlg ul{margin:10px 0 0;padding-left:18px;font-size:13px;color:var(--mut);line-height:1.5;text-align:left}
 .dlg .rw{display:flex;gap:10px;margin-top:20px}.dlg .bt2{flex:1;padding:12px 8px;border-radius:14px;background:var(--card);color:var(--tx);font-size:15px}.dlg .bt2.pri{background:var(--acc);color:#fff;font-weight:600}
-.dlg .pct{font-size:30px;font-weight:300;margin-top:4px;font-variant-numeric:tabular-nums}
+.dlg .lk{display:block;margin:12px auto 0;color:var(--mut);font-size:13px;text-decoration:underline;background:none}.dlg .pct{font-size:30px;font-weight:300;margin-top:4px;font-variant-numeric:tabular-nums}
 </style></head><body>
 <script src="js/version.js"></script>
 <svg width="0" height="0" style="position:absolute"><defs>
@@ -521,6 +521,7 @@ window.__back=function(){if($('sh').classList.contains('on')){closeSheet();retur
 /* ---------- arranque ---------- */
 window.__perm=function(ok){permState=ok?'ok':'denied';if(ok){loaded=false;render();nat('scan')}else render()};
 window.__lib=function(a){setLib(a)};
+window.__genres=function(m){var ch=false;for(var k in m){var t=BY[k];if(t&&t.g!==m[k]){t.g=m[k];ch=true}}if(ch){clearTimeout(window.__gT);window.__gT=setTimeout(function(){var v=top().t;if(v==='home'||v==='lib'||v==='genres'||v==='search')render('f')},300)}};
 function DEMO_LIB(){var T=[['Noche en calma','Luna Verde','Cielos'],['Camino a casa','Luna Verde','Cielos'],['Olas de tarde','Marea Alta','Costa'],['Rumbo norte','Marea Alta','Costa'],['Polvo de estrellas','Aurora','Brillo'],['Despertar','Aurora','Brillo'],['Ciudad dormida','Los Faroles','Avenida'],['Lluvia en la ventana','Los Faroles','Avenida'],['Domingo lento','Café Azul','Mañanas'],['Verano eterno','Café Azul','Mañanas'],['Bajo la luna','Luna Verde','Cielos'],['Fuego tranquilo','Aurora','Brillo'],['Luces de neón','Los Faroles','Avenida'],['Brisa del mar','Marea Alta','Costa']];
  var GG=['Pop','Rock','Electronic','Hip-Hop','Reggaeton','Jazz','Pop','Rock','Chill','Latin','Classical','Folk','Electronic','Reggae'];return T.map(function(x,k){return {i:100+k,t:x[0],a:x[1],al:x[2],ai:x[2].length,d:(150+k*17)*1000,da:1700000000+k*86400,g:GG[k]}})}
 look();
@@ -533,7 +534,7 @@ window.__R={P:P,render:render,nav:nav,go:go,get ST(){return ST},DB:DB};
 (function(){
 var A=window.Native,REMOTE='https://raw.githubusercontent.com/Anthonyxddddd/crece-fit-web/main/';
 var $=function(i){return document.getElementById(i)};
-var upd={busy:false,shown:false,apkShown:false,rk:null},lastApk=0,natStat='',jsStat='',apkInfo=null;
+var upd={busy:false,shown:false,apkShown:false,rk:null},lastApk=0,lastInfo=null,natStat='',jsStat='',apkInfo=null;
 function esc(t){return String(t==null?'':t).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
 function toast(m){var t=$('utoast');t.textContent=m;t.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(function(){t.classList.remove('on')},2600)}
 function show(h){var m=$('umodal');m.innerHTML='<div class="dlg" id="upd">'+h+'</div>';m.classList.add('on')}
@@ -584,10 +585,11 @@ function startRocket(svg){
 function showUpd(){show('<h3>Actualización disponible</h3><p>Hay mejoras nuevas y <b>no necesitas instalar nada</b>. Se descargan ahora: la app se cerrará sola y, al abrirla de nuevo, ya estará actualizada.</p><div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="go">Actualizar</button></div>')}
 function showUpdFail(web){var d='Instalada: v'+(window.APP_VERSION||0)+' · Disponible: v'+upd.target+' · APK '+(window.APK_NAME||'?')+' ('+apkCode()+')';show('<h3>La actualización no se aplicó</h3><p>Se descargó pero la app sigue en la versión anterior.</p><p style="margin-top:8px;font-size:12px">'+esc(d)+'</p><div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="go">Reintentar</button></div>')}
 function notes(i){return(i&&i.notes&&i.notes.length)?'<ul>'+i.notes.slice(0,3).map(function(n){return'<li>'+esc(n)+'</li>'}).join('')+'</ul>':''}
-function showApk(info,req){lastApk=req?0:(info&&info.code)||0;var v=info&&info.version?info.version:'?';show('<h3>'+(req?'Necesitas la nueva versión':'Nueva versión disponible')+'</h3><p>'+(req?'Esta actualización necesita instalar un APK nuevo (v'+esc(v)+'). ':'Hay un APK nuevo (v'+esc(v)+') con mejoras. ')+'Descárgalo desde la página, ábrelo e instálalo encima: <b>no pierdes tus ajustes</b>.</p>'+notes(info)+'<div class="rw"><button class="bt2" data-a="no">Más tarde</button><button class="bt2 pri" data-a="site">Ir a descargar</button></div>')}
+function showApk(info,req){lastInfo=info;lastApk=req?0:(info&&info.code)||0;var v=info&&info.version?info.version:'?';show('<h3>'+(req?'Necesitas la nueva versión':'Nueva versión disponible')+'</h3><p>'+(req?'Esta actualización necesita instalar un APK nuevo (v'+esc(v)+'). ':'Hay un APK nuevo (v'+esc(v)+') con mejoras. ')+(A&&A.installApk?'Se descarga aquí mismo y Android te pedirá confirmar la instalación: <b>no pierdes tus ajustes</b>.':'Descárgalo desde la página, ábrelo e instálalo encima: <b>no pierdes tus ajustes</b>.')+'</p>'+notes(info)+'<div class="rw"><button class="bt2" data-a="no">Más tarde</button>'+(A&&A.installApk?'<button class="bt2 pri" data-a="apk">Actualizar ahora</button>':'<button class="bt2 pri" data-a="site">Ir a descargar</button>')+'</div>'+(A&&A.installApk?'<button class="lk" data-a="site">Descargar desde la página</button>':''))}
 $('umodal').addEventListener('click',function(e){var a=e.target.getAttribute&&e.target.getAttribute('data-a');if(!a)return;
  if(a==='no'){if(lastApk){try{localStorage.setItem('apkd',String(lastApk))}catch(x){}lastApk=0}hide()}
  else if(a==='site'){hide();try{A.openUrl('https://daijstudio.daijstudio.workers.dev/ritmo/')}catch(x){}}
+ else if(a==='apk'){var inf=lastInfo||apkInfo||{};upd.busy=true;show('<h3 id="uph">Descargando…</h3><svg id="uprk" width="180" height="180" style="display:block;margin:4px auto 0"></svg><div class="pct" id="upt">0%</div><p id="upn" style="margin-top:6px">No cierres la app</p>');startRocket($('uprk'));try{A.installApk(REMOTE+'ritmo/Ritmo.apk',inf.sha256||'')}catch(x){window.__apkError('No se pudo iniciar la descarga')}}
  else if(a==='go'){try{localStorage.setItem('otaTry',JSON.stringify({v:upd.target||0,t:Date.now()}))}catch(x){}upd.busy=true;show('<h3 id="uph">Actualizando…</h3><svg id="uprk" width="180" height="180" style="display:block;margin:4px auto 0"></svg><div class="pct" id="upt">0%</div><p id="upn" style="margin-top:6px">No cierres la app</p>');startRocket($('uprk'));
   try{if(A&&A.startUpdate)A.startUpdate();else{upd.busy=false;hide();location.reload()}}catch(x){window.__updateError()}}});
 /* consulta */
@@ -608,6 +610,10 @@ window.__ambCheck=function(){upd.shown=false;upd.apkShown=false;toast('Buscando�
 window.__ambStatus=function(){var e=$('ustat');if(!e)return;try{if(A&&A.updateStatus)natStat=A.updateStatus()}catch(x){}e.textContent=(natStat||'La app busca actualizaciones al abrirse.')+(jsStat?' · '+jsStat:'')};
 setTimeout(function(){if(A)jsCheck(false)},2500);
 window.__updateAvailable=function(v){if(upd.busy)return;loadMeta(function(o){decide(o,v,false)})};
+window.__apkProgress=function(p){var t=$('upt');if(upd.rk)upd.rk.target=p;if(t)t.textContent=p+'%'};
+window.__apkReady=function(){upd.busy=false;var h=$('uph'),n=$('upn');if(h)h.textContent='Listo para instalar';if(n)n.textContent='Confirma en la pantalla de Android. Si no se abre, vuelve a tocar Actualizar ahora.';var d=$('upd');if(d&&!d.querySelector('.rw'))d.insertAdjacentHTML('beforeend','<div class="rw"><button class="bt2" data-a="no">Cerrar</button><button class="bt2 pri" data-a="apk">Instalar otra vez</button></div>')};
+window.__apkNeedPerm=function(){upd.busy=false;hide();show('<h3>Un permiso más</h3><p>Android necesita que permitas a Nova Music instalar actualizaciones. Activa «Permitir desde esta fuente», vuelve a la app y toca <b>Actualizar ahora</b> otra vez.</p><div class="rw"><button class="bt2 pri" data-a="no">Entendido</button></div>')};
+window.__apkError=function(m){upd.busy=false;hide();show('<h3>No se pudo actualizar</h3><p>'+esc(m||'Revisa tu internet e inténtalo de nuevo.')+'</p><div class="rw"><button class="bt2" data-a="no">Cerrar</button><button class="bt2 pri" data-a="site">Ir a descargar</button></div>')};
 window.__updateStatus=function(m,manual){natStat=m;if(manual)toast(m);window.__ambStatus()};
 window.__updateProgress=function(p){var t=$('upt'),h=$('uph');if(upd.rk)upd.rk.target=p;if(t)t.textContent=p+'%';if(p>=100&&h){h.textContent='Listo. Cerrando la app…';var n=$('upn');if(n)n.textContent='La próxima vez que entres ya estará actualizada'}};
 window.__updateError=function(m){upd.busy=false;hide();natStat=m||natStat;show('<h3>No se pudo actualizar</h3><p>'+esc(m||'Revisa tu internet e inténtalo de nuevo.')+'</p><div class="rw"><button class="bt2 pri" data-a="no">Entendido</button></div>')};
