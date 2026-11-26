@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Music en tu computadora</title>
+<meta name="description" content="Abre tu música del teléfono en el navegador de la computadora.">
+<link rel="icon" href="../img/icon.png">
+<style>
+:root{--bg:#0b1630;--card:rgba(255,255,255,.07);--line:rgba(255,255,255,.14);--tx:#eaf3ff;--mut:#9db6d8;--acc:#7dd3fc;--b:#3b82f6}
+*{box-sizing:border-box;margin:0}
+body{background:radial-gradient(1200px 700px at 20% -10%,#24508f 0,transparent 60%),linear-gradient(180deg,#0d1b3a,#0b1630);min-height:100vh;color:var(--tx);font-family:Inter,system-ui,Segoe UI,Roboto,sans-serif;line-height:1.55}
+.w{max-width:640px;margin:0 auto;padding:0 20px 60px}
+nav{display:flex;justify-content:space-between;align-items:center;padding:20px 0}nav a{color:var(--mut);text-decoration:none;font-size:14px}
+.hd{text-align:center;margin:26px 0 22px}.hd img{width:84px;height:84px;border-radius:22px;box-shadow:0 18px 40px -16px rgba(59,130,246,.7)}.hd h1{font-size:30px;margin:16px 0 6px;letter-spacing:-.02em}.hd p{color:var(--mut)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;margin-top:16px}
+.card h2{font-size:17px;margin-bottom:10px}ol{padding-left:20px;color:var(--mut)}ol li{margin:7px 0}ol b{color:var(--tx)}
+label{display:block;font-size:13px;color:var(--mut);margin-bottom:6px}
+input{width:100%;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:rgba(0,0,0,.25);color:var(--tx);font-size:18px;outline:0}input:focus{border-color:var(--acc)}
+.btn{display:block;width:100%;margin-top:14px;padding:14px;border-radius:14px;border:0;background:linear-gradient(135deg,#3b82f6,#22c4ec);color:#fff;font-weight:700;font-size:16px;cursor:pointer}
+.sm{font-size:13px;color:var(--mut);margin-top:10px}.err{color:#ffb4c0}
+details{margin-top:14px;color:var(--mut);font-size:14px}summary{cursor:pointer;color:var(--tx);font-weight:600}
+</style></head><body><div class="w">
+<nav><a href="/studio/">daij studio</a><a href="../">Descargar la app</a></nav>
+<div class="hd"><img src="../img/icon.png" alt="Nova Music"><h1>Nova Music en tu computadora</h1><p>Tu música del teléfono, en el navegador de la PC. Sin copiar canciones.</p></div>
+<div class="card"><h2>1. En el teléfono</h2><ol><li>Abre <b>Nova Music</b> y ve a <b>Ajustes</b>.</li><li>Toca <b>Escuchar en la computadora → Activar</b>.</li><li>Apunta la <b>dirección</b> y el <b>PIN</b> que te muestra.</li></ol></div>
+<div class="card"><h2>2. Aquí en la computadora</h2>
+<label for="a">Dirección que muestra el teléfono</label>
+<input id="a" placeholder="192.168.1.20:8765" inputmode="url" autocomplete="off" spellcheck="false">
+<button class="btn" id="go">Abrir mi música</button>
+<p class="sm" id="m">Se guarda en este navegador para la próxima vez. El PIN te lo pide la propia app.</p></div>
+<details class="card"><summary>¿Por qué hay que abrir la dirección del teléfono?</summary><p style="margin-top:10px">Tu música está en el teléfono, así que es el teléfono quien la envía por tu Wi-Fi. Por seguridad, los navegadores no dejan que una página con candado (https) como esta hable directamente con un aparato de tu red, así que esta página solo te lleva hasta él. Nada de tu música pasa por internet.</p></details>
+<details class="card"><summary>No conecta, ¿qué reviso?</summary><ol style="margin-top:10px"><li>El teléfono y la computadora deben estar en <b>la misma red Wi-Fi</b>.</li><li>En el teléfono, <b>Escuchar en la computadora</b> debe decir «Activado».</li><li>Algunos Wi-Fi públicos o de invitados bloquean la conexión entre aparatos. Prueba con el punto de acceso del teléfono.</li><li>Si cambias de red, la dirección cambia: mírala de nuevo en la app.</li></ol></details>
+</div>
+<script>
+(function(){var a=document.getElementById('a'),m=document.getElementById('m');
+try{a.value=localStorage.getItem('nova-pc')||''}catch(e){}
+function go(){var v=a.value.trim().replace(/^https?:\/\//,'').replace(/\/.*$/,'');
+ if(!/^[A-Za-z0-9.\-]+(:\d{2,5})?$/.test(v)){m.className='sm err';m.textContent='Escribe la dirección como aparece en el teléfono, por ejemplo 192.168.1.20:8765';return}
+ try{localStorage.setItem('nova-pc',v)}catch(e){}
+ location.href='http://'+v+'/'}
+document.getElementById('go').onclick=go;a.onkeydown=function(e){if(e.key==='Enter')go()}})();
+</script></body></html>
