@@ -73,35 +73,38 @@
       '" fill="none" stroke="' + col + '" stroke-width="' + w + '" stroke-linecap="round" stroke-linejoin="round"/>';
   }
 
-  function draw(anim, p, J) {
+  function draw(anim, p, J, bare) {
     var front = anim.view === 'front';
     var C = g.FigColors, far = C.far, near = C.near, skin = '#ffd9b3', dark = C.dark;
     var s = '';
     // suelo y sombra
-    s += '<ellipse cx="' + J.p[0].toFixed(1) + '" cy="' + (GROUND + 2) + '" rx="62" ry="4" fill="' + C.shadow + '"/>';
-    s += '<line x1="14" y1="' + GROUND + '" x2="226" y2="' + GROUND + '" stroke="' + C.ground + '" stroke-width="2" stroke-linecap="round"/>';
-    if (anim.wall != null) {
+    var vb = anim._vb || [0, -34, 240, 206];
+    if (!bare) {
+      s += '<ellipse cx="' + J.p[0].toFixed(1) + '" cy="' + (GROUND + 2) + '" rx="62" ry="4" fill="' + C.shadow + '"/>';
+      s += '<line x1="' + (vb[0] + 6).toFixed(0) + '" y1="' + GROUND + '" x2="' + (vb[0] + vb[2] - 6).toFixed(0) + '" y2="' + GROUND + '" stroke="' + C.ground + '" stroke-width="2.6" stroke-linecap="round"/>';
+    }
+    if (anim.wall != null && !bare) {
       s += '<rect x="' + anim.wall + '" y="-30" width="9" height="' + (GROUND + 30) + '" fill="' + C.wall + '"/>';
       s += '<line x1="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y1="-30" x2="' + (anim.wallSide === 'l' ? anim.wall + 9 : anim.wall) + '" y2="' + GROUND + '" stroke="' + C.wallLine + '" stroke-width="2"/>';
     }
     // extremidades lejanas
-    s += limb(J.s2, J.e2, J.w2, 6.4, far);
-    s += limb(J.h2, J.k2, J.f2, 7.4, far);
-    if (!front) s += line(J.f2, J.t2, 6, far);
+    s += limb(J.s2, J.e2, J.w2, 8.2, far);
+    s += limb(J.h2, J.k2, J.f2, 9.4, far);
+    if (!front) s += line(J.f2, J.t2, 7.6, far);
     // torso (curva)
     var d = [J.n[0] - J.p[0], J.n[1] - J.p[1]], len = Math.sqrt(d[0] * d[0] + d[1] * d[1]) || 1;
     var cx = (J.p[0] + J.n[0]) / 2 + (-d[1] / len) * p.tb, cy = (J.p[1] + J.n[1]) / 2 + (d[0] / len) * p.tb;
     s += '<path d="M' + J.p[0].toFixed(1) + ',' + J.p[1].toFixed(1) + ' Q' + cx.toFixed(1) + ',' + cy.toFixed(1) + ' ' + J.n[0].toFixed(1) + ',' + J.n[1].toFixed(1) +
-      '" fill="none" stroke="' + dark + '" stroke-width="' + (front ? 15 : 12) + '" stroke-linecap="round"/>';
-    if (front) { s += line(J.s1, J.s2, 7, dark); s += line(J.h1, J.h2, 7, dark); }
+      '" fill="none" stroke="' + dark + '" stroke-width="' + (front ? 17 : 14.5) + '" stroke-linecap="round"/>';
+    if (front) { s += line(J.s1, J.s2, 8.4, dark); s += line(J.h1, J.h2, 8.4, dark); }
     // extremidades cercanas
-    s += limb(J.h1, J.k1, J.f1, 8, near);
-    if (!front) s += line(J.f1, J.t1, 6.4, near);
-    s += limb(J.s1, J.e1, J.w1, 6.8, near);
-    s += '<circle cx="' + J.w1[0].toFixed(1) + '" cy="' + J.w1[1].toFixed(1) + '" r="3.6" fill="' + skin + '"/>';
-    s += '<circle cx="' + J.w2[0].toFixed(1) + '" cy="' + J.w2[1].toFixed(1) + '" r="3.2" fill="#b9b2ad" opacity=".9"/>';
+    s += limb(J.h1, J.k1, J.f1, 10, near);
+    if (!front) s += line(J.f1, J.t1, 8, near);
+    s += limb(J.s1, J.e1, J.w1, 8.4, near);
+    s += '<circle cx="' + J.w1[0].toFixed(1) + '" cy="' + J.w1[1].toFixed(1) + '" r="4.6" fill="' + skin + '"/>';
+    s += '<circle cx="' + J.w2[0].toFixed(1) + '" cy="' + J.w2[1].toFixed(1) + '" r="4" fill="#b9b2ad" opacity=".9"/>';
     // cabeza
-    s += '<circle cx="' + J.h[0].toFixed(1) + '" cy="' + J.h[1].toFixed(1) + '" r="9.5" fill="' + skin + '" stroke="#e8b987" stroke-width="1.5"/>';
+    s += '<circle cx="' + J.h[0].toFixed(1) + '" cy="' + J.h[1].toFixed(1) + '" r="11" fill="' + skin + '" stroke="#e8b987" stroke-width="1.5"/>';
     // carita (mira hacia donde apunta la cara)
     var fa = (p.hd > -180 && p.hd < 0 || p.hd >= 180) ? 1 : 1;
     var ex = front ? 0 : 3.6, ey = -1;
@@ -110,8 +113,8 @@
     function rot(x, y) { return [hx + x * Math.cos(ang) - y * Math.sin(ang), hy + x * Math.sin(ang) + y * Math.cos(ang)]; }
     var e1, e2;
     if (front) { e1 = rot(-3.2, -1); e2 = rot(3.2, -1); } else { e1 = rot(ex, ey); e2 = null; }
-    s += '<circle cx="' + e1[0].toFixed(1) + '" cy="' + e1[1].toFixed(1) + '" r="1.5" fill="#33291f"/>';
-    if (e2) s += '<circle cx="' + e2[0].toFixed(1) + '" cy="' + e2[1].toFixed(1) + '" r="1.5" fill="#33291f"/>';
+    s += '<circle cx="' + e1[0].toFixed(1) + '" cy="' + e1[1].toFixed(1) + '" r="1.8" fill="#33291f"/>';
+    if (e2) s += '<circle cx="' + e2[0].toFixed(1) + '" cy="' + e2[1].toFixed(1) + '" r="1.8" fill="#33291f"/>';
     return s;
   }
 
@@ -182,14 +185,56 @@
     this.svg = svg; this.anim = anim; this.i = 0; this.stop = false; this.speed = opt.speed || 1;
     var mk = anim.face ? FP : P; this.poses = anim.poses.map(function (x) { return mk(x); });
     this.t0 = 0; this.phase = 0;
-    svg.setAttribute('viewBox', '0 -34 240 206');
+    if (!anim.face) this.analyze();
+    svg.setAttribute('viewBox', anim.face ? '0 -34 240 206' : anim._vb.join(' '));
     this.render(this.poses[0]);
     if (!opt.still) this.start();
   }
+  // encuadre automático (la figura llena el recuadro), pose fantasma del extremo opuesto y trayectoria del movimiento
+  var KEYS = ['h', 'n', 'p', 'e1', 'w1', 'e2', 'w2', 'k1', 'f1', 'k2', 'f2', 't1', 't2'];
+  Fig.prototype.analyze = function () {
+    var anim = this.anim, self = this;
+    if (anim._vb) return;
+    var Js = this.poses.map(function (q) { return place(anim, q); });
+    var x0 = 1e9, y0 = 1e9, x1 = -1e9, y1 = -1e9;
+    Js.forEach(function (J) { KEYS.forEach(function (k) { var v = J[k]; if (v[0] < x0) x0 = v[0]; if (v[0] > x1) x1 = v[0]; if (v[1] < y0) y0 = v[1]; if (v[1] > y1) y1 = v[1]; }); });
+    if (anim.wall != null) { x0 = Math.min(x0, anim.wall - 4); x1 = Math.max(x1, anim.wall + 13); }
+    var pad = 20, w = x1 - x0 + pad * 2, h = (Math.max(y1, GROUND) - y0) + pad * 2 + 6, ar = 240 / 206;
+    if (w / h < ar) w = h * ar; else h = w / ar;
+    if (w < 150) { w = 150; h = w / ar; }
+    var cx = (x0 + x1) / 2, bottom = Math.max(y1, GROUND) + pad * 0.7 + 4;
+    anim._vb = [+(cx - w / 2).toFixed(1), +(bottom - h).toFixed(1), +w.toFixed(1), +h.toFixed(1)];
+    // pose más lejana a la primera (rango del movimiento) y articulación que más viaja
+    var best = 0, bd = -1, i;
+    for (i = 1; i < Js.length; i++) { var dd = 0; KEYS.forEach(function (k) { dd += Math.abs(Js[i][k][0] - Js[0][k][0]) + Math.abs(Js[i][k][1] - Js[0][k][1]); }); if (dd > bd) { bd = dd; best = i; } }
+    anim._ghost = best;
+    var mk = null, md = 0, W = { p: 1.3, h: 1.15, f1: 1, t1: 1, k1: 1, w1: 0.8, e1: 0.6, w2: 0.7, f2: 0.7, k2: 0.7 };
+    Object.keys(W).forEach(function (k) { var d = Math.hypot(Js[best][k][0] - Js[0][k][0], Js[best][k][1] - Js[0][k][1]); if (d * W[k] > md + 1e-6) { md = d * W[k]; mk = k; } });
+    anim._trail = md >= 14 && best > 0 ? { k: mk, a: Js[0][mk], b: Js[best][mk] } : null;
+  };
+  function trailSvg(t, s) {
+    if (!t) return '';
+    var ax = t.a[0], ay = t.a[1], bx = t.b[0], by = t.b[1], mx = (ax + bx) / 2, my = (ay + by) / 2, dx = bx - ax, dy = by - ay, L = Math.hypot(dx, dy) || 1;
+    var qx = mx - dy / L * L * 0.22, qy = my + dx / L * L * 0.22;
+    var ang = Math.atan2(by - qy, bx - qx), hs = 7;
+    var h1 = [bx - hs * Math.cos(ang - 0.45), by - hs * Math.sin(ang - 0.45)], h2 = [bx - hs * Math.cos(ang + 0.45), by - hs * Math.sin(ang + 0.45)];
+    return '<g opacity=".95"><path d="M' + ax.toFixed(1) + ',' + ay.toFixed(1) + ' Q' + qx.toFixed(1) + ',' + qy.toFixed(1) + ' ' + bx.toFixed(1) + ',' + by.toFixed(1) + '" fill="none" stroke="#ffb04a" stroke-width="2.6" stroke-dasharray="1 5.5" stroke-linecap="round"/>' +
+      '<polyline points="' + h1[0].toFixed(1) + ',' + h1[1].toFixed(1) + ' ' + bx.toFixed(1) + ',' + by.toFixed(1) + ' ' + h2[0].toFixed(1) + ',' + h2[1].toFixed(1) + '" fill="none" stroke="#ffb04a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></g>';
+  }
   Fig.prototype.render = function (p) {
     if (this.anim.face) { this.svg.innerHTML = drawFace(this.anim, p); return; }
-    var J = place(this.anim, p);
-    this.svg.innerHTML = draw(this.anim, p, J);
+    var a = this.anim, J = place(a, p), s = '';
+    if (a._ghost > 0) {
+      var gp = this.poses[0], gq = this.poses[a._ghost];
+      // fantasma = la pose del otro extremo (la que está más lejos de la actual)
+      var d0 = 0, d1 = 0, k;
+      for (k in p) { if (p[k] instanceof Array) { d0 += Math.abs(p[k][0] - gp[k][0]) + Math.abs(p[k][1] - gp[k][1]); d1 += Math.abs(p[k][0] - gq[k][0]) + Math.abs(p[k][1] - gq[k][1]); } else { d0 += Math.abs(p[k] - gp[k]); d1 += Math.abs(p[k] - gq[k]); } }
+      var other = d0 > d1 ? gp : gq;
+      s += '<g opacity=".22">' + draw(a, other, place(a, other), true) + '</g>';
+    }
+    s += draw(a, p, J);
+    s += trailSvg(a._trail);
+    this.svg.innerHTML = s;
   };
   Fig.prototype.start = function () {
     var self = this, n = this.poses.length, anim = this.anim;
