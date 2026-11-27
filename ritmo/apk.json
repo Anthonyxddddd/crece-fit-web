@@ -1,1 +1,1 @@
-{"version": "0.13", "code": 13, "size": 189747, "date": "27/11/2026", "notes": ["Arreglo: el contenido descargado ahora sí se abre (carga directa y verificación de archivos)"], "sha256": "4cf0f0b64a9a99ea671d764ef452e0566d06a22095219b6d1e323624f0238267"}
+{"version": "0.14", "code": 14, "size": 193988, "date": "27/11/2026", "notes": ["Botón de favoritas en la notificación y en la pantalla de bloqueo"], "sha256": "5379713f74533a30af3d205c805f6ccb0032f37483f063cff6e2e29c0f6802c1"}

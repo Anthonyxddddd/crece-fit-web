@@ -727,6 +727,15 @@ document.addEventListener('click',function(ev){var el=ev.target.closest&&ev.targ
  else if(s==='hidesong'){DB.hide[id]=1;save();closeSheet();setLib(RAWLIB);toast('Canción oculta (Ajustes → Canciones ocultas)')}
 },true);
 
+
+/* favoritas sincronizadas con la notificación */
+var favLast='',favLock=0;
+function favCsv(){return Object.keys(DB.fav).sort().join(',')}
+function syncFav(){if(!has('favSet'))return;var c=favCsv();if(c===favLast)return;favLast=c;favLock=Date.now();nat('favSet',c)}
+var _save2=save;save=function(){_save2();syncFav()};
+if(has('favList')){try{var fr=JSON.parse(nat('favList'));if(!fr.init){syncFav()}else{DB.fav={};fr.ids.forEach(function(i){DB.fav[i]=1});favLast=favCsv();_save2()}}catch(e){}}
+var _os2=onState;onState=function(s){if(s&&s.fav!=null&&s.id&&has('favList')&&Date.now()-favLock>1500){var on=!!DB.fav[s.id];if(on!==!!s.fav){if(s.fav)DB.fav[s.id]=1;else delete DB.fav[s.id];favLast=favCsv();_save2();if(typeof render==='function')try{render('f')}catch(e){}}}_os2(s)};
+
 $('bSet').onclick=settings;$('cQu').onclick=queueSheet;
 sendAudio();
 
