@@ -204,6 +204,8 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></symbol>
+<symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
+<symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/></symbol>
 <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
@@ -538,7 +540,7 @@ window.__perm=function(ok){permState=ok?'ok':'denied';if(ok){loaded=false;render
 window.__lib=function(a){setLib(a)};
 window.__genres=function(m){var ch=false;for(var k in m){var t=BY[k];if(t&&t.g!==m[k]){t.g=m[k];ch=true}}if(ch){clearTimeout(window.__gT);window.__gT=setTimeout(function(){var v=top().t;if(v==='home'||v==='lib'||v==='genres'||v==='search')render('f')},300)}};
 function DEMO_LIB(){var T=[['Noche en calma','Luna Verde','Cielos'],['Camino a casa','Luna Verde','Cielos'],['Olas de tarde','Marea Alta','Costa'],['Rumbo norte','Marea Alta','Costa'],['Polvo de estrellas','Aurora','Brillo'],['Despertar','Aurora','Brillo'],['Ciudad dormida','Los Faroles','Avenida'],['Lluvia en la ventana','Los Faroles','Avenida'],['Domingo lento','Café Azul','Mañanas'],['Verano eterno','Café Azul','Mañanas'],['Bajo la luna','Luna Verde','Cielos'],['Fuego tranquilo','Aurora','Brillo'],['Luces de neón','Los Faroles','Avenida'],['Brisa del mar','Marea Alta','Costa']];
- var GG=['Pop','Rock','Electronic','Hip-Hop','Reggaeton','Jazz','Pop','Rock','Chill','Latin','Classical','Folk','Electronic','Reggae'];return T.map(function(x,k){return {i:100+k,t:x[0],a:x[1],al:x[2],ai:x[2].length,d:(150+k*17)*1000,da:1700000000+k*86400,g:GG[k]}})}
+ var GG=['Pop','Rock','Electronic','Hip-Hop','Reggaeton','Jazz','Pop','Rock','Chill','Latin','Classical','Folk','Electronic','Reggae'];return T.map(function(x,k){return {i:100+k,t:x[0],a:x[1],al:x[2],ai:x[2].length,d:(150+k*17)*1000,da:1700000000+k*86400,g:GG[k],p:'Music/'+['Rock','Pop','Favoritas'][k%3]}})}
 
 /* ---------- modo computadora (la música llega desde el teléfono por Wi-Fi) ---------- */
 function loadLib(){fetch(ru('/api/lib')).then(function(r){if(r.status===401){TOK='';try{sessionStorage.removeItem('rtok')}catch(e){}askPin('La sesión caducó. Escribe el PIN otra vez.');throw 0}return r.json()}).then(function(a){hidePin();setLib(a)}).catch(function(e){if(e!==0){loaded=false;showPin('No se pudo conectar con el teléfono. ¿Sigue activado «Escuchar en la computadora»?',true)}})}
@@ -552,6 +554,103 @@ function msSync(){if(!REM||!('mediaSession' in navigator)||!ST.id||msSync.id===S
 look();
 if(REM){remoteBoot()}else if(DEMO){setLib(DEMO_LIB())}else{if(nat('hasPerm')){permState='ok';nat('scan')}else{permState='ask';render()};try{var s0=JSON.parse(nat('state')||'{}');if(s0.id)onState(s0)}catch(e){}
  if(has('speed')&&DB.speed!==1)nat('speed',DB.speed);P.eq()}
+/* ===== Nova Music 0.12: más cosas ===== */
+DB.ov=DB.ov||{};DB.hide=DB.hide||{};DB.log=DB.log||[];DB.cov=DB.cov||{};DB.lyrOv=DB.lyrOv||{};DB.xf=DB.xf||0;if(DB.norm==null)DB.norm=false;
+var RAWLIB=[];
+function applyOv(t){var o=DB.ov[t.i];if(!o)return t;var c={};for(var k in t)c[k]=t[k];if(o.t)c.t=o.t;if(o.a)c.a=o.a;if(o.al)c.al=o.al;if(o.g!=null&&o.g!=='')c.g=o.g;return c}
+var _setLib=setLib;setLib=function(a){RAWLIB=a;_setLib(a.map(applyOv).filter(function(t){return !DB.hide[t.i]}))};
+var _art=window.__art;window.__art=function(id,url){_art(id,url||DB.cov[id]||null)};
+/* historial con fechas */
+function logPlay(id){DB.log.push([id,Date.now()]);if(DB.log.length>4000)DB.log=DB.log.slice(-4000);save()}
+var _cp=countPlay;countPlay=function(){var b=lastCounted;_cp();if(lastCounted&&lastCounted!==b)logPlay(lastCounted)};
+function lastPlayed(){var m={};DB.log.forEach(function(e){m[e[0]]=e[1]});return m}
+/* listas inteligentes nuevas */
+var G_TRAIN=/rock|electr|hip|rap|latin|reggaeton|dance|metal|punk|pop|trap|house|techno|urban|salsa|cumbia/i,G_SLEEP=/chill|ambient|classic|clasic|jazz|acust|folk|new age|meditat|instrumental|piano|relax|lo.?fi|soundtrack|banda sonora/i;
+var _smart=smart;smart=function(id){
+ if(id==='train'){var t=LIB.filter(function(x){return G_TRAIN.test(gnorm(x.g))&&x.d<330000});if(t.length<5)t=LIB.filter(function(x){return x.d<240000||(DB.plays[x.i]||0)>2});t=shuffled(t).slice(0,60);return {name:'Para entrenar',items:t,desc:'Canciones con ritmo (por género y duración)',empty:'No encontré canciones con ritmo. Si tus canciones no tienen género, edítalo desde su menú.'}}
+ if(id==='sleep'){var s=LIB.filter(function(x){return G_SLEEP.test(gnorm(x.g))||G_SLEEP.test(x.t)});s=shuffled(s).slice(0,60);return {name:'Para dormir',items:s,desc:'Música tranquila (por género)',empty:'No encontré música tranquila. Si tus canciones no tienen género, edítalo desde su menú.'}}
+ if(id==='month'){var lim=Date.now()-30*864e5,c={};DB.log.forEach(function(e){if(e[1]>=lim)c[e[0]]=(c[e[0]]||0)+1});var l=Object.keys(c).filter(function(k){return c[k]>=2&&BY[k]}).sort(function(a,b){return c[b]-c[a]}).map(function(k){return BY[k]}).slice(0,50);return {name:'Más repetidas este mes',items:l,desc:'Las que más has puesto en los últimos 30 días',empty:'Todavía no hay canciones que hayas repetido este mes.'}}
+ if(id==='forgot'){var lp=lastPlayed(),lim2=Date.now()-45*864e5,f=LIB.filter(function(x){return DB.plays[x.i]&&(lp[x.i]?lp[x.i]<lim2:DB.recent.indexOf(x.i)<0)});f=shuffled(f).slice(0,60);return {name:'No escuchas hace tiempo',items:f,desc:'Las que sonaron antes y ya no',empty:'Aún no hay canciones olvidadas. Se llenará con el tiempo.'}}
+ return _smart(id)};
+/* Inicio y Biblioteca */
+var MIXN=[['train','Para entrenar','linear-gradient(135deg,#ff6b3d,#8a1f1f)','bolt'],['sleep','Para dormir','linear-gradient(135deg,#6366f1,#1e1b4b)','moon'],['month','Repetidas este mes','linear-gradient(135deg,#22d3ee,#0b3f78)','rep'],['forgot','Hace tiempo','linear-gradient(135deg,#f59e0b,#6a380d)','clock']];
+function mixHtml(){return '<div class="mix">'+MIXN.map(function(x,i){return '<div class="mx press" data-go="'+x[0]+'" style="background:'+x[2]+';animation-delay:'+i*50+'ms">'+ic(x[3])+'<div><b>'+x[1]+'</b></div></div>'}).join('')+'</div>'}
+var _home=home;home=function(){var r=_home();r.h=r.h.replace("<div style=\"height:6px\"></div>",secH('Listas para ti')+mixHtml()+'<div style="height:6px"></div>');return r};
+var _lib=lib;lib=function(){var r=_lib();var d=dupGroups().length,x=lrow('tag','Carpetas',foldersList().length,'data-tab2="folders"',6)+lrow('disc','Canciones repetidas',d,'data-tab2="dups"',7)+lrow('note','Sin carátula',null,'data-tab2="nocover"',8)+lrow('star','Tu resumen',null,'data-tab2="recap"',9);r.h=r.h.replace(secH('Mezclas'),secH('Tu música')+x+secH('Mezclas'));r.h+=secH('Listas para ti')+mixHtml();return r};
+/* carpetas */
+function foldersList(){var m={};LIB.forEach(function(t){var k=t.p||'Sin carpeta';(m[k]=m[k]||{key:k,name:k.split('/').filter(Boolean).slice(-1)[0]||k,path:k,tr:[]}).tr.push(t)});return Object.keys(m).map(function(k){return m[k]}).sort(function(a,b){return b.tr.length-a.tr.length||a.path.localeCompare(b.path)})}
+/* repetidas */
+function nrm(s){return String(s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/\(.*?\)|\[.*?\]/g,'').replace(/[^a-z0-9]+/g,' ').trim()}
+function dupGroups(){var m={};RAWLIB.map(applyOv).forEach(function(t){var k=nrm(t.t)+'|'+nrm(t.a);(m[k]=m[k]||[]).push(t)});return Object.keys(m).map(function(k){return m[k]}).filter(function(g){return g.length>1&&Math.abs(g[0].d-g[1].d)<15000})}
+/* vistas */
+var _view=view_;view_=function(v){var t=v.t;
+ if(t==='folders'){var fl=foldersList();return {t:'Carpetas',h:'<div class="lt">Carpetas</div>'+fl.map(function(x,k){var id='F'+x.key;HOLD[id]=x;return '<div class="row press" data-fo="'+esc(id)+'" style="animation-delay:'+Math.min(k,12)*22+'ms"><div style="width:48px;height:48px;flex:none;border-radius:10px;display:grid;place-items:center;background:var(--card);font-size:22px">'+ic('tag')+'</div><div class="rt"><b>'+esc(x.name)+'</b><span>'+esc(x.path)+' · '+plural(x.tr.length,'canción','canciones')+'</span></div><div class="end">'+ic('chev','','font-size:14px')+'</div></div>'}).join('')}}
+ if(t==='folder'){var f=HOLD[v.id],it=srt(f.tr);return {t:f.name,h:'<div class="hero"><div class="cv" style="background:'+grad(f.path)+'">'+ic('tag','','font-size:60px')+'</div><h2>'+esc(f.name)+'</h2><p>'+esc(f.path)+'</p><p>'+plural(it.length,'canción','canciones')+' · '+mins(total(it))+'</p></div>'+actBtns()+rows(it)}}
+ if(t==='dups'){var g=dupGroups(),h='<div class="lt">Canciones repetidas</div>';if(!g.length)return {t:'Repetidas',h:h+'<div class="empty">No encontré canciones repetidas.</div>'};h+='<div class="about" style="padding:0 18px 10px">Mismo título y artista. Puedes ocultar las copias: el archivo no se borra y puedes mostrarlas de nuevo.</div>';g.forEach(function(gr){h+='<div style="margin:10px 0 4px;padding:0 18px;font-weight:700">'+esc(gr[0].t)+' <span class="sub">· '+esc(gr[0].a)+'</span></div>'+gr.map(function(t,i){return '<div class="row" style="padding:6px 18px">'+cover(t.i,t.a+t.al,'width:44px;height:44px')+'<div class="rt"><b>'+fmt(t.d)+' · '+esc(t.al)+'</b><span>'+esc(t.p||'')+'</span></div>'+(i?'<button class="chip press" data-s="hide" data-id="'+t.i+'">Ocultar</button>':'<span class="sub">Se queda</span>')+'</div>'}).join('')});var hid=Object.keys(DB.hide).length;if(hid)h+='<div class="btns"><button class="bt press" data-s="unhide">Mostrar las '+hid+' ocultas</button></div>';return {t:'Repetidas',h:h}}
+ if(t==='nocover'){var al=albums().filter(function(a){var i=a.tr[0].i;return ART[i]===null&&!DB.cov[i]});LIB.forEach(function(x){reqArt(x.i)});setTimeout(function(){if(top().t==='nocover')render('f')},2500);var h2='<div class="lt">Sin carátula</div>';if(!al.length)return {t:'Sin carátula',h:h2+'<div class="empty">Todas tus canciones tienen carátula (o aún se están revisando).</div>'};h2+='<div class="about" style="padding:0 18px 10px">'+plural(al.length,'álbum','álbumes')+' sin carátula. Puedo buscarlas en internet (iTunes): se envía el nombre del álbum y del artista, nada más.</div><div class="btns"><button class="bt press" data-s="covgo" style="background:var(--acc);color:#fff">Buscar carátulas</button></div>';return {t:'Sin carátula',h:h2+al.map(function(a){return '<div class="row" style="padding:6px 18px">'+cover(a.tr[0].i,a.name,'width:48px;height:48px')+'<div class="rt"><b>'+esc(a.name)+'</b><span>'+esc(a.artist)+'</span></div></div>'}).join('')}}
+ if(t==='recap')return {t:'Tu resumen',h:recapHtml(DB.recapP||'month')};
+ return _view(v)};
+document.addEventListener('click',function(ev){var el=ev.target.closest&&ev.target.closest('[data-fo]');if(el){nav.stack.push({t:'folder',id:el.dataset.fo});render('r')}},true);
+/* resumen (mes / año / siempre) */
+function recapData(p){var lim=p==='month'?Date.now()-30*864e5:p==='year'?Date.now()-365*864e5:0,c={},ar={},ge={},ms=0,n=0;DB.log.forEach(function(e){if(e[1]<lim)return;var t=BY[e[0]];if(!t)return;n++;ms+=t.d;c[e[0]]=(c[e[0]]||0)+1;ar[t.a]=(ar[t.a]||0)+1;var g=gnorm(t.g);if(g!=='Sin género')ge[g]=(ge[g]||0)+1});var tops=function(o,k){return Object.keys(o).sort(function(a,b){return o[b]-o[a]}).slice(0,k).map(function(x){return [x,o[x]]})};return {n:n,ms:ms,songs:tops(c,5),artists:tops(ar,5),genres:tops(ge,3)}}
+function recapText(p){var d=recapData(p),nm={month:'del mes',year:'del año',all:'de siempre'}[p];if(!d.n)return '';return 'Mi resumen '+nm+' en Nova Music\n'+d.n+' reproducciones · '+mins(d.ms)+'\n\nCanciones:\n'+d.songs.map(function(x,i){var t=BY[x[0]];return (i+1)+'. '+t.t+' — '+t.a+' ('+x[1]+')'}).join('\n')+'\n\nArtistas: '+d.artists.map(function(x){return x[0]}).join(', ')+(d.genres.length?'\nGéneros: '+d.genres.map(function(x){return x[0]}).join(', '):'')}
+function recapHtml(p){var d=recapData(p),h='<div class="lt">Tu resumen</div><div class="chips" style="padding:0 18px 8px">'+[['month','Este mes'],['year','Este año'],['all','Siempre']].map(function(o){return '<button class="chip press'+(p===o[0]?' on':'')+'" data-s="recapP" data-v="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div>';
+ if(!d.n)return h+'<div class="empty">Todavía no hay historial. Desde esta versión Nova Music guarda cuándo escuchas cada canción; vuelve en unos días.</div>';
+ h+='<div style="margin:6px 18px 14px;padding:18px;border-radius:22px;background:linear-gradient(135deg,var(--acc),#1a1f4d);color:#fff"><div style="font-size:13px;opacity:.8">Escuchaste</div><div style="font-size:34px;font-weight:800;letter-spacing:-.02em">'+mins(d.ms)+'</div><div style="opacity:.85">'+d.n+' reproducciones</div></div>';
+ h+=secH('Tus canciones')+d.songs.map(function(x,i){var t=BY[x[0]];return '<div class="row" style="padding:6px 18px"><b style="width:22px;color:var(--acc)">'+(i+1)+'</b>'+cover(t.i,t.a+t.al,'width:46px;height:46px')+'<div class="rt"><b>'+esc(t.t)+'</b><span>'+esc(t.a)+' · '+x[1]+' veces</span></div></div>'}).join('');
+ h+=secH('Tus artistas')+'<div style="padding:0 18px">'+d.artists.map(function(x,i){return '<div class="mi" style="padding:6px 0"><span>'+(i+1)+'. '+esc(x[0])+'</span><span class="sub">'+x[1]+'</span></div>'}).join('')+'</div>';
+ if(d.genres.length)h+=secH('Tus géneros')+'<div class="chips" style="padding:0 18px">'+d.genres.map(function(x){return '<span class="chip on">'+esc(x[0])+' · '+x[1]+'</span>'}).join('')+'</div>';
+ return h+'<div class="btns"><button class="bt press" data-s="share" data-v="'+p+'" style="background:var(--acc);color:#fff">Compartir</button></div>'}
+/* acciones de hojas (editar, ocultar, cola, ajustes...) */
+function editSheet(id){var t=BY[id];if(!t)return;var f=function(k,l,v){return '<label style="display:block;font-size:12px;color:var(--mut);margin:10px 0 4px">'+l+'</label><input class="edi" data-k="'+k+'" value="'+esc(v||'')+'" style="width:100%;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:16px;user-select:text">'};
+ sheet('<h3>Editar información</h3><div class="sub">Solo cambia cómo se ve en Nova Music; el archivo no se modifica.</div>'+f('t','Título',t.t)+f('a','Artista',t.a)+f('al','Álbum',t.al)+f('g','Género',t.g||'')+'<div class="btns" style="margin-top:14px"><button class="bt press" data-s="editsave" data-id="'+id+'" style="background:var(--acc);color:#fff">Guardar</button>'+(DB.ov[id]?'<button class="bt press" data-s="editreset" data-id="'+id+'">Quitar mis cambios</button>':'')+'</div>')}
+function lyrEditSheet(){var id=ST.id;if(!id)return;var r=LY.res||{},cur=DB.lyrOv[id]||r.synced||r.plain||'';sheet('<h3>Letra</h3><div class="sub">Pega o corrige la letra. Si tiene tiempos como [01:23.40] se mueve sola con la canción.</div><textarea id="lyrTa" style="width:100%;height:42vh;margin-top:10px;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--tx);font-size:15px;user-select:text">'+esc(cur)+'</textarea><div class="btns" style="margin-top:10px"><button class="bt press" data-s="lyrsave" style="background:var(--acc);color:#fff">Guardar</button>'+(DB.lyrOv[id]?'<button class="bt press" data-s="lyrclr">Quitar mi letra</button>':'')+'</div>')}
+function audioHtml(){return '<div class="sub" style="margin-top:14px">Transición entre canciones</div><div class="chips" style="padding:0">'+[[0,'Sin pausas'],[3,'3 s'],[6,'6 s'],[9,'9 s'],[12,'12 s']].map(function(o){return '<button class="chip press'+((DB.xf||0)===o[0]?' on':'')+'" data-s="xf" data-v="'+o[0]+'">'+o[1]+'</button>'}).join('')+'</div>'+
+ '<div class="mi" style="padding:10px 2px"><span>Volumen parejo (ReplayGain)</span><div class="tg'+(DB.norm?' on':'')+'" data-s="norm"></div></div><div class="about">Baja las canciones que suenan más fuerte si el archivo trae su ReplayGain. Las que no lo traen no cambian.'+(has('audioOpts')?'':' Instala la última versión para usarlo.')+'</div>'+
+ '<div class="sub" style="margin-top:14px">Colores</div><div class="chips" style="padding:0">'+ACC.map(function(a,i){return '<button class="chip press'+(DB.acc===i?' on':'')+'" data-s="acc" data-v="'+i+'" style="'+(DB.acc===i?'':'border-left:10px solid '+a[1])+'">'+a[0]+'</button>'}).join('')+'</div>'}
+function sendAudio(){if(has('audioOpts'))nat('audioOpts',DB.xf||0,!!DB.norm)}
+var _settings=settings;settings=function(){_settings();var s=$('sh');s.insertAdjacentHTML('beforeend','<div id="aud2">'+audioHtml()+'</div><button class="mi" data-s="dim" style="margin-top:10px">'+ic('moon')+' Solo audio (pantalla casi apagada)</button>')};
+var _menu=menu;menu=function(id){_menu(id);var b=$('sh').querySelector('.mi[data-s="gal"]');if(b)b.insertAdjacentHTML('beforebegin','<button class="mi" data-s="edit" data-id="'+id+'">'+ic('pencil')+' Editar información</button>')};
+var _qs=queueSheet;queueSheet=function(){_qs();if(!has('queueMove')&&!DEMO)return;[].forEach.call($('sh').querySelectorAll('.row[data-jq]'),function(r){var k=+r.dataset.jq;r.insertAdjacentHTML('beforeend','<span class="qc" style="display:flex;gap:2px;flex:none"><button class="ib press" data-s="qup" data-k="'+k+'" style="width:34px;height:34px">'+ic('down','','transform:rotate(180deg)')+'</button><button class="ib press" data-s="qdn" data-k="'+k+'" style="width:34px;height:34px">'+ic('down')+'</button><button class="ib press" data-s="qrm" data-k="'+k+'" style="width:34px;height:34px">'+ic('trash')+'</button></span>')})};
+$('sh').addEventListener('click',function(ev){var el=ev.target.closest('[data-s]');if(!el)return;var s=el.dataset.s,id=el.dataset.id;var used=true;
+ if(s==='edit')editSheet(+id);
+ else if(s==='editsave'){var o={};[].forEach.call($('sh').querySelectorAll('.edi'),function(i){o[i.dataset.k]=i.value.trim()});DB.ov[id]=o;save();closeSheet();setLib(RAWLIB);toast('Guardado')}
+ else if(s==='editreset'){delete DB.ov[id];save();closeSheet();setLib(RAWLIB);toast('Cambios quitados')}
+ else if(s==='hide'){DB.hide[id]=1;save();setLib(RAWLIB)}
+ else if(s==='unhide'){DB.hide={};save();setLib(RAWLIB)}
+ else if(s==='recapP'){DB.recapP=el.dataset.v;save();render('f')}
+ else if(s==='share'){var tx=recapText(el.dataset.v);if(has('share'))nat('share',tx);else if(navigator.clipboard){navigator.clipboard.writeText(tx);toast('Copiado')}}
+ else if(s==='xf'){DB.xf=+el.dataset.v;save();sendAudio();$('aud2').innerHTML=audioHtml()}
+ else if(s==='norm'){DB.norm=!DB.norm;save();sendAudio();el.classList.toggle('on',DB.norm)}
+ else if(s==='acc'){DB.acc=+el.dataset.v;save();look();$('aud2').innerHTML=audioHtml()}
+ else if(s==='dim'){closeSheet();dimOn(true)}
+ else if(s==='lyrsave'){var v=$('lyrTa').value.trim();if(v)DB.lyrOv[ST.id]=v;else delete DB.lyrOv[ST.id];save();closeSheet();lyrLoad()}
+ else if(s==='lyrclr'){delete DB.lyrOv[ST.id];save();closeSheet();lyrLoad()}
+ else if(s==='qup'||s==='qdn'||s==='qrm'){var k=+el.dataset.k;if(s==='qrm')P.qdel(k);else P.qmove(k,k+(s==='qup'?-1:1));setTimeout(function(){queueSheet()},250)}
+ else if(s==='covgo')findCovers();
+ else used=false;
+ if(used){ev.stopPropagation();ev.preventDefault()}},true);
+/* cola: mover / quitar */
+P.qmove=function(a,b){if(REM){return}if(!DEMO){nat('queueMove',a,b);return}if(!DQ)return;var i=a,j=b;if(i<=DQ.p||j<=DQ.p||i>=DQ.order.length||j>=DQ.order.length)return;var v=DQ.order.splice(i,1)[0];DQ.order.splice(j,0,v);ST.q=DQ.order.slice(DQ.p+1,DQ.p+61).map(function(k){return DQ.ids[k]});onState(ST)};
+P.qdel=function(k){if(REM)return;if(!DEMO){nat('queueDel',k);return}if(!DQ||k<=DQ.p||k>=DQ.order.length)return;DQ.order.splice(k,1);ST.q=DQ.order.slice(DQ.p+1,DQ.p+61).map(function(x){return DQ.ids[x]});onState(ST)};
+/* carátulas desde internet */
+var covBusy=false;
+function findCovers(){if(covBusy)return;covBusy=true;var al=albums().filter(function(a){var i=a.tr[0].i;return ART[i]===null&&!DB.cov[i]});var n=0,done=0;toast('Buscando carátulas…');
+ (function step(){if(!al.length){covBusy=false;toast(done?('Encontré '+done+' carátulas'):'No encontré carátulas nuevas');render('f');return}var a=al.shift();
+  fetch('https://itunes.apple.com/search?media=music&entity=album&limit=1&term='+encodeURIComponent(a.artist.replace('Artista desconocido','')+' '+a.name)).then(function(r){return r.json()}).then(function(j){var u=j.results&&j.results[0]&&j.results[0].artworkUrl100;if(u){u=u.replace('100x100','500x500');a.tr.forEach(function(t){DB.cov[t.i]=u;window.__art(t.i,u)});done++;save()}}).catch(function(){}).then(function(){setTimeout(step,1100)})})()}
+/* solo audio */
+function dimOn(on){var d=$('dimv');if(!d){d=document.createElement('div');d.id='dimv';d.style.cssText='position:fixed;inset:0;background:#000;z-index:90;display:none;place-items:center;color:#444;font:600 14px sans-serif;text-align:center;padding:30px';d.innerHTML='Solo audio<br><small style="font-weight:400">Toca dos veces para volver</small>';var lt=0;d.addEventListener('click',function(){var n=Date.now();if(n-lt<450)dimOn(false);lt=n});document.body.appendChild(d)}
+ d.style.display=on?'grid':'none';nat('dim',on)}
+/* letras: pantalla completa y edición */
+var lyT=document.createElement('div');lyT.id='lyrTools';lyT.style.cssText='position:absolute;right:0;top:0;z-index:3;gap:6px';lyT.innerHTML='<button class="ib press" id="lyFull" title="Pantalla completa" style="width:38px;height:38px;background:rgba(255,255,255,.14);border-radius:50%">'+ic('expand')+'</button><button class="ib press" id="lyEdit" title="Editar letra" style="width:38px;height:38px;background:rgba(255,255,255,.14);border-radius:50%">'+ic('pencil')+'</button>';$('artw').appendChild(lyT);
+$('lyFull').onclick=function(){$('pl').classList.toggle('lyrFull')};$('lyEdit').onclick=lyrEditSheet;
+var stl=document.createElement('style');stl.textContent='#lyrTools{display:none}#pl.lyrOn #lyrTools{display:flex}#pl.lyrFull .meta,#pl.lyrFull .pbar,#pl.lyrFull #pt1{display:none}#pl.lyrFull #lyr .ll{font-size:34px}#pl.lyrFull #lyr{padding:22vh 12px}html[data-mode=amoled]{--bg:#000;--bg2:#000;--blur:rgba(0,0,0,.82);--sheet:#0c0c0c}.qc{display:flex}';document.head.appendChild(stl);
+MODES.push(['amoled','Negro total']);ACC.push(['Turquesa','#2dd4bf'],['Dorado','#e8b84a'],['Rojo','#ef4444'],['Lima','#a3e635']);
+var _lyrToggle=lyrToggle;lyrToggle=function(){_lyrToggle();if(!lyrOn)$('pl').classList.remove('lyrFull')};$('cLy').onclick=lyrToggle;
+var _lyrLoad=lyrLoad;lyrLoad=function(f){var o=DB.lyrOv[ST.id];if(o&&ST.id){LY.id=ST.id;LY.act=-1;var syn=/\[\d+:\d+/.test(o);LY.res=syn?{synced:o,src:'tuya'}:{plain:o,src:'tuya'};lyrShow();return}_lyrLoad(f)};
+$('bSet').onclick=settings;$('cQu').onclick=queueSheet;
+sendAudio();
+
 window.__R={P:P,render:render,nav:nav,go:go,get ST(){return ST},DB:DB};
 })();
 </script>
