@@ -1,1 +1,1 @@
-{"version": "0.12", "code": 12, "size": 185651, "date": "27/11/2026", "notes": ["Crossfade y sin pausas, widget, editar info, carpetas, repetidas, carátulas, listas nuevas, resumen, letra en pantalla completa y control remoto desde la PC"], "sha256": "9d866028c3eadd9cc4085191fb5865813197093d0782934683e07b6995051076"}
+{"version": "0.13", "code": 13, "size": 189747, "date": "27/11/2026", "notes": ["Arreglo: el contenido descargado ahora sí se abre (carga directa y verificación de archivos)"], "sha256": "4cf0f0b64a9a99ea671d764ef452e0566d06a22095219b6d1e323624f0238267"}
