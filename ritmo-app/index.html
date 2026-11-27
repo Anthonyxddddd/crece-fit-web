@@ -693,6 +693,41 @@ document.addEventListener('click',function(ev){var el=ev.target.closest&&ev.targ
 var stl2=document.createElement('style');stl2.textContent='.sgt{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:22px 22px 8px}.sg{background:var(--card);border-radius:18px;margin:0 16px;overflow:hidden}.sr{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);min-height:54px}.sg>.sr:last-child{border-bottom:0}.sr .si{width:30px;height:30px;border-radius:9px;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:17px;flex:none}.sr .sl{flex:1;font-size:15.5px;min-width:0}.sr .sl small{display:block;font-size:12px;color:var(--mut);margin-top:1px}.sr .sv{color:var(--mut);font-size:14px;text-align:right}.sp{padding:14px 16px;border-bottom:1px solid var(--line)}.sp:last-child{border-bottom:0}.spt{font-size:13px;color:var(--mut);font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between}.thm{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.th{text-align:center;font-size:12px;color:var(--mut);font-weight:600}.thp{height:64px;border-radius:12px;border:2px solid var(--line);padding:8px;position:relative;margin-bottom:6px;overflow:hidden}.thp i{display:block;height:7px;border-radius:4px;margin-bottom:5px;width:85%}.thp b{position:absolute;left:8px;bottom:8px;width:16px;height:6px;border-radius:3px}.th.on .thp{border-color:var(--acc)}.th.on{color:var(--tx)}.swg{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 8px;justify-items:center}.swc{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12);border:3px solid transparent;background-clip:padding-box}.swc.on{border-color:var(--tx);box-shadow:none}.swc .i{stroke-width:2.6}';document.head.appendChild(stl2);
 $('bSet').onclick=settings;
 
+/* ===== Reproductor estilo Spotify + menú de acciones ===== */
+(function(){
+ var ctl=document.querySelector('#pl .ctl'),bar=document.querySelector('#pl .pbar');
+ var sh=$('cSh'),re=$('cRe'),cPr=$('cPr'),cNx=$('cNx'),ly=$('cLy'),qu=$('cQu');
+ var hide=document.createElement('div');hide.id='pbHide';hide.style.display='none';document.body.appendChild(hide);
+ ['cSl','cSp','cEq'].forEach(function(i){var e=$(i);if(e)hide.appendChild(e)});
+ ctl.insertBefore(sh,cPr);ctl.appendChild(re);
+ bar.innerHTML='';bar.appendChild(ly);bar.appendChild(qu);
+ ly.querySelector('span').textContent='Letra';qu.querySelector('span').textContent='Cola';
+ var st=document.createElement('style');st.textContent='.ctl{justify-content:space-between;gap:0;padding:0 2px}.ctl button{width:56px;height:56px;font-size:34px}.ctl button.pp{width:84px;height:84px;font-size:52px}.ctl #cSh,.ctl #cRe{font-size:24px;color:rgba(255,255,255,.7);position:relative}.ctl #cSh.on,.ctl #cRe.on{color:var(--acc)}.ctl #cSh.on::after,.ctl #cRe.on::after{content:"";position:absolute;bottom:8px;left:50%;width:5px;height:5px;border-radius:50%;background:var(--acc);transform:translateX(-50%)}.ctl #cSh span,.ctl #cRe span{display:none}.pbar{justify-content:space-between;margin-top:14px;padding:0 4px}.pbar button{flex:none;width:auto;height:44px;flex-direction:row;gap:8px;padding:0 18px;background:rgba(255,255,255,.1);font-size:19px;color:#fff}.pbar button span{font-size:13px;font-weight:600}.pbar button.on{background:rgba(255,255,255,.24)}.pbar button.on::after{display:none}'+
+  '.tg3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0 6px}.tile{background:var(--card);border-radius:16px;padding:14px 6px 12px;display:flex;flex-direction:column;align-items:center;gap:7px;font-size:12.5px;font-weight:600;text-align:center;min-height:82px;justify-content:center;transition:transform .15s,background .2s}.tile:active{transform:scale(.95)}.tile .i{font-size:24px;color:var(--acc)}.tile.on .i{color:#ff4f7b}.tile small{display:block;font-size:11px;font-weight:500;color:var(--mut);margin-top:-3px}';
+ document.head.appendChild(st);
+})();
+/* iconos nuevos */
+(function(){var sp=document.querySelector('svg defs')||document.querySelector('svg');var d=document.createElementNS('http://www.w3.org/2000/svg','svg');d.innerHTML='<symbol id="i-share" viewBox="0 0 24 24"><path d="M5 12v7h14v-7M12 3v12M8 7l4-4 4 4"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></symbol>';[].forEach.call(d.querySelectorAll('symbol'),function(s){sp.appendChild(s)})})();
+function tile(icn,label,attrs,on,sub){return '<button class="tile press'+(on?' on':'')+'" '+attrs+'>'+ic(icn,on?'f':'')+'<span>'+label+'</span>'+(sub?'<small>'+sub+'</small>':'')+'</button>'}
+menu=function(id){var t=BY[id];if(!t)return;var inList=top().t==='list',cur=ST.id==id;
+ var tiles=tile('heart',DB.fav[id]?'Quitar favorita':'Favorita','data-s="fav" data-id="'+id+'"',!!DB.fav[id])+
+  tile('next2','Sonar después','data-s="next" data-id="'+id+'"')+tile('queue','A la cola','data-s="queue" data-id="'+id+'"')+
+  tile('list','A una lista','data-s="tolist" data-id="'+id+'"')+tile('timer','Temporizador','data-st="sleep"',false,ST.sleep>0?'activo':'')+tile('speed','Velocidad','data-st="speed"',false,(ST.speed||1)!==1?(ST.speed+'x'):'')+
+  tile('eq','Ecualizador','data-st="eq"',false,DB.eq.on?'activado':'')+tile('wave','Transición','data-st="xf"',false,DB.xf?DB.xf+' s':'sin pausas')+tile('expand','Letra grande','data-st="lyrfull" data-id="'+id+'"')+
+  tile('disc','Ir al álbum','data-s="gal" data-id="'+id+'"')+tile('user','Ir al artista','data-s="gar" data-id="'+id+'"')+tile('pencil','Editar info','data-s="edit" data-id="'+id+'"')+
+  tile('share','Compartir','data-st="sharesong" data-id="'+id+'"')+tile('info','Información','data-st="info" data-id="'+id+'"')+tile('moon','Solo audio','data-st="dimon"');
+ sheet('<div class="sh-h">'+cover(t.i,t.a+t.al)+'<div class="rt" style="flex:1;min-width:0"><b>'+esc(t.t)+'</b><span>'+esc(t.a)+' · '+esc(t.al)+'</span></div></div><div class="tg3">'+tiles+'</div>'+
+  (inList?'<button class="mi" data-s="rmlist" data-id="'+id+'" style="color:#ff5a5a">'+ic('trash')+' Quitar de esta lista</button>':'')+'<button class="mi" data-st="hidesong" data-id="'+id+'">'+ic('trash')+' Ocultar esta canción</button>');observe($('sh'))};
+function infoSheet(id){var t=BY[id];if(!t)return;var lp=lastPlayed()[id];var r=function(k,v){return v?'<div class="mi" style="padding:9px 2px"><span class="sub">'+k+'</span><span style="text-align:right;max-width:62%;word-break:break-word">'+esc(v)+'</span></div>':''};
+ sheet('<h3>Información</h3>'+r('Título',t.t)+r('Artista',t.a)+r('Álbum',t.al)+r('Género',t.g?gnorm(t.g):'')+r('Duración',fmt(t.d))+r('Carpeta',t.p||'')+r('Reproducciones',String(DB.plays[id]||0))+r('Última vez',lp?new Date(lp).toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'}):'')+r('Agregada',t.da?new Date(t.da*1000).toLocaleDateString('es',{day:'numeric',month:'long',year:'numeric'}):''))}
+document.addEventListener('click',function(ev){var el=ev.target.closest&&ev.target.closest('[data-st]');if(!el)return;var s=el.dataset.st,id=+el.dataset.id;
+ if(s==='lyrfull'){closeSheet();openP(true);if(!lyrOn)lyrToggle();$('pl').classList.add('lyrFull')}
+ else if(s==='sharesong'){var tx=BY[id].t+' — '+BY[id].a;if(has('share'))nat('share',tx);else if(navigator.clipboard){navigator.clipboard.writeText(tx);toast('Copiado')}closeSheet()}
+ else if(s==='info')infoSheet(id);
+ else if(s==='dimon'){closeSheet();dimOn(true)}
+ else if(s==='hidesong'){DB.hide[id]=1;save();closeSheet();setLib(RAWLIB);toast('Canción oculta (Ajustes → Canciones ocultas)')}
+},true);
+
 $('bSet').onclick=settings;$('cQu').onclick=queueSheet;
 sendAudio();
 
