@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Tareas · Automatismo</title>
+<style>
+:root{--bg:#f4f6fb;--card:#fff;--tx:#14213d;--mut:#5b6b8a;--line:#dde3ef;--acc:#2f6bff;--ok:#12a150;--warn:#c77d00;--bad:#d0342c;--code:#f0f3fa}
+@media (prefers-color-scheme:dark){:root{--bg:#0b1020;--card:#121a31;--tx:#eaf0ff;--mut:#9db0d6;--line:#25314f;--acc:#6aa3ff;--code:#0d1428}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.55 Inter,system-ui,Segoe UI,Roboto,sans-serif}
+.w{max-width:980px;margin:0 auto;padding:18px 16px 70px}
+h1{font-size:26px;margin:18px 0 4px}h2{font-size:21px;margin:34px 0 10px}h3{font-size:17px;margin:0}
+.sub{color:var(--mut)}
+.gate{min-height:70vh;display:grid;place-items:center}.gate form{width:min(92vw,380px);background:var(--card);border:1px solid var(--line);border-radius:20px;padding:26px;text-align:center}
+input[type=password]{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--code);color:var(--tx);font-size:17px;margin:14px 0 4px}
+button{font:inherit;cursor:pointer}.btn{border:0;border-radius:10px;padding:9px 14px;background:var(--acc);color:#fff;font-weight:600;font-size:14px}
+.btn.g{background:var(--code);color:var(--tx);border:1px solid var(--line)}.btn:disabled{opacity:.5}
+.err{color:var(--bad);min-height:22px;font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin:12px 0}
+.hd{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.hd .n{background:var(--acc);color:#fff;border-radius:8px;padding:2px 10px;font-weight:700;font-size:14px}
+.tag{border-radius:99px;padding:2px 10px;font-size:12px;font-weight:700;border:1px solid}.tag.Completo{color:var(--ok);border-color:var(--ok)}.tag.Corregido,.tag.Terminado{color:var(--acc);border-color:var(--acc)}.tag.Pendiente{color:var(--warn);border-color:var(--warn)}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+pre{white-space:pre-wrap;background:var(--code);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;font:14.5px/1.5 ui-monospace,Menlo,Consolas,monospace;overflow-wrap:anywhere}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media (max-width:760px){.two{grid-template-columns:1fr}}
+.lbl{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--mut);text-transform:uppercase}
+ul{margin:6px 0 0;padding-left:20px}li{margin:5px 0}
+.sch{background:#fff;border:1px solid var(--line);border-radius:12px;padding:6px;overflow:auto}.sch svg{width:100%;height:auto;display:block;max-height:80vh}
+table{width:100%;border-collapse:collapse;font-size:14.5px}th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line)}th{color:var(--mut);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+a{color:var(--acc)}.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:#14213d;color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;opacity:0;transition:.25s;pointer-events:none}.toast.on{opacity:1}
+.lock{float:right}
+</style></head><body><div class="w" id="app">
+<div class="gate" id="gate"><form id="f"><div style="font-size:34px">🔒</div><h1 style="font-size:22px">Tareas</h1><div class="sub">Contenido privado. Escribe la contraseña para verlo.</div><input type="password" id="pw" placeholder="Contraseña" autocomplete="current-password" autofocus><div class="err" id="er"></div><button class="btn" id="go" style="width:100%;padding:12px">Abrir</button></form></div>
+</div><div class="toast" id="t"></div>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)};
+function b64(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+function toast(m){var t=$('t');t.textContent=m;t.classList.add('on');clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove('on')},1800)}
+async function decrypt(pass,d){
+ var km=await crypto.subtle.importKey('raw',new TextEncoder().encode(pass),'PBKDF2',false,['deriveKey']);
+ var key=await crypto.subtle.deriveKey({name:'PBKDF2',salt:b64(d.salt),iterations:d.iter,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['decrypt']);
+ var pt=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64(d.iv)},key,b64(d.ct));
+ var s=await new Response(new Blob([pt]).stream().pipeThrough(new DecompressionStream('gzip'))).text();return JSON.parse(s)}
+function copy(txt){if(navigator.clipboard&&window.isSecureContext)return navigator.clipboard.writeText(txt).then(function(){toast('Copiado')},fb);return fb();function fb(){var a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity=0;document.body.appendChild(a);a.select();try{document.execCommand('copy');toast('Copiado')}catch(e){toast('No se pudo copiar')}a.remove()}}
+function svgToPng(svg,scale){return new Promise(function(res,rej){var m=/viewBox="0 0 (\d+) (\d+)"/.exec(svg),w=+m[1],h=+m[2];var im=new Image();im.onload=function(){var c=document.createElement('canvas');c.width=w*scale;c.height=h*scale;var x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);c.toBlob(function(b){b?res(b):rej()},'image/png')};im.onerror=rej;im.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)})}
+function dl(blob,name){var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},500)}
+function render(D){
+ var up=false;var S={};D.textos.forEach(function(t){S['t'+t.id]=t});D.esquemas.forEach(function(e){S['e'+e.id]=e});
+ var h='<div class="lock"><button class="btn g" id="out">Cerrar</button></div><h1>Tareas · Automatismo</h1><div class="sub">Informes y esquemas, numerados para identificarlos y copiarlos.</div>';
+ h+='<div class="card"><div class="lbl">Resumen</div><table><tr><th>N.º</th><th>Pieza</th><th>Práctica</th><th>Estado</th></tr>';
+ D.textos.forEach(function(t){h+='<tr><td><a href="#texto-'+t.id+'">Texto '+t.id+'</a></td><td>Informe escrito</td><td>'+t.informe+'</td><td>Corregido</td></tr>'});
+ D.esquemas.forEach(function(e){h+='<tr><td><a href="#esquema-'+e.id+'">Esquema '+e.id+'</a></td><td>'+e.tipo+'</td><td>'+e.informe+'</td><td><span class="tag '+e.estado+'">'+e.estado+'</span></td></tr>'});
+ h+='</table></div>';
+ h+='<div class="card"><div class="lbl">Antes de empezar</div><ul>'+D.general.map(function(g){return '<li>'+esc(g)+'</li>'}).join('')+'</ul></div>';
+ D.informes.forEach(function(inf){
+  h+='<h2>'+esc(inf.titulo)+'</h2>';
+  D.textos.filter(function(t){return t.informe===inf.n}).forEach(function(t){
+   h+='<div class="card" id="texto-'+t.id+'"><div class="hd"><span class="n">Texto '+t.id+'</span><h3>'+esc(t.titulo)+'</h3></div>'+
+   '<div class="two"><div><div class="lbl">Como lo escribiste</div><pre>'+esc(t.original)+'</pre></div><div><div class="lbl">Corregido</div><pre id="cor'+t.id+'">'+esc(t.corregido.toUpperCase())+'</pre></div></div>'+
+   '<div class="row"><button class="btn" data-a="cu" data-i="'+t.id+'">Copiar corregido (mayúsculas)</button><button class="btn g" data-a="cn" data-i="'+t.id+'">Copiar corregido (normal)</button><button class="btn g" data-a="co" data-i="'+t.id+'">Copiar original</button></div>'+
+   '<div class="lbl" style="margin-top:14px">Qué corregí y por qué</div><ul>'+t.cambios.map(function(c){return '<li>'+esc(c)+'</li>'}).join('')+'</ul>'+
+   (t.sugerencias&&t.sugerencias.length?'<div class="lbl" style="margin-top:12px">Para que decidas</div><ul>'+t.sugerencias.map(function(c){return '<li>'+esc(c)+'</li>'}).join('')+'</ul>':'')+'</div>'});
+  D.esquemas.filter(function(e){return e.informe===inf.n}).forEach(function(e){
+   h+='<div class="card" id="esquema-'+e.id+'"><div class="hd"><span class="n">Esquema '+e.id+'</span><h3>Esquema de '+e.tipo.toLowerCase()+' · práctica '+e.informe+'</h3><span class="tag '+e.estado+'">'+e.estado+'</span></div>'+
+   '<div class="sch">'+e.svg+'</div>'+
+   '<div class="row"><button class="btn" data-a="ci" data-i="'+e.id+'">Copiar imagen</button><button class="btn g" data-a="dp" data-i="'+e.id+'">Descargar PNG</button><button class="btn g" data-a="ds" data-i="'+e.id+'">Descargar SVG</button><button class="btn g" data-a="cs" data-i="'+e.id+'">Copiar notas</button></div>'+
+   '<div class="lbl" style="margin-top:14px">Qué encontré (de la '+esc(e.foto)+')</div><ul>'+e.hallazgos.map(function(c){return '<li>'+esc(c)+'</li>'}).join('')+'</ul></div>'})});
+ $('app').innerHTML=h;
+ $('out').onclick=function(){try{sessionStorage.removeItem('tp')}catch(x){}location.reload()};
+ $('app').onclick=function(ev){var b=ev.target.closest('button[data-a]');if(!b)return;var a=b.dataset.a,i=b.dataset.i;
+  if(a[0]==='c'&&'cu cn co'.indexOf(a)>=0){var t=S['t'+i];copy(a==='cu'?t.corregido.toUpperCase():a==='cn'?t.corregido:t.original)}
+  else{var e=S['e'+i];
+   if(a==='ci'){svgToPng(e.svg,2).then(function(bl){if(navigator.clipboard&&window.ClipboardItem){return navigator.clipboard.write([new ClipboardItem({'image/png':bl})]).then(function(){toast('Imagen copiada')})}dl(bl,'esquema-'+i+'.png');toast('Tu navegador no copia imágenes: la descargué')}).catch(function(){toast('No se pudo copiar la imagen')})}
+   else if(a==='dp'){svgToPng(e.svg,2).then(function(bl){dl(bl,'esquema-'+i+'.png')})}
+   else if(a==='ds'){dl(new Blob([e.svg],{type:'image/svg+xml'}),'esquema-'+i+'.svg')}
+   else if(a==='cs'){copy('Esquema '+i+' ('+e.tipo+', práctica '+e.informe+')\n'+e.hallazgos.map(function(x){return '- '+x}).join('\n'))}}};
+ if(location.hash){var el=document.getElementById(location.hash.slice(1));if(el)el.scrollIntoView()}}
+async function open(pass,silent){
+ $('go')&&($('go').disabled=true);
+ try{var d=await (await fetch('data.json',{cache:'no-store'})).json();var D=await decrypt(pass,d);try{sessionStorage.setItem('tp',pass)}catch(x){}render(D)}
+ catch(e){var er=$('er');if(er&&!silent)er.textContent='Contraseña incorrecta.';if($('go'))$('go').disabled=false;try{sessionStorage.removeItem('tp')}catch(x){}}}
+$('f').onsubmit=function(ev){ev.preventDefault();var v=$('pw').value;if(v)open(v)};
+var sp='';try{sp=sessionStorage.getItem('tp')||''}catch(e){}
+if(sp)open(sp,true);
+})();
+</script></body></html>
