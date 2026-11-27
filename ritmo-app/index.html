@@ -204,6 +204,8 @@ input[type=range].ez::-webkit-slider-thumb{-webkit-appearance:none;width:22px;he
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zM12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/></symbol>
 <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-vol" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7"/></symbol>
 <symbol id="i-expand" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></symbol>
 <symbol id="i-pencil" viewBox="0 0 24 24"><path d="M4 20l4-1 11-11-3-3L5 16zM14 6l3 3"/></symbol>
 <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></symbol>
@@ -648,6 +650,49 @@ var stl=document.createElement('style');stl.textContent='#lyrTools{display:none}
 MODES.push(['amoled','Negro total']);ACC.push(['Turquesa','#2dd4bf'],['Dorado','#e8b84a'],['Rojo','#ef4444'],['Lima','#a3e635']);
 var _lyrToggle=lyrToggle;lyrToggle=function(){_lyrToggle();if(!lyrOn)$('pl').classList.remove('lyrFull')};$('cLy').onclick=lyrToggle;
 var _lyrLoad=lyrLoad;lyrLoad=function(f){var o=DB.lyrOv[ST.id];if(o&&ST.id){LY.id=ST.id;LY.act=-1;var syn=/\[\d+:\d+/.test(o);LY.res=syn?{synced:o,src:'tuya'}:{plain:o,src:'tuya'};lyrShow();return}_lyrLoad(f)};
+/* ===== Ajustes en pantalla propia, por grupos ===== */
+var ACCN=ACC;
+var _view2=view_;view_=function(v){if(v.t==='settings')return {t:'Ajustes',h:settingsHtml()};return _view2(v)};
+settings=function(){closeSheet();if(top().t!=='settings')go({t:'settings'});else render('f')};
+function sRow(icn,label,val,st,extra){return '<div class="sr press" data-st="'+st+'"'+(extra||'')+'><span class="si">'+ic(icn)+'</span><span class="sl">'+label+'</span><span class="sv">'+(val==null?'':val)+'</span>'+ic('chev','','font-size:13px;opacity:.5')+'</div>'}
+function sTog(icn,label,on,st,sub){return '<div class="sr" data-st="'+st+'"><span class="si">'+ic(icn)+'</span><span class="sl">'+label+(sub?'<small>'+sub+'</small>':'')+'</span><div class="tg'+(on?' on':'')+'"></div></div>'}
+var SORTN={t:'Título',a:'Artista',n:'Más nuevas',d:'Duración'};
+function settingsHtml(){
+ var th={oscuro:['#08080c','#15151d','Oscuro'],azul:['#0a1430','#13224a','Azul noche'],claro:['#f4f4f7','#ffffff','Claro'],amoled:['#000000','#101010','Negro total']};
+ var h='<div class="lt">Ajustes</div>';
+ h+='<div class="sgt">Apariencia</div><div class="sg"><div class="sp"><div class="spt">Tema</div><div class="thm">'+Object.keys(th).map(function(k){var o=th[k],on=DB.mode===k;return '<div class="th press'+(on?' on':'')+'" data-st="mode" data-v="'+k+'"><div class="thp" style="background:'+o[0]+'"><i style="background:'+o[1]+'"></i><i style="background:'+o[1]+';width:60%"></i><b style="background:var(--acc)"></b></div><span>'+o[2]+'</span></div>'}).join('')+'</div></div>'+
+  '<div class="sp"><div class="spt">Color de acento <span class="sv">'+ACC[DB.acc][0]+'</span></div><div class="swg">'+ACC.map(function(a,i){return '<button class="swc press'+(DB.acc===i?' on':'')+'" data-st="acc" data-v="'+i+'" style="background:'+a[1]+'" aria-label="'+a[0]+'">'+(DB.acc===i?ic('check'):'')+'</button>'}).join('')+'</div></div></div>';
+ h+='<div class="sgt">Reproducción</div><div class="sg">'+sRow('wave','Transición entre canciones',DB.xf?DB.xf+' s':'Sin pausas','xf')+sRow('speed','Velocidad',(ST.speed||1)+'x','speed')+sRow('eq','Ecualizador',DB.eq.on?'Activado':'Apagado','eq')+sRow('timer','Temporizador para dormir',ST.sleep>0?'Activo':'Apagado','sleep')+sTog('vol','Volumen parejo',DB.norm,'norm','Usa ReplayGain si el archivo lo trae')+'</div>';
+ var hid=Object.keys(DB.hide).length;
+ h+='<div class="sgt">Biblioteca</div><div class="sg">'+sRow('list','Ordenar canciones',SORTN[DB.sort]||'Título','sort')+sRow('disc','Buscar música de nuevo',null,'rescan')+(hid?sRow('tag','Canciones ocultas',hid,'unhide'):'')+'</div>';
+ h+='<div class="sgt">Computadora</div><div class="sg">'+sRow('wave','Escuchar en la computadora',(function(){try{return JSON.parse(nat('remoteInfo')||'{}').on?'Activado':'Apagado'}catch(e){return 'Apagado'}})(),'remote')+'</div>';
+ h+='<div class="sgt">Privacidad</div><div class="sg">'+sTog('mic','Buscar letras en internet',!!DB.lyrOnline,'lyrnet','Envía título, artista y duración a LRCLIB')+sRow('trash','Borrar historial de reproducciones',null,'clear','')+'</div>';
+ h+='<div class="sgt">Acerca de</div><div class="sg">'+sRow('down','Buscar actualizaciones',null,'upd')+'<div class="sr" style="display:block"><span class="sl" style="display:block;opacity:.85">Nova Music '+(window.APK_NAME||'')+' · contenido v'+(window.APP_VERSION||0)+'</span><span id="ustat" class="sv" style="display:block;margin-top:2px;text-align:left"></span></div></div>';
+ h+='<div style="text-align:center;margin:26px 0 8px;opacity:.9"><img class="dlogo" alt="daij studio" src="'+((document.querySelector('.dlogo')||{}).src||'')+'" style="height:70px;width:auto"></div><div class="about" style="text-align:center;margin:0 0 14px">Tu música no sale del teléfono.</div>';
+ return h}
+function pick(title,opts,cur,cb){window.__pickCb=cb;sheet('<h3>'+title+'</h3><div class="sg" style="margin:12px 0 0">'+opts.map(function(o){return '<div class="sr press" data-st="pick" data-v="'+o[0]+'"><span class="sl">'+o[1]+'</span>'+(String(o[0])===String(cur)?ic('check','','color:var(--acc)'):'')+'</div>'}).join('')+'</div>')}
+document.addEventListener('click',function(ev){var el=ev.target.closest&&ev.target.closest('[data-st]');if(!el)return;var s=el.dataset.st,v=el.dataset.v;
+ ev.stopPropagation();ev.preventDefault();
+ if(s==='mode'){DB.mode=v;save();look();render('f')}
+ else if(s==='acc'){DB.acc=+v;save();look();render('f')}
+ else if(s==='xf')pick('Transición entre canciones',[[0,'Sin pausas (enlazadas)'],[3,'Mezclar 3 segundos'],[6,'Mezclar 6 segundos'],[9,'Mezclar 9 segundos'],[12,'Mezclar 12 segundos']],DB.xf||0,function(x){DB.xf=+x;save();sendAudio()});
+ else if(s==='sort')pick('Ordenar canciones por',[['t','Título'],['a','Artista'],['n','Más nuevas'],['d','Duración']],DB.sort,function(x){DB.sort=x;save()});
+ else if(s==='pick'){var cb=window.__pickCb;closeSheet();if(cb)cb(v);setTimeout(function(){if(top().t==='settings')render('f')},60)}
+ else if(s==='speed')speedSheet();
+ else if(s==='eq')eqSheet();
+ else if(s==='sleep')sleepSheet();
+ else if(s==='norm'){DB.norm=!DB.norm;save();sendAudio();el.querySelector('.tg').classList.toggle('on',DB.norm)}
+ else if(s==='lyrnet'){DB.lyrOnline=!DB.lyrOnline;save();el.querySelector('.tg').classList.toggle('on',DB.lyrOnline)}
+ else if(s==='rescan'){loaded=false;nat('scan');if(DEMO)setTimeout(function(){setLib(DEMO_LIB())},300);toast('Buscando música…')}
+ else if(s==='unhide'){DB.hide={};save();setLib(RAWLIB);render('f')}
+ else if(s==='remote')remoteSheet();
+ else if(s==='clear'){sheet('<h3>¿Borrar el historial?</h3><div class="sub">Se borran las reproducciones, las recientes y tu resumen. Tus favoritas y listas no se tocan.</div><div class="btns" style="margin-top:14px"><button class="bt press" data-st="clear2" style="color:#ff5a5a">Borrar historial</button><button class="bt press" data-s="x" onclick="document.getElementById(\'ov\').click()">Cancelar</button></div>')}
+ else if(s==='clear2'){DB.plays={};DB.recent=[];DB.log=[];save();closeSheet();render('f');toast('Historial borrado')}
+ else if(s==='upd'){if(window.__ambCheck)window.__ambCheck()}
+},true);
+var stl2=document.createElement('style');stl2.textContent='.sgt{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);margin:22px 22px 8px}.sg{background:var(--card);border-radius:18px;margin:0 16px;overflow:hidden}.sr{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);min-height:54px}.sg>.sr:last-child{border-bottom:0}.sr .si{width:30px;height:30px;border-radius:9px;background:var(--acc);color:#fff;display:grid;place-items:center;font-size:17px;flex:none}.sr .sl{flex:1;font-size:15.5px;min-width:0}.sr .sl small{display:block;font-size:12px;color:var(--mut);margin-top:1px}.sr .sv{color:var(--mut);font-size:14px;text-align:right}.sp{padding:14px 16px;border-bottom:1px solid var(--line)}.sp:last-child{border-bottom:0}.spt{font-size:13px;color:var(--mut);font-weight:600;margin-bottom:10px;display:flex;justify-content:space-between}.thm{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.th{text-align:center;font-size:12px;color:var(--mut);font-weight:600}.thp{height:64px;border-radius:12px;border:2px solid var(--line);padding:8px;position:relative;margin-bottom:6px;overflow:hidden}.thp i{display:block;height:7px;border-radius:4px;margin-bottom:5px;width:85%}.thp b{position:absolute;left:8px;bottom:8px;width:16px;height:6px;border-radius:3px}.th.on .thp{border-color:var(--acc)}.th.on{color:var(--tx)}.swg{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 8px;justify-items:center}.swc{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:22px;box-shadow:inset 0 0 0 2px rgba(255,255,255,.12);border:3px solid transparent;background-clip:padding-box}.swc.on{border-color:var(--tx);box-shadow:none}.swc .i{stroke-width:2.6}';document.head.appendChild(stl2);
+$('bSet').onclick=settings;
+
 $('bSet').onclick=settings;$('cQu').onclick=queueSheet;
 sendAudio();
 
